@@ -1,0 +1,40 @@
+"""V1 bounded continuation feedback plus read-only GUI static preflight."""
+from pathlib import Path
+import ast, collections, hashlib, json, re
+from html.parser import HTMLParser
+M=Path('F:/CGKN-LeanLoop-V1-20261101/migration/veriarbor')
+R=Path('F:/CGKN-ITER-132/production-core-convergence-v1/promotion/run-05')
+def read(p):return json.loads(p.read_text(encoding='utf-8'))
+def put(p,d):
+    with p.open('x',encoding='utf-8') as f:json.dump(d,f,indent=2)
+source=R/'candidate/early_main.py';text=source.read_text(encoding='utf-8')
+tree=ast.parse(text)
+html=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign)
+          and any(isinstance(t,ast.Name) and t.id=='INDEX_HTML' for t in n.targets))
+class Tags(HTMLParser):
+    def __init__(self):super().__init__();self.ids=[];self.testids=[];self.media=[]
+    def handle_starttag(self,tag,attrs):
+        a=dict(attrs)
+        if 'id' in a:self.ids.append(a['id'])
+        if 'data-testid' in a:self.testids.append(a['data-testid'])
+        if tag in {'img','video'}:self.media.append({'tag':tag,'id':a.get('id')})
+t=Tags();t.feed(html)
+refs=set(re.findall(r'getElementById\([\"\x27]([^\"\x27]+)[\"\x27]\)',html))
+preflight={'kind':'StaticGUIBoundaryPreflight','source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+    'duplicate_ids':[k for k,v in collections.Counter(t.ids).items() if v>1],
+    'duplicate_testids':[k for k,v in collections.Counter(t.testids).items() if v>1],
+    'missing_literal_getElementById_targets':sorted(refs-set(t.ids)), 'media_elements':t.media,
+    'dynamic_selectors_and_business_enabled_state':'Require actual browser check; static scan cannot grant PASS.',
+    'host_business_patches':0}
+pf=M/'GUI_BLOCK_V1_PREFLIGHT.json';put(pf,preflight)
+d=read(M/'continuation-feedback/veriarbor-37.json');f=d['feedback']
+refs=[str(M/'BLOCK_PORT_V1_BASELINE.json'),str(M/'BLOCK_PORT_SHADOW_RESULTS.json'),str(M/'M6_MEDIA_LOADER_DIAGNOSIS.json'),str(pf)]
+f['strategy_constraints']=[]
+f['milestone_completion_request']='User BLOCK_PORT_V1 supersedes earlier fullfile-only and whole-chain-refresh instructions. CURRENT canonical M11 failure already recorded128: valid imported media wrongly rejected by M6. Do not remeasure or add129 duplicate; current VerificationKey rejects it. Repair original86 remaining wrong module resolution only, preserve its now-correct3argcall and unchanged M1-M5/117. Use exact bounded patch or fullfile as appropriate; full_file_write constraint REMOVED, no requirement to setfalse/true. Required M11 local composition is media resolution/validation -> approval/publish handoff -> receiptmedia binding -> realGUIpreview.89 owns missing/broken/stale media validation before publish side effects,91 soleGUIwriter owns attach/save/preview/review/approve/publish/receipt. Read actual canonical media contract/module identity, neverguessM5 filename. Keep34meaningfulM11tests; restoreSTALEclaimcoverage at87 without weakening existing assertions. Existingsource repair may invalidate its direct checks; run only necessary local original checks. Newly independently verified same-boundary owner replacement now permits certified dependency acceptance reuse; do NOT refreshM8/M9/M10 merely because sourcehashchanged. Existing terminal stale observers retire without replay. After local fixes perform originalM11verticalslice and negative missing/broken/stale/changed-after-approval/idempotency cases, then M12 complete realGUI/startup/config/navigation/scheduler/analytics/restart/docs/packaging. Final GoalAcceptance and canonical delivery/accounting/Corpus unchanged; retained finaltest fixture debts must be repaired by original testowners, not waived.'
+f['admission_correction']='Prior37 blocked because full_file_writefalse matched forbiddenfamily. V1 removes that obsolete fullfile-only constraint; keep current exact owner86 scope/deps and evidence; choose a bounded executable delta. Strategy still requires problem and2named mechanisms plus hypothesis current evidence array. No duplicate existing failure measurement. Return exact JSON, no prose. Do not use guessedmodule filenames or insert unusedhelper. Preserve original contract/effect semantics.'
+f['gui_writer_policy']='91 singlewriter for early_main.py. Read deterministic preflight ref: noimg/video means previewmissing; fix actual DOM/mediaendpoint/event path coherently, not merelabel. VerifyuniqueIDs/testids/selectorclosure and actual enabled state in browser. Preserve alreadyworkingM7workflow.'
+f['fresh_runtime_diagnosis']={'current_M11':'128 canonical1/2 ValueError media missing for valid imported asset','M6_source_sha256':'db223502ff57164389978d41cde5d9f850c756a714f9c8b5fd9085ffea27d511','canonical_media':'milestones/milestone_dbb8341c8910593063a8/api.py','gui_static_preflight':preflight,'evidence_refs':refs,'prior_debts':str(M/'continuation-feedback/veriarbor-33.json'),'upstream_unknowns':6,'V1_limits':'Currentlegacycontractsopaqueexact; genericpartialtypedcompatibilitydoesnotgrantproductPASS; historicalDAGrawdependencyretryremainsconservative.'}
+f['cost_policy']='QwenFlash Agent/Worker; deterministicfirst; noPro/Max for modulepath/JSON/schema/staleevidence. PreserveallUNKNOWNs; neverreplay.'
+f['redecision']={'strategy_revision':hashlib.sha256(b'user BLOCK_PORT_V1 exact bounded path repair remove obsolete fullfilefalse ban current128 independentfailure').hexdigest(),'reason':'Explicit new user architecture and bounded local repair policy replaces old fullfile-only strategy constraint; current128failure is sufficient and must not be remeasured. V1 compatibility/certificate/dedup integration passed library and host smoke/regression; no product source edits by host.','evidence_refs':refs}
+put(M/'continuation-feedback/veriarbor-38.json',d)
+print(json.dumps({'feedback':'veriarbor-38','preflight':preflight}))

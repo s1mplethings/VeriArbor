@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,hashlib
+M=Path('F:/CGKN-LeanLoop-V1-20261101/migration/veriarbor')
+R=Path('F:/CGKN-ITER-132/production-core-convergence-v1/promotion/run-05')
+S=R/'state/iter132-promotion-studio/promotion-05'
+def read(p):return json.loads(p.read_text(encoding='utf-8'))
+data=read(M/'continuation-feedback/veriarbor-33.json');f=data['feedback']
+f['milestone_completion_request']='The one-time observer122 refresh is DONE and current M11 sourcee4737c44 has canonical FAILED evidence. Do not retry122 again on unchanged source, and do not rewrite successful117. The NEXT bounded business action is REPAIR_IMPLEMENTATION on ORIGINAL M6 approval writer86, using its own original approval API scope only, after reading the current table and binding its exact failure refs. Implement actual missing/broken media reference validation before approval, independent of media.get being called. Preserve M6 public behavior and unrelated verified artifacts. Separate subsequent M7 publish owner89 and real early GUI preview owner91 repairs, each under its own original owner contract. Current meaningful34tests retain5failures; do not delete/skip/weaken them. Test118a6 local effects are reconciled NOT_APPLIED, upstreamUNKNOWN preserved, no old request replay. After source changes, run the affected original independent checks only as required by current version; an old startup refresh instruction must not trigger recurring unchanged checks. Continue M11, M12, prior final-test debts, original canonical packaging/delivery/accounting/provenance/Corpus. Do not claim completion from paths or model selftest alone.'
+f['admission_correction']='For next existing sourceowner86 use action4 task_kind3, exact current scope ID for milestones/milestone_33270fed0c9054f5ae04/api.py and its original dependencies. Target117 is already complete;122 is current FAILED, no stale-retry action needed on current bytes. Scope IDs are from current table, not owner node IDs. hypothesis.falsifying_evidence must be an ARRAY of exact current failure refs. Strategy must name actual validation boundary and data ownership, not promise that a helper exists. Add a legitimate admitted read dependency only when needed; never create cycles or overwrite another owner. On a bounded patch correction, change only the listed field.'
+f['gui_writer_policy']='Current source117e4737c44 preserved; current122already refreshed. Separate owner86 approval,89 publication,91 earlyGUI preview. Keep unrelated verified source and public acceptance unchanged.'
+last=max((S/'attempts/sem-node-0122').glob('*.json'),key=lambda p:p.stat().st_mtime)
+ref={'path':str(last),'sha256':hashlib.sha256(last.read_bytes()).hexdigest()}
+f['fresh_runtime_diagnosis']['canonical_current_refresh']=ref
+f['fresh_runtime_diagnosis']['consumed_instruction']='33 FIRST-refresh instruction was followed twice; both complete, sourceunchanged. This continuation replaces that instruction with direct originalowner repair. No failure or cost erased.'
+f['redecision']={'strategy_revision':hashlib.sha256(('consume-initial-refresh-on-e4737c44-owner86-'+ref['sha256']).encode()).hexdigest(),
+ 'reason':'Current original observer122 now measures sourcee4737c44 and confirms FAILED. Remove consumed one-time refresh instruction that caused a redundant measurement; execute distinct remaining original approval-owner validation repair with the current bound failure. Preserve prior rejection and measurement history.',
+ 'evidence_refs':[str(last),str(M/'m11-generated-tests-e4737c44/receipt.json'),str(M/'M11_TEST_EFFECT_RECONCILIATION.json')]}
+dest=M/'continuation-feedback/veriarbor-34.json';assert not dest.exists();dest.write_text(json.dumps(data,indent=2),encoding='utf-8');print(dest)

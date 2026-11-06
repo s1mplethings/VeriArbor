@@ -1,0 +1,23 @@
+from pathlib import Path
+import hashlib,json
+M=Path('F:/CGKN-LeanLoop-V1-20261101/migration/veriarbor');R=Path('F:/CGKN-ITER-132/production-core-convergence-v1/promotion/run-05');S=R/'state/iter132-promotion-studio/promotion-05'
+def read(p):return json.loads(p.read_text(encoding='utf8'))
+source=hashlib.sha256((R/'candidate/main.py').read_bytes()).hexdigest();assert source.startswith('f269c86e')
+check=read(S/'goal_acceptance.json')['checks'][-1]
+assert check['subjects']['main.py']==source and check['verdict']=='FAILED' and check['observation']['checker_version']=='qualified-revision-11'
+assert not any(n['status']=='RUNNING' for n in read(S/'run_state.json')['nodes'].values())
+evidence={'path':f"attempts/{check['node_id']}/{check['attempt_id']}.json",'receipt_hash':check['receipt_hash']}
+feedback=read(M/'continuation-feedback/veriarbor-97.json');f=feedback['feedback'];text=(R/'candidate/main.py').read_text(encoding='utf8')
+f['milestone_completion_request']='Repair existing143 B02 remaining adapter dispatch ONLY. Actual36 changedsource but explicit M1+media.import is still incorrectly rerouted toM11. Additionally every milestone now runs under one media lock, regressing original unrelated-operation concurrency. Original server-path import now works and must stay supported. Independent qualified checker11 confirms both defects on current source. Preserve working image/video frontend, media-serving, original ThreadingHTTPServer and M1-M11 modules. One bounded attempt then hold; no fullM12/noFINISH.'
+f['fresh_runtime_diagnosis']={'current_block':'B02','source_sha256':source,'native_failure':evidence,'checker':'qualified-revision-11','observed':check['observation']['observed'],'qualification':str(M/'B02_DISPATCH_CHECKER_QUALIFICATION/receipt.json'),'working':'Original ServerPathPort and browser image/video now work; keep all GUI and media serving byte-identical.','failure':'handle chooses handler using explicit milestone, but its browser-data media.import branch ignores that milestone and _media_import_adapter hard-codes M11. _media_store_call currently always acquires one media lock even when passed M1/M4/etc. Restrict adapter behavior and shared-store coordination to the actual M11 boundary; unrelated handlers must remain independently runnable.'}
+f['admission_correction']='Repair143 falsifying_evidence must be JSON array containing exactly current native failure '+json.dumps(evidence)+'. No stale158/157. Strategy must explicitly preserve original dispatch and limit media-store coordination to actual M11 boundary. No business patch is supplied; independently author exact scoped edits.'
+for constraint in f['strategy_constraints']:constraint['evidence_refs']=[evidence]
+p=f['bounded_patch_policy'];p['files']['main.py'].update(source_sha256=source,ranges=[[text.index('def handle(data_dir, request):')-4,text.index('class ThreadedHTTPServer')]],max_changed_chars=18000)
+p['acceptance_requirements']=[
+ 'Current actual failure: explicit M1 request carrying valid browser media data must reach original M1 and be rejected, never call M11 or import any media. Only actual M11 browser import may enter the temporary-file adapter. Existing M11 server-path import remains supported.',
+ 'Preserve existing media-store coordination for real M11 media operations. Unrelated M1/M4 handler calls must overlap when they wait on each other; one global serialization lock across all handlers is a regression. Maintain ThreadingHTTPServer and original backend semantics; no retry masking or second store.',
+ 'Only handle and adjacent media adapter helper region may change. _serve_media already delegates through handle; do not edit it. All frontend and M1-M11 code read-only. Current scoped patch gate is unchanged, do not bridge forbidden sections.',
+ 'Full B02 certification requires39checks including PNG/MP4 upload+decodedpreview+exactbytes, negative inputs, cleanup, existingpath, explicitmilestone,12concurrentreads, unrelatedmilestoneconcurrency, processrestart andprojectisolation. OneWorkerattempt; source delta beforebrowser.']
+f['redecision']={'strategy_revision':hashlib.sha256(json.dumps(f['fresh_runtime_diagnosis'],sort_keys=True).encode()).hexdigest(),'reason':'Current source delta exposes exact remaining dispatch bypass and new unrelated-concurrency regression, independently qualified and native sealed','evidence_refs':[str(S/evidence['path']),str(M/'B02_DISPATCH_CHECKER_QUALIFICATION/receipt.json')]}
+with (M/'continuation-feedback/veriarbor-100.json').open('x',encoding='utf8') as stream:json.dump(feedback,stream,ensure_ascii=False,indent=2)
+print(json.dumps({'native':evidence,'source':source,'ranges':p['files']['main.py']['ranges']}))
