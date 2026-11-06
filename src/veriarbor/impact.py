@@ -10,7 +10,8 @@ from dataclasses import asdict, dataclass
 
 from .adapter import Adapter
 from .block import Block
-from .compatibility import PortCompatibility as C, compare_blocks, compare_ports
+from .compatibility import (PortCompatibility as C, compare_blocks,
+                            compare_effects, compare_ports)
 from .contract import schema_subset
 from .dedup import VerificationKey, verification_disposition
 from .expansion import next_hop, progressive_boundary_expansion
@@ -43,10 +44,14 @@ class ImpactPlan:
     reuse: tuple[tuple[str, str], ...]
     unresolved: tuple[str, ...] = ()
     unmapped_inputs: tuple[str, ...] = ()
+    unmapped_consumers: tuple[str, ...] = ()
+    consumer_reuse_allowed: bool = False
+    reuse_gate: str = "BLOCKED_UNPROVEN_UPSTREAM"
 
     def retest(self):
         """Nodes with no reusable/current evidence disposition."""
-        return tuple(node.node_id for node in self.impacted if node.reuse == "EXECUTE")
+        return tuple(node for node, value in self.reuse
+                     if value in {"EXECUTE", "UNVERIFIED"})
 
     def as_dict(self):
         return asdict(self)
@@ -99,6 +104,8 @@ def plan_impact(
     authenticated_keys: dict[str, str] | None = None,
     input_producers: dict[str, str] | None = None,
     producer_ports: dict[str, dict[str, Port]] | None = None,
+    unmapped_consumers: tuple[str, ...] | list[str] | None = None,
+    external_context_unchanged: bool = False,
     expand_breaking: bool = True,
 ) -> ImpactPlan:
     """Compute the affected nodes, required checks and evidence reuse.
@@ -116,6 +123,12 @@ def plan_impact(
     the exact key fingerprint the host has authenticated; without it no key is
     eligible for reuse.  Missing/stale keys never imply reuse.
 
+    Consumer reuse on an IDENTICAL boundary additionally requires the changed
+    block to have a current authenticated PASS key and
+    ``external_context_unchanged=True``.  Structural port identity alone never
+    authorizes skipping downstream tests.  ``unmapped_consumers`` keeps missing
+    port-level edges in the retest scope.
+
     Only direct BREAKING consumers expand one hop through ``adjacency``; the
     expansion never recurses.  The returned ``expanded`` set is the next
     frontier if the caller wants another explicit round.
@@ -132,17 +145,34 @@ def plan_impact(
     authenticated_keys = authenticated_keys or {}
     input_producers = input_producers or {}
     producer_ports = producer_ports or {}
+    unmapped_consumers = tuple(sorted(set(unmapped_consumers or ())))
 
     block_relation = compare_blocks(old_block, new_block)
+    block_level_break = (compare_effects(old_block.effect_contract,
+                                         new_block.effect_contract) == C.BREAKING
+                         or old_block.capability != new_block.capability)
     changed_reuse = _reuse(
         changed, new_keys, observations, "EXECUTE",
         authenticated_keys=authenticated_keys,
         stale_key=old_keys.get(changed) if old_block != new_block else None,
     )
+    changed_is_current = changed_reuse == "REUSE_PASS"
+    if old_block == new_block:
+        consumer_reuse_allowed = True
+        reuse_gate = "NO_BOUNDARY_CHANGE"
+    elif changed_is_current and external_context_unchanged and not unmapped_consumers:
+        consumer_reuse_allowed = True
+        reuse_gate = "CURRENT_CHANGED_KEY_AND_CONTEXT"
+    else:
+        consumer_reuse_allowed = False
+        reuse_gate = ("BLOCKED_UNMAPPED_CONSUMERS" if unmapped_consumers
+                      else "BLOCKED_UNPROVEN_UPSTREAM")
     impacted = [ImpactedNode(changed, block_relation.value,
                              _checks(block_relation, changed), (),
                              "changed block artifact/boundary", changed_reuse)]
     reuse = {changed: changed_reuse}
+    for node_id in unmapped_consumers:
+        reuse.setdefault(node_id, "EXECUTE")
     unaffected: list[str] = []
     breaking: list[str] = []
     unmapped_inputs: list[str] = []
@@ -176,21 +206,30 @@ def plan_impact(
             if list(C).index(relation) > list(C).index(worst):
                 worst = relation
 
+        if not changed_ports and block_level_break:
+            worst = C.BREAKING
+            changed_ports.append("<effect>")
         if not changed_ports:
             unaffected.append(consumer)
-            reuse[consumer] = _reuse(
-                consumer, old_keys, observations, "UNVERIFIED",
-                authenticated_keys=authenticated_keys,
-            )
+            if consumer_reuse_allowed:
+                reuse[consumer] = _reuse(
+                    consumer, old_keys, observations, "UNVERIFIED",
+                    authenticated_keys=authenticated_keys,
+                )
+            else:
+                reuse[consumer] = "EXECUTE"
             continue
 
+        node_reuse = _reuse(consumer, new_keys, observations, "EXECUTE",
+                            authenticated_keys=authenticated_keys,
+                            stale_key=old_keys.get(consumer))
+        if not consumer_reuse_allowed and node_reuse in {"REUSE_PASS", "REUSE_RUNNING"}:
+            node_reuse = "EXECUTE"
         node = ImpactedNode(
             consumer, worst.value, _checks(worst, consumer),
             tuple(sorted(set(used_adapters))),
             "dependency output changed: " + ",".join(sorted(set(changed_ports))),
-            _reuse(consumer, new_keys, observations, "EXECUTE",
-                   authenticated_keys=authenticated_keys,
-                   stale_key=old_keys.get(consumer)),
+            node_reuse,
             tuple(sorted(set(unresolved_ports))),
         )
         impacted.append(node)
@@ -216,19 +255,25 @@ def plan_impact(
         if supply in (C.IDENTICAL, C.COMPATIBLE):
             if producer not in reuse:
                 unaffected.append(producer)
-                reuse[producer] = _reuse(
-                    producer, old_keys, observations, "UNVERIFIED",
-                    authenticated_keys=authenticated_keys,
-                )
+                if consumer_reuse_allowed:
+                    reuse[producer] = _reuse(
+                        producer, old_keys, observations, "UNVERIFIED",
+                        authenticated_keys=authenticated_keys,
+                    )
+                else:
+                    reuse[producer] = "EXECUTE"
             continue
         if producer in reuse:
             continue
+        node_reuse = _reuse(producer, new_keys, observations, "EXECUTE",
+                            authenticated_keys=authenticated_keys,
+                            stale_key=old_keys.get(producer))
+        if not consumer_reuse_allowed and node_reuse in {"REUSE_PASS", "REUSE_RUNNING"}:
+            node_reuse = "EXECUTE"
         node = ImpactedNode(
             producer, supply.value, _checks(supply, producer), (),
             "upstream supply incompatible for input " + port_id,
-            _reuse(producer, new_keys, observations, "EXECUTE",
-                   authenticated_keys=authenticated_keys,
-                   stale_key=old_keys.get(producer)),
+            node_reuse,
             (port_id,),
         )
         impacted.append(node)
@@ -241,12 +286,15 @@ def plan_impact(
         for node_id in next_nodes:
             if node_id in reuse:
                 continue
+            node_reuse = _reuse(node_id, new_keys, observations, "EXECUTE",
+                                authenticated_keys=authenticated_keys,
+                                stale_key=old_keys.get(node_id))
+            if not consumer_reuse_allowed and node_reuse in {"REUSE_PASS", "REUSE_RUNNING"}:
+                node_reuse = "EXECUTE"
             node = ImpactedNode(
                 node_id, C.BREAKING.value, _checks(C.BREAKING, node_id), (),
                 "one-hop expansion from breaking boundary",
-                _reuse(node_id, new_keys, observations, "EXECUTE",
-                       authenticated_keys=authenticated_keys,
-                       stale_key=old_keys.get(node_id)),
+                node_reuse,
             )
             impacted.append(node)
             reuse[node_id] = node.reuse
@@ -267,4 +315,7 @@ def plan_impact(
         reuse=tuple(sorted(reuse.items())),
         unresolved=unresolved,
         unmapped_inputs=tuple(sorted(unmapped_inputs)),
+        unmapped_consumers=unmapped_consumers,
+        consumer_reuse_allowed=consumer_reuse_allowed,
+        reuse_gate=reuse_gate,
     )
