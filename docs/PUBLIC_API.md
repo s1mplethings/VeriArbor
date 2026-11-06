@@ -21,6 +21,7 @@ also accepts bytes directly.
 | search | ProofCost, proof_cost, Candidate, pareto, allocate | Calibrated bounds; no acceptance inference |
 | scheduling | ResourceClaim, conflicts, conflict_graph, parallel_batch | Canonical resource identities; existing runtime dispatches |
 | review | ReviewKind, review_kind, evaluator_disposition, qualify_evaluator, review_needed | Actual model identity and control receipts |
+| impact | plan_impact, ImpactPlan, ImpactedNode | Current Block/Port boundaries, explicit adapters, authenticated observations/key fingerprints, input producers |
 | protocols | Archive, EvidenceStore, Acceptance, Executor, EventSink | Concrete implementations remain host-owned |
 
 Dataclass certificates serialize with `as_dict()` and reconstruct with the
