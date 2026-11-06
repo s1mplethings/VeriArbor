@@ -48,12 +48,13 @@ def rows(value, status="PASS", authenticated=True):
     return [{"key": value.fingerprint, "status": status, "authenticated": authenticated}]
 
 
-def safe_gate(new, *, authenticated=None, observations=None):
+def safe_gate(new, *, authenticated=None, observations=None, proofs=None):
     changed = key("b", new)
     return {
         "new_keys": {"b": changed},
         "authenticated_keys": {"b": changed.fingerprint, **(authenticated or {})},
         "observations": {"b": rows(changed), **(observations or {})},
+        "consumer_reuse_proofs": dict(proofs or {}),
         "external_context_unchanged": True,
     }
 
@@ -94,6 +95,9 @@ class ImpactPlanTests(unittest.TestCase):
             }, observations={
                 "c1": rows(old_consumer),
                 "c2": rows(other_consumer),
+            }, proofs={
+                "c1": "sha256:consumer-c1",
+                "c2": "sha256:consumer-c2",
             }),
         )
         self.assertEqual(dict(plan.reuse)["c1"], "REUSE_PASS")
@@ -111,7 +115,8 @@ class ImpactPlanTests(unittest.TestCase):
             consumers={"c1": ("out",), "c2": ("stable",)},
             old_keys={"c2": consumer},
             **safe_gate(new, authenticated={"c2": consumer.fingerprint},
-                        observations={"c2": rows(consumer)}),
+                        observations={"c2": rows(consumer)},
+                        proofs={"c2": "sha256:consumer-c2"}),
         )
         self.assertEqual(plan.block_relation, "COMPATIBLE")
         by_id = {node.node_id: node for node in plan.impacted}
@@ -167,6 +172,7 @@ class ImpactPlanTests(unittest.TestCase):
             new_keys={"b": changed_key},
             authenticated_keys={"b": changed_key.fingerprint,
                                 "c1": consumer.fingerprint},
+            consumer_reuse_proofs={"c1": "sha256:consumer-c1"},
             external_context_unchanged=True,
         )
         self.assertEqual(
@@ -264,7 +270,8 @@ class ImpactPlanTests(unittest.TestCase):
             producer_ports={"p1": {"in": producer}},
             old_keys={"p1": producer_key},
             **safe_gate(new, authenticated={"p1": producer_key.fingerprint},
-                        observations={"p1": rows(producer_key)}),
+                        observations={"p1": rows(producer_key)},
+                        proofs={"p1": "sha256:producer-p1"}),
         )
         self.assertEqual(plan.unaffected, ("p1",))
         self.assertEqual(dict(plan.reuse)["p1"], "REUSE_PASS")
@@ -280,7 +287,7 @@ class ImpactPlanTests(unittest.TestCase):
     def test_observation_alone_is_not_key_authentication(self):
         old, new = block("old"), block("new")
         consumer = key("c1", old)
-        gate = safe_gate(new)
+        gate = safe_gate(new, proofs={"c1": "sha256:consumer-c1"})
         gate["observations"] = {**gate["observations"], "c1": rows(consumer)}
         plan = plan_impact(
             "b", old, new,
@@ -297,6 +304,41 @@ class ImpactPlanTests(unittest.TestCase):
         self.assertEqual(node.relation, "BREAKING")
         self.assertEqual(plan.breaking, ("c1",))
         self.assertEqual(plan.required_adapters, ())
+
+    def test_changed_pass_alone_does_not_authorize_consumer_reuse(self):
+        old, new = block("old"), block("new")
+        consumer = key("c1", old)
+        plan = plan_impact(
+            "b", old, new,
+            consumers={"c1": ("stable",)},
+            old_keys={"c1": consumer},
+            **safe_gate(new, authenticated={"c1": consumer.fingerprint},
+                        observations={"c1": rows(consumer)}),
+        )
+        self.assertEqual(dict(plan.reuse)["c1"], "EXECUTE")
+        self.assertEqual(plan.reuse_gate, "BLOCKED_CONSUMER_SCOPE_UNPROVEN")
+        self.assertIn("c1", plan.retest())
+
+    def test_consumer_scope_proof_is_per_consumer(self):
+        old, new = block("old"), block("new")
+        c1 = key("c1", old)
+        c2 = key("c2", old)
+        gate = safe_gate(new, authenticated={
+            "c1": c1.fingerprint, "c2": c2.fingerprint,
+        }, observations={
+            "c1": rows(c1), "c2": rows(c2),
+        }, proofs={"c1": "sha256:consumer-c1"})
+        plan = plan_impact(
+            "b", old, new,
+            consumers={"c1": ("stable",), "c2": ("stable",)},
+            old_keys={"c1": c1, "c2": c2},
+            **gate,
+        )
+        self.assertEqual(dict(plan.reuse)["c1"], "REUSE_PASS")
+        self.assertEqual(dict(plan.reuse)["c2"], "EXECUTE")
+        self.assertEqual(plan.reuse_gate, "BLOCKED_CONSUMER_SCOPE_UNPROVEN")
+        self.assertIn("c2", plan.retest())
+        self.assertNotIn("c1", plan.retest())
 
     def test_missing_key_never_implies_reuse(self):
         old, new = block("old"), block("new")
@@ -346,7 +388,8 @@ class ImpactPlanTests(unittest.TestCase):
         )
         self.assertEqual(dict(plan_impact(**base).reuse)["c1"], "EXECUTE")
         self.assertEqual(
-            dict(plan_impact(**base, external_context_unchanged=True).reuse)["c1"],
+            dict(plan_impact(**base, external_context_unchanged=True,
+                             consumer_reuse_proofs={"c1": "sha256:consumer-c1"}).reuse)["c1"],
             "REUSE_PASS")
 
     def test_identity_mismatch_is_rejected(self):

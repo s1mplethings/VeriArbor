@@ -13,9 +13,10 @@ remain for new capability completion and final independent acceptance.
 downstream consumers, changed input-side producer supply, explicit adapter
 scope, one-hop breaking expansion and reuse decisions from host-authenticated
 verification-key fingerprints. Structural `IDENTICAL` alone never authorizes
-consumer reuse: the changed block must have a current authenticated PASS and
-the host must explicitly prove the external context unchanged. It does not
-execute or authenticate checks.
+consumer reuse: the changed block must have a current authenticated PASS, the
+host must prove the external context unchanged, and each reused consumer needs
+its own scope proof covering the relevant behavior. It does not execute or
+authenticate checks.
 
 The following older APIs remain compatibility/optional experiments, not V1
 completion gates. `model` carries generic serializable inputs. `graph` validates and reduces the
