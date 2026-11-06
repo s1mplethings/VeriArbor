@@ -1,0 +1,95 @@
+{
+  "kind": "VeriArborMigrationAcceptance",
+  "schema_version": "1",
+  "created_at": "2026-11-06T06:25:00+00:00",
+  "status": "BASELINE_RECORDED_HOST_P11_REFERENCED",
+  "scope": "Library baseline plus host P11 reference; not a product acceptance and not a replacement for historical M12 records.",
+  "library_repository": {
+    "path": "D:\\VeriArbor",
+    "branch": "main",
+    "baseline_commits": [
+      "8204141644bfc6f7def3ba64a5187c40ec59ed9f",
+      "85929556babf5ad8b61dbc4d15d844ff40db67e2",
+      "8caed279adf8740f52e5fd5c64b256e02eb47f5a",
+      "03c583b9e6c10f2b5f3d6d8fffb74b03c9adf32b",
+      "af98ff9c6982fab9bcb966303fef9f8a0e3316a1",
+      "820515bab54bb4d3d4032eb0fcacbf0f3255db9b"
+    ],
+    "source_files": 21,
+    "source_hashes_match_recorded_regression": "21/21",
+    "library_tests": {
+      "command": "D:\\VeriArbor\\.venv\\Scripts\\python.exe -m unittest discover -s tests -v",
+      "ran": 37,
+      "result": "OK",
+      "exit_code": 0
+    }
+  },
+  "host_reference": {
+    "path": "F:\\CGKN-LeanLoop-V1-20261101",
+    "p11_commit": "cf5c754b5e2ed3991010fb1dc91b8f3e19adb3d2",
+    "p11_parent": "0bd7134ade87cb6ece13f8f7868860cd2c3ba67c",
+    "p11_files": [
+      "cgkn/state/provenance.py",
+      "cgkn/state/release_authorization.py",
+      "scripts/final_delivery_truth.py",
+      "scripts/production_candidate_provenance.py",
+      "tools/sign_release_authorization.py"
+    ],
+    "recorded_host_source_sync": {
+      "total": 376,
+      "matching": 373,
+      "p11_changed": 3,
+      "changed_files": [
+        "cgkn/state/provenance.py",
+        "scripts/final_delivery_truth.py",
+        "scripts/production_candidate_provenance.py"
+      ]
+    },
+    "host_integration_tests": {
+      "command": "python -m pytest -q tests/test_veriarbor_block_adapter.py tests/test_veriarbor_substitution_provenance.py",
+      "ran": 7,
+      "result": "passed",
+      "exit_code": 0
+    },
+    "p11_security_tests": {
+      "result": "24/24 PASS",
+      "evidence": "F:\\CGKN-LeanLoop-V1-20261101\\migration\\veriarbor\\P11_FIX_20261106\\P11_P19_RESULTS_FORMAL.json"
+    },
+    "provenance_regression": {
+      "result": "112 passed",
+      "evidence": "F:\\CGKN-LeanLoop-V1-20261101\\migration\\veriarbor\\P11_FIX_20261106\\REGRESSION_FORMAL.txt"
+    },
+    "m12": {
+      "host_status": "VERIFIED",
+      "candidate_main_sha256": "711c051954513eab78261062f46228f7ea757a5857a5624ffd487787697d4237",
+      "bundle_sha256": "f6eb10fb8283b250c28796e0ac95308bb6135e8434f6eef742acc58fbb469f8f",
+      "goal_acceptance_sha256": "c3d55cfd3cb335948728f1153c7dbb675204760574e46c3ad3fdaf83dbd635aa"
+    }
+  },
+  "historical_records": {
+    "migration_receipt_modified": false,
+    "migration_receipt_m12": "FAILED",
+    "product_status": "PRODUCT_NOT_READY",
+    "regression_status": "PASS_FOR_RECORDED_SCOPE",
+    "product_acceptance": "NOT_VERIFIED_BY_THESE_CHECKS",
+    "note": "The old M12=FAILED record is retained as history; this file does not rewrite it."
+  },
+  "excluded_evidence": {
+    "governance/": "raw call-correlation, check logs and source manifests; kept on disk, excluded from Git",
+    "reports/": "large report bundles including a 796 MB ZIP; kept on disk, excluded from Git",
+    "reason": "raw evidence and large logs are not library source and may contain sensitive execution data"
+  },
+  "security": {
+    "trust_anchor": "PENDING_TRUST_ANCHOR",
+    "formal_release_authorization": "NOT_SIGNED",
+    "formal_delivery_status": "PAUSED_PENDING_TRUST_ANCHOR",
+    "new_paid_provider_calls": 0
+  },
+  "not_verified": [
+    "product acceptance",
+    "full Provider/external-asset suite",
+    "M12 in the library migration receipt (historical FAILED)",
+    "real Windows signer/ACL environment",
+    "user-signed release authorization"
+  ]
+}
