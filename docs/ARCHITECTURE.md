@@ -10,9 +10,9 @@ The replacement boundary is input + output + effects, not a module hash.
 Verification proceeds Block -> Edge -> Local Composition; milestone slices
 remain for new capability completion and final independent acceptance.
 `impact.plan_impact` composes those policies into a change plan: affected
-consumers, explicit adapter scope, one-hop breaking expansion and reuse
-decisions from host-authenticated verification keys. It does not execute or
-authenticate checks.
+downstream consumers, changed input-side producer supply, explicit adapter
+scope, one-hop breaking expansion and reuse decisions from host-authenticated
+verification-key fingerprints. It does not execute or authenticate checks.
 
 The following older APIs remain compatibility/optional experiments, not V1
 completion gates. `model` carries generic serializable inputs. `graph` validates and reduces the
