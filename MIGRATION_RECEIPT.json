@@ -1,0 +1,33 @@
+{
+  "status": "CORE_MIGRATION_CHECKPOINT",
+  "library_version": "0.1.0.dev0",
+  "host_switches": 55,
+  "product_status": "PRODUCT_NOT_READY",
+  "M1_M6_baseline": "83 baseline certificates; two identical preserved rebuilds before later integration repairs",
+  "M1_M6": {
+    "M1": "VERIFIED",
+    "M2": "VERIFIED",
+    "M3": "VERIFIED",
+    "M4": "VERIFIED",
+    "M5": "VERIFIED",
+    "M6": "VERIFIED"
+  },
+  "M7": "VERIFIED",
+  "M8_M12": {
+    "M8": "VERIFIED",
+    "M9": "VERIFIED",
+    "M10": "VERIFIED",
+    "M11": "VERIFIED",
+    "M12": "FAILED"
+  },
+  "push_publish": false,
+  "host_business_patches": 0,
+  "regression": "REGRESSION.json",
+  "library_limitations": [
+    "New hierarchical rollup is available; compatibility host rollup retains original predicate structure",
+    "Allocation adapter governs slots, not every model/token/context resource",
+    "Non-chronological host advice uses exact failed strategy identity; no automatic rollback",
+    "General learned-nogood matching is tested; host repeated-no-progress guard is integrated"
+  ],
+  "next": "Continue remaining product milestones and canonical delivery; do not equate migration regression with product acceptance"
+}
