@@ -1,0 +1,8 @@
+{
+  "fixture_kind": "synthetic_bounded_replay",
+  "provenance": "User-provided Anny failure pattern; illustrative metrics, not recovered production measurements",
+  "generic_metric": 0.8,
+  "specialized_metric": 0.6,
+  "profile_influence": true,
+  "provider_calls": 0
+}

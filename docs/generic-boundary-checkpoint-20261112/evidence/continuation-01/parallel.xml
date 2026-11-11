@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="8" time="33.004" timestamp="2026-11-11T22:49:34.209241+08:00" hostname="test"><testcase classname="tests.runtime.test_parallel_qualification" name="test_two_node_barrier_total_wall_below_serial_executor_sum" time="3.205" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_barrier_failure_isolation_retry_and_join" time="7.639"><failure message="AssertionError: assert ('FAILED' == 'SUCCEEDED'&#10;  &#10;  - SUCCEEDED&#10;  + FAILED)">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23505/test_barrier_failure_isolation0')
+
+    def test_barrier_failure_isolation_retry_and_join(tmp_path):
+        tree=tree_of([('A',()),('B',()),('C',('A',)),('D',('A','B')),('E',('B',))])
+        ex=Timed(threading.Barrier(2));ex.fail={'A'};store,runner=run_setup(tmp_path,tree,ex,max_parallel=3)
+        start=time.monotonic();r=run_calibration(runner,project_id='p',run_id='r',tree=tree,dag=compile_tree(tree));wall=time.monotonic()-start
+        assert r.failed_nodes==('A',) and set(r.blocked_nodes)=={'C','D'}
+        assert store.load_result('p','r','E').status==BlockStatus.SUCCEEDED
+        a,b=[next(x for x in ex.times if x['node']==n) for n in ('A','B')]
+        overlap=min(a['end'],b['end'])-max(a['start'],b['start'])
+        assert overlap&gt;1
+        (tmp_path/'parallel-timing.json').write_text(json.dumps({'nodes':ex.times,'overlap_ms':overlap*1000,'wall_seconds':wall}))
+        ex.barrier=None;ex.fail.clear()
+        recovered=run_calibration(runner,project_id='p',run_id='r',tree=tree,dag=compile_tree(tree),retry_node='A')
+&gt;       assert recovered.status=='SUCCEEDED' and set(recovered.actual_executions)=={'A','C','D'}
+E       AssertionError: assert ('FAILED' == 'SUCCEEDED'
+E         
+E         - SUCCEEDED
+E         + FAILED)
+
+tests\runtime\test_parallel_qualification.py:92: AssertionError</failure></testcase><testcase classname="tests.runtime.test_parallel_qualification" name="test_real_local_process_file_sqlite_and_conflict[False]" time="5.416" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_real_local_process_file_sqlite_and_conflict[True]" time="9.705" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_resource_capacity_and_event_appends" time="4.954" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_unknown_effect_checked_before_reconciliation_not_replayed" time="0.615"><failure message="ValueError: RECEIPT_ID_REQUIRED">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23505/test_unknown_effect_checked_be0')
+
+    def test_unknown_effect_checked_before_reconciliation_not_replayed(tmp_path):
+        tree=tree_of([('A',())]);ex=Timed();store,runner=run_setup(tmp_path,tree,ex,max_parallel=2,reconciliation_executors=('verify.effect@1',))
+        c=build_leaf_contract(goal='Inspect reconciled durable effect',kind='INSPECTION',scope=['effect.txt'],
+            acceptance=['committed'],checker='effect',output_identity='effect',effect_domains=['effect'],executor='witness@1',
+            subject='effect.txt',expected_observation='committed bytes',pass_fail_rule='independent disk read')
+        tree=CapabilityTree(tree.goal,(replace(tree.nodes[0],config={**tree.nodes[0].config,'leaf_contract':c}),))
+        runner.registry.register(FileDeliverableChecker(tmp_path,{'committed':lambda root,c:
+            {'passed':(root/'effect.txt').read_text()=='committed','observed':{'bytes':(root/'effect.txt').read_text()}}}))
+        runner.deliverable_checkers['effect']='deliverable.files@1'
+        state=runner._new_state('p','r',compile_tree(tree));state.nodes['A'].status='RUNNING';store.save_run(state)
+        # Simulated controller interruption after a real local effect, before receipt.
+        subprocess.run([sys.executable,'-c',"from pathlib import Path;Path('effect.txt').write_text('committed')"],cwd=tmp_path,check=True)
+        assert run_calibration(runner,project_id='p',run_id='r',tree=tree,dag=compile_tree(tree),resume=True).blocked_nodes==('A',)
+        old=store.load_result('p','r','A');assert old.error.details['outcome_unknown']
+        with pytest.raises(GraphEditRejected,match='UNRESOLVED'):run_calibration(runner,project_id='p',run_id='r',tree=tree,dag=compile_tree(tree),retry_node='A')
+        read=subprocess.run([sys.executable,'-c',"from pathlib import Path;assert Path('effect.txt').read_text()=='committed';print('committed')"],cwd=tmp_path,capture_output=True,check=True)
+        ref=put_evidence(store,'p','r',{'kind':'EffectObservation','stdout':read.stdout.decode(),'returncode':read.returncode,'effect_sha256':hashlib.sha256((tmp_path/'effect.txt').read_bytes()).hexdigest()})
+        checker=BlockExecutionResult(project_id='p',run_id='r',node_id='verify',attempt_id='attempt-0001',executor_ref='verify.effect@1',status=BlockStatus.SUCCEEDED,
+            outputs={'effect_reconciliation':{'source_receipt_hash':digest(old.as_dict()),'disposition':'COMPLETED','evidence_refs':[ref],'recovered_outputs':{'effect':'committed'}}})
+        store.save_result(checker);runner.reconcile_effects('p','r','A',checker)
+&gt;       assert run_calibration(runner,project_id='p',run_id='r',tree=tree,dag=compile_tree(tree),resume=True).status=='SUCCEEDED'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_parallel_qualification.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\calibration_admission.py:57: in run_calibration
+    return runner.run(project_id=project_id,run_id=run_id,tree=tree,dag=dag,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:67: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:190: in _run
+    self._authority(project_id,run_id).validate_execution_result(saved)
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:760: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002066E88F890&gt;
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'A'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+&gt;       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError</failure></testcase><testcase classname="tests.runtime.test_parallel_qualification" name="test_evaluation_overlaps_unrelated_business_and_route_waits" time="0.013"><failure message="veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23505/test_evaluation_overlaps_unrel0')
+
+    def test_evaluation_overlaps_unrelated_business_and_route_waits(tmp_path):
+        from cgkn.executors.task_evaluation import TaskEvaluationExecutor
+        from cgkn.providers import ModelRoleConfig
+        from tests.agent.test_capability_routing_qualification import Evaluator
+        store=FileRunStore(tmp_path/'state');started=threading.Event();routed=threading.Event();times={}
+        class Work:
+            descriptor=ExecutorDescriptor('work@1','deterministic',('*',))
+            def execute(self,r):
+                times[r.node_id+'_start']=time.monotonic()
+                if r.node_id=='B':started.set();assert routed.wait(10)
+                if r.node_id=='route':
+                    assert list((store.run_dir('p','r')/'evaluations').glob('*/*.json'));routed.set()
+                times[r.node_id+'_end']=time.monotonic()
+                return BlockExecutionResult(project_id='p',run_id='r',node_id=r.node_id,attempt_id=r.attempt_id,executor_ref=r.executor_ref,status=BlockStatus.SUCCEEDED,outputs={'node':r.node_id})
+        class Client(Evaluator):
+            def complete(self,**kw):
+                assert started.wait(5);times['evaluation_start']=time.monotonic();out=super().complete(**kw);times['evaluation_end']=time.monotonic();return out
+        reg=ExecutorRegistry();reg.register(Work());reg.register(TaskEvaluationExecutor(store,Client(),ModelRoleConfig('worker','fake')))
+        tree=tree_of([('A',()),('B',()),('evaluate',('A',)),('route',('evaluate',))],ref='work@1')
+        tree=CapabilityTree(tree.goal,tuple(probe_node(n.id,capability_ref='task.evaluate@1',depends_on=n.depends_on,config={**n.config,'executor_ref':'task.evaluate@1','meta_operation':True,'inputs':{'feedback_identity':digest(['p','r','A','attempt-0001']),'evaluation_contract':'2'}}) if n.id=='evaluate' else n for n in tree.nodes))
+&gt;       assert probe_runner(reg,store,max_parallel=3).run(project_id='p',run_id='r',tree=tree,dag=compile_tree(tree)).status=='SUCCEEDED'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_parallel_qualification.py:184: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\qualification_support.py:62: in probe_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_legacy(*, project_id='NOT_APPLICABLE',run_id='NOT_APPLICABLE'):
+        context=_legacy.get()
+&gt;       if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+
+D:\VeriArbor\src\veriarbor\governance.py:194: GovernanceError</failure></testcase><testcase classname="tests.runtime.test_parallel_qualification" name="test_real_controller_process_loss_preserves_completed_sibling" time="0.727"><failure message="AssertionError: Traceback (most recent call last):&#13;&#10;    File &quot;&lt;string&gt;&quot;, line 23, in &lt;module&gt;&#13;&#10;    File &quot;F:\CGKN-LeanLoop-V1-20261101\tests\qualification_support.py&quot;, line 62, in probe_runner&#13;&#10;      return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)&#13;&#10;             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#13;&#10;    File &quot;F:\CGKN-LeanLoop-V1-20261101\cgkn\runtime\dag_runner.py&quot;, line 49, in __init__&#13;&#10;      require_legacy()&#13;&#10;    File &quot;D:\VeriArbor\src\veriarbor\governance.py&quot;, line 194, in require_legacy&#13;&#10;      if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')&#13;&#10;                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#13;&#10;  veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required&#13;&#10;  &#10;assert 1 == 73&#10; +  where 1 = CompletedProcess(args=['D:\\anaconda\\python.exe', '-c', &quot;\nimport os,sys,time,pathlib\nfrom cgkn.execution import Blo...^^^^^^^^^^^\r\nveriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required\r\n').returncode">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23505/test_real_controller_process_l0')
+
+    def test_real_controller_process_loss_preserves_completed_sibling(tmp_path):
+        code=r'''
+    import os,sys,time,pathlib
+    from cgkn.execution import BlockExecutionResult,BlockStatus
+    from cgkn.executors import ExecutorRegistry,ExecutorDescriptor
+    from cgkn.runtime import DAGRunner
+    from cgkn.state import FileRunStore
+    from cgkn.orchestration.execution_dag import compile_tree
+    from tests.runtime.test_parallel_qualification import tree_of
+    from tests.qualification_support import probe_runner
+    root=pathlib.Path(sys.argv[1]);store=FileRunStore(root/'state')
+    class Child:
+     descriptor=ExecutorDescriptor('witness@1','deterministic',('*',))
+     def execute(self,r):
+      if r.node_id=='A':
+       end=time.monotonic()+10
+       while store.load_run('p','r').nodes['B'].status!='SUCCEEDED':
+        if time.monotonic()&gt;end:raise RuntimeError('B not committed')
+        time.sleep(.01)
+       (root/'A-effect').write_text('committed before crash');os._exit(73)
+      (root/'B-effect').write_text('completed')
+      return BlockExecutionResult(project_id='p',run_id='r',node_id=r.node_id,attempt_id=r.attempt_id,executor_ref=r.executor_ref,status=BlockStatus.SUCCEEDED,outputs={'node':r.node_id})
+    reg=ExecutorRegistry();reg.register(Child());tree=tree_of([('A',()),('B',())])
+    probe_runner(reg,store,max_parallel=2).run(project_id='p',run_id='r',tree=tree,dag=compile_tree(tree))
+    '''
+        proc=subprocess.run([sys.executable,'-c',code,str(tmp_path)],capture_output=True,timeout=20)
+&gt;       assert proc.returncode==73,proc.stderr.decode()
+E       AssertionError: Traceback (most recent call last):
+E           File "&lt;string&gt;", line 23, in &lt;module&gt;
+E           File "F:\CGKN-LeanLoop-V1-20261101\tests\qualification_support.py", line 62, in probe_runner
+E             return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "F:\CGKN-LeanLoop-V1-20261101\cgkn\runtime\dag_runner.py", line 49, in __init__
+E             require_legacy()
+E           File "D:\VeriArbor\src\veriarbor\governance.py", line 194, in require_legacy
+E             if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+E                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+E         
+E       assert 1 == 73
+E        +  where 1 = CompletedProcess(args=['D:\\anaconda\\python.exe', '-c', "\nimport os,sys,time,pathlib\nfrom cgkn.execution import Blo...^^^^^^^^^^^\r\nveriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required\r\n').returncode
+
+tests\runtime\test_parallel_qualification.py:216: AssertionError</failure></testcase></testsuite></testsuites>

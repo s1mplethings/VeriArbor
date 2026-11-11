@@ -1,0 +1,24 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls _
+tests\providers\test_domestic_final.py:201: in test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+    assert acceptance.execute(root,'never-read',phase='finish')['state']=='FINISHED'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\domestic_task_acceptance.py:251: in execute
+    result=loop.run(project_id=PROJECT_ID,run_id=RUN_ID,goal=GOAL,planning=planning,constraints=('Only math_utils.py may change','No model retry or repairs in this acceptance'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:321: in _run
+    self.store.immutable_json(root/'agent'/f'context-{number:02d}.json', context.as_dict())
+cgkn\state\store.py:153: in immutable_json
+    raise ValueError('conflicting immutable record: ' + path.name)
+E   ValueError: conflicting immutable record: context-01.json
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\planning-pause-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_domestic_final.py::test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+1 failed in 6.38s

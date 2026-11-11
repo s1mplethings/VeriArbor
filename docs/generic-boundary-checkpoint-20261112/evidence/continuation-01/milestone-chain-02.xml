@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="8" time="37.581" timestamp="2026-11-11T23:29:30.520614+08:00" hostname="test"><testcase classname="tests.agent.test_milestone_worker_chain" name="test_offline_gateway_contract_core_to_existing_delivery" time="10.169"><failure message="AssertionError: {'delivery_status': 'NOT_EVALUATED', 'goal_acceptance': {'checker_bindings': {'independent': 'project.acceptance@1'}, ...:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23533\\test_offline_gateway_contract_0\\candidate', ...}&#10;assert 'BLOCKED' == 'GOALS_VERIFIED'&#10;  &#10;  - GOALS_VERIFIED&#10;  + BLOCKED">tests\agent\test_milestone_worker_chain.py:153: in test_offline_gateway_contract_core_to_existing_delivery
+    assert result['status']=='GOALS_VERIFIED',result
+E   AssertionError: {'delivery_status': 'NOT_EVALUATED', 'goal_acceptance': {'checker_bindings': {'independent': 'project.acceptance@1'}, ...:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23533\\test_offline_gateway_contract_0\\candidate', ...}
+E   assert 'BLOCKED' == 'GOALS_VERIFIED'
+E     
+E     - GOALS_VERIFIED
+E     + BLOCKED</failure></testcase><testcase classname="tests.agent.test_milestone_worker_chain" name="test_offline_explicit_runtime_reverification_uses_same_delivery_gate" time="10.921"><failure message="AssertionError: assert ('BLOCKED' == 'GOALS_VERIFIED'&#10;  &#10;  - GOALS_VERIFIED&#10;  + BLOCKED)">tests\agent\test_milestone_worker_chain.py:183: in test_offline_explicit_runtime_reverification_uses_same_delivery_gate
+    test_offline_gateway_contract_core_to_existing_delivery(tmp_path,monkeypatch,explicit_probe=True)
+tests\agent\test_milestone_worker_chain.py:139: in test_offline_gateway_contract_core_to_existing_delivery
+    assert result['status']=='GOALS_VERIFIED' and result['delivery_status']=='BLOCKED'
+E   AssertionError: assert ('BLOCKED' == 'GOALS_VERIFIED'
+E     
+E     - GOALS_VERIFIED
+E     + BLOCKED)</failure></testcase><testcase classname="tests.agent.test_milestone_worker_chain" name="test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[session]" time="9.507" /><testcase classname="tests.agent.test_milestone_worker_chain" name="test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[application_service]" time="0.029"><failure message="ValueError: conflicting immutable record: execution_authorization.json">tests\agent\test_milestone_worker_chain.py:370: in test_milestone_compiler_worker_independent_failure_repair_and_checkpoint
+    result=service.run_project(project_id='p',run_id='r',workspace=workspace,intent=intent,
+cgkn\application\software_project\service.py:181: in run_project
+    policy,planning=self._execution_authorities(project_id,run_id,store,execution_authorization)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:231: in _execution_authorities
+    store.immutable_json(store.run_dir(project_id,run_id)/'execution_authorization.json',raw)
+cgkn\state\store.py:153: in immutable_json
+    raise ValueError('conflicting immutable record: ' + path.name)
+E   ValueError: conflicting immutable record: execution_authorization.json</failure></testcase><testcase classname="tests.agent.test_milestone_worker_chain" name="test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[profile]" time="1.586"><failure message="AssertionError: assert [] == ['R-value']&#10;  &#10;  Right contains one more item: 'R-value'&#10;  Use -v to get more diff">tests\agent\test_milestone_worker_chain.py:288: in test_milestone_compiler_worker_independent_failure_repair_and_checkpoint
+    document=service.run_profile(profile,goal='return seven')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:100: in decide
+    decision=session.composer.decide(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\composer.py:240: in decide
+    return semantic_decide(self,context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\protocol\adapters.py:96: in semantic_decide
+    compiled,final,stats=exchange(composer.client,composer.config,
+cgkn\protocol\exchange.py:37: in exchange
+    completion=client.complete(system=packed_system,user=encoded(packed),
+cgkn\providers\recording.py:100: in complete
+    result = self.client.complete(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\agent\test_milestone_worker_chain.py:54: in complete
+    assert request['context']['goal_state']['failed']==['R-value']
+E   AssertionError: assert [] == ['R-value']
+E     
+E     Right contains one more item: 'R-value'
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.agent.test_milestone_worker_chain" name="test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[conversation]" time="1.419"><failure message="AssertionError: assert [] == ['R-value']&#10;  &#10;  Right contains one more item: 'R-value'&#10;  Use -v to get more diff">tests\agent\test_milestone_worker_chain.py:272: in test_milestone_compiler_worker_independent_failure_repair_and_checkpoint
+    document=codex_conversation.run_formal_generation_once(tmp_path/'controller',goal='return seven')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:856: in run_formal_generation_once
+    result = service.run_profile(core_profile, goal=goal, on_started=on_started)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:100: in decide
+    decision=session.composer.decide(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\composer.py:240: in decide
+    return semantic_decide(self,context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\protocol\adapters.py:96: in semantic_decide
+    compiled,final,stats=exchange(composer.client,composer.config,
+cgkn\protocol\exchange.py:37: in exchange
+    completion=client.complete(system=packed_system,user=encoded(packed),
+cgkn\providers\recording.py:100: in complete
+    result = self.client.complete(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\agent\test_milestone_worker_chain.py:54: in complete
+    assert request['context']['goal_state']['failed']==['R-value']
+E   AssertionError: assert [] == ['R-value']
+E     
+E     Right contains one more item: 'R-value'
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.agent.test_milestone_worker_chain" name="test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[api_job]" time="1.308"><failure message="AssertionError: assert [] == ['R-value']&#10;  &#10;  Right contains one more item: 'R-value'&#10;  Use -v to get more diff">tests\agent\test_milestone_worker_chain.py:277: in test_milestone_compiler_worker_independent_failure_repair_and_checkpoint
+    codex_conversation.start_generation_from_income(None,'api',tmp_path,tmp_path,'ignored',60,
+scripts\codex_conversation.py:7308: in start_generation_from_income
+    start_agent_generation(client,conversation_id,session_dir,log_dir,model,timeout,
+scripts\codex_conversation.py:7027: in start_agent_generation
+    run_provider_generation_job(client,conversation_id,session_dir,log_dir,model,timeout,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\codex_conversation.py:6625: in run_provider_generation_job
+    result=service.run_profile(profile,goal=combined_requirement(session),on_started=started)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:100: in decide
+    decision=session.composer.decide(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\composer.py:240: in decide
+    return semantic_decide(self,context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\protocol\adapters.py:96: in semantic_decide
+    compiled,final,stats=exchange(composer.client,composer.config,
+cgkn\protocol\exchange.py:37: in exchange
+    completion=client.complete(system=packed_system,user=encoded(packed),
+cgkn\providers\recording.py:100: in complete
+    result = self.client.complete(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\agent\test_milestone_worker_chain.py:54: in complete
+    assert request['context']['goal_state']['failed']==['R-value']
+E   AssertionError: assert [] == ['R-value']
+E     
+E     Right contains one more item: 'R-value'
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.agent.test_milestone_worker_chain" name="test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[local_cli]" time="1.308"><failure message="AssertionError: assert [] == ['R-value']&#10;  &#10;  Right contains one more item: 'R-value'&#10;  Use -v to get more diff">tests\agent\test_milestone_worker_chain.py:284: in test_milestone_compiler_worker_independent_failure_repair_and_checkpoint
+    document=run_local_pipeline.execute(SimpleNamespace(use_api=True,provider_mode='live',
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\run_local_pipeline.py:145: in execute
+    result=service.run_profile(profile,goal=str(args.goal))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:100: in decide
+    decision=session.composer.decide(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\composer.py:240: in decide
+    return semantic_decide(self,context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\protocol\adapters.py:96: in semantic_decide
+    compiled,final,stats=exchange(composer.client,composer.config,
+cgkn\protocol\exchange.py:37: in exchange
+    completion=client.complete(system=packed_system,user=encoded(packed),
+cgkn\providers\recording.py:100: in complete
+    result = self.client.complete(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\agent\test_milestone_worker_chain.py:54: in complete
+    assert request['context']['goal_state']['failed']==['R-value']
+E   AssertionError: assert [] == ['R-value']
+E     
+E     Right contains one more item: 'R-value'
+E     Use -v to get more diff</failure></testcase></testsuite></testsuites>

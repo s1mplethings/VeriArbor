@@ -1,0 +1,219 @@
+..........................FF                                             [100%]
+================================== FAILURES ===================================
+_________ test_current_profile_formal_cli_budget_and_false_pass[none] _________
+tests\providers\test_current_profile_budget.py:39: in test_current_profile_formal_cli_budget_and_false_pass
+    with pytest.raises(expected,match='schema_validation_failed' if admission=='budgeted' else 'PROVIDER_BUDGET_EXHAUSTED'):
+E   Failed: DID NOT RAISE <class 'scripts.provider_api_budget.ProviderBudgetExhausted'>
+---------------------------- Captured stdout call -----------------------------
+{
+  "kind": "CGKNProjectSessionCoreResult",
+  "status": "BLOCKED",
+  "target_goal_satisfied": false,
+  "delivery_status": "NOT_EVALUATED",
+  "run_id": "one",
+  "run_dir": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl1\\controller\\.cgkn\\agent-kit\\project_sessions\\budget-fixture\\one",
+  "project_dir": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl1\\candidate",
+  "goal_acceptance": {
+    "obligations": {
+      "R": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "weight": 1,
+        "must": true
+      }
+    },
+    "hard_verdict": "INSUFFICIENT_EVIDENCE",
+    "completion": 0.0,
+    "evidence_coverage": 0.0,
+    "requirements": {
+      "R": {
+        "must": true,
+        "checker_keys": [
+          "independent"
+        ]
+      }
+    },
+    "checker_bindings": {
+      "independent": "project.acceptance@1"
+    },
+    "subject_identities": {},
+    "goals": [],
+    "phases": [],
+    "uncovered_must": [
+      "R"
+    ],
+    "complete": false,
+    "evidence_mode": "production_provenance",
+    "progress_basis": "verified required goals; not executed tasks or elapsed time"
+  },
+  "result": {
+    "status": "BLOCKED",
+    "execution_mode": "GOVERNED",
+    "decision_count": 1,
+    "agent_calls": 1,
+    "worker_calls": 0,
+    "tree": {
+      "kind": "CGKNCapabilityTree",
+      "schema_version": "1.0",
+      "goal": "Create an offline tested sample",
+      "nodes": []
+    },
+    "run_summary": null,
+    "escalation_reason": "BUDGET_BLOCKED: provider budget denied; no further planning or worker calls"
+  },
+  "provider_usage": {
+    "agent_request_ids": [],
+    "worker_request_ids": [],
+    "provider_usage": [
+      {
+        "role": "agent",
+        "identity": "1fa3092278c04d0c94c2c020ea04059e",
+        "requested_provider_or_model": "qwen",
+        "requested_model": "qwen3.8-flash",
+        "model": "UNKNOWN",
+        "routing": {},
+        "request_id": null,
+        "usage": {},
+        "provider_attempts": null,
+        "status": "ERROR_RECORDED",
+        "outcome_unknown": true,
+        "error": {
+          "category": null,
+          "completed_response": null,
+          "ended_at": 1794411340.8897228,
+          "error": "PROVIDER_BUDGET_EXHAUSTED: gateway calls require a ledger, complete limits, and operator-supplied price estimates",
+          "error_type": "ProviderBudgetExhausted",
+          "identity": "1fa3092278c04d0c94c2c020ea04059e",
+          "outcome_unknown": null,
+          "provider_dispatched": null
+        },
+        "evidence_ref": "provider_calls\\1fa3092278c04d0c94c2c020ea04059e\\request.json"
+      }
+    ],
+    "provider_call_count": 1,
+    "agent_calls": 1,
+    "worker_calls": 0,
+    "provider_attempts_known": 0,
+    "provider_attempt_records_unknown": 1,
+    "outcome_unknown": 1,
+    "deterministic_calls": 0,
+    "worker_execution_attempts": 0
+  },
+  "public_delivery_allowed": false,
+  "lean_report": {
+    "json": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl1\\controller\\.cgkn\\agent-kit\\project_sessions\\budget-fixture\\one\\lean-report.json",
+    "markdown": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl1\\controller\\.cgkn\\agent-kit\\project_sessions\\budget-fixture\\one\\lean-report.md"
+  },
+  "generation_job_id": "fixture-job",
+  "generation_attempt_id": "fixture-attempt"
+}
+______ test_current_profile_formal_cli_budget_and_false_pass[exhausted] _______
+tests\providers\test_current_profile_budget.py:39: in test_current_profile_formal_cli_budget_and_false_pass
+    with pytest.raises(expected,match='schema_validation_failed' if admission=='budgeted' else 'PROVIDER_BUDGET_EXHAUSTED'):
+E   Failed: DID NOT RAISE <class 'scripts.provider_api_budget.ProviderBudgetExhausted'>
+---------------------------- Captured stdout call -----------------------------
+{
+  "kind": "CGKNProjectSessionCoreResult",
+  "status": "BLOCKED",
+  "target_goal_satisfied": false,
+  "delivery_status": "NOT_EVALUATED",
+  "run_id": "one",
+  "run_dir": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl2\\controller\\.cgkn\\agent-kit\\project_sessions\\budget-fixture\\one",
+  "project_dir": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl2\\candidate",
+  "goal_acceptance": {
+    "obligations": {
+      "R": {
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "weight": 1,
+        "must": true
+      }
+    },
+    "hard_verdict": "INSUFFICIENT_EVIDENCE",
+    "completion": 0.0,
+    "evidence_coverage": 0.0,
+    "requirements": {
+      "R": {
+        "must": true,
+        "checker_keys": [
+          "independent"
+        ]
+      }
+    },
+    "checker_bindings": {
+      "independent": "project.acceptance@1"
+    },
+    "subject_identities": {},
+    "goals": [],
+    "phases": [],
+    "uncovered_must": [
+      "R"
+    ],
+    "complete": false,
+    "evidence_mode": "production_provenance",
+    "progress_basis": "verified required goals; not executed tasks or elapsed time"
+  },
+  "result": {
+    "status": "BLOCKED",
+    "execution_mode": "GOVERNED",
+    "decision_count": 1,
+    "agent_calls": 1,
+    "worker_calls": 0,
+    "tree": {
+      "kind": "CGKNCapabilityTree",
+      "schema_version": "1.0",
+      "goal": "Create an offline tested sample",
+      "nodes": []
+    },
+    "run_summary": null,
+    "escalation_reason": "BUDGET_BLOCKED: provider budget denied; no further planning or worker calls"
+  },
+  "provider_usage": {
+    "agent_request_ids": [],
+    "worker_request_ids": [],
+    "provider_usage": [
+      {
+        "role": "agent",
+        "identity": "0ecaa909272e4d83a7d0e26259ae21c1",
+        "requested_provider_or_model": "qwen",
+        "requested_model": "qwen3.8-flash",
+        "model": "UNKNOWN",
+        "routing": {},
+        "request_id": null,
+        "usage": {},
+        "provider_attempts": null,
+        "status": "ERROR_RECORDED",
+        "outcome_unknown": true,
+        "error": {
+          "category": null,
+          "completed_response": null,
+          "ended_at": 1794411341.768081,
+          "error": "PROVIDER_BUDGET_EXHAUSTED: max_api_calls",
+          "error_type": "ProviderBudgetExhausted",
+          "identity": "0ecaa909272e4d83a7d0e26259ae21c1",
+          "outcome_unknown": null,
+          "provider_dispatched": null
+        },
+        "evidence_ref": "provider_calls\\0ecaa909272e4d83a7d0e26259ae21c1\\request.json"
+      }
+    ],
+    "provider_call_count": 1,
+    "agent_calls": 1,
+    "worker_calls": 0,
+    "provider_attempts_known": 0,
+    "provider_attempt_records_unknown": 1,
+    "outcome_unknown": 1,
+    "deterministic_calls": 0,
+    "worker_execution_attempts": 0
+  },
+  "public_delivery_allowed": false,
+  "lean_report": {
+    "json": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl2\\controller\\.cgkn\\agent-kit\\project_sessions\\budget-fixture\\one\\lean-report.json",
+    "markdown": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23540\\test_current_profile_formal_cl2\\controller\\.cgkn\\agent-kit\\project_sessions\\budget-fixture\\one\\lean-report.md"
+  },
+  "generation_job_id": "fixture-job",
+  "generation_attempt_id": "fixture-attempt"
+}
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\observations-03.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_current_profile_budget.py::test_current_profile_formal_cli_budget_and_false_pass[none]
+FAILED tests/providers/test_current_profile_budget.py::test_current_profile_formal_cli_budget_and_false_pass[exhausted]
+2 failed, 26 passed in 6.04s

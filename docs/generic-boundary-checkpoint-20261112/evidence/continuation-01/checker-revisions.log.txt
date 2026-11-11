@@ -1,0 +1,337 @@
+.......................F...........................................F.F.. [ 79%]
+....F..........FFFF                                                      [100%]
+================================== FAILURES ===================================
+_ test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[import json,sys,pathlib,runpy\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\nactual=runpy.run_path(str(pathlib.Path(request['workspace'])/'module.py'))['value']()\nprint(json.dumps({'execution':'VALID','observed':{'value':actual==7,'actual':actual,'hidden_answer':'PRIVATE-CHECKER-MARKER'}}))\n\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_exit_zero_or_invalid_harn3')
+program = "import json,sys,pathlib,runpy\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\nactual=runp...idden_answer':'PRIVATE-CHECKER-MARKER'}}))\n\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n"
+
+    @pytest.mark.parametrize('program',[
+        'print("OK")',
+        'print(\'{"execution":"VALID","observed":{"value":"true"}}\')',
+        'import sys;print(\'{"execution":"VALID","observed":{"value":true}}\');sys.exit(1)',
+        CONSUMER+"\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n",
+    ])
+    def test_exit_zero_or_invalid_harness_cannot_verify_a_candidate(tmp_path,program):
+        executor,request,acceptance,workspace=setup(tmp_path,program)
+>       result=measure(executor,request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\application\software_project\test_milestone_consumer.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\governed_measurement_support.py:48: in execute_external_measurement
+    return execute_measurement(executor.session_acceptance.store,request,
+tests\governed_measurement_support.py:76: in execute_measurement
+    packet=a.staging_dir(node.permit_id)/'outputs.json'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:367: in staging_dir
+    p=self.validate_permit(permit_id)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x00000290F5723800>
+permit_id = 'permit-1ebfebc3d1c942e1b80c2130d98f451e', expected = {}
+p = NodeExecutionPermit(permit_id='permit-1ebfebc3d1c942e1b80c2130d98f451e', run_id='r', project_id='p', node_id='check', ...ion_id='resource-d5d2a3f40525409a8a5593d3318e7964', previous_permit_id=None, checker_identities={}, schema_version='2')
+current = {'admission_id': 'admission-6881b0aac9c0428ea0d607f9f251ba7b', 'tree': {'goal': 'ROOT', 'kind': 'CGKNCapabilityTree', ...], 'effect_domains': [...], ...}}, 'depends_on': [], 'id': 'check', ...}], 'schema_version': '1.0'}, 'tree_version': 2}
+CapabilityTree = <class 'cgkn.orchestration.capability_tree.CapabilityTree'>
+path = 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23521\\test_exit_zero_or_invalid_harn3\\candidate\\module.py'
+h = '26a85f6b4cf414a039edfa361ac3753d35e6c207d5a7bd11bd13186424a85ba1'
+
+    def validate_permit(self, permit_id, **expected):
+        if not isinstance(permit_id,str):raise ValueError('PERMIT_ID_REQUIRED')
+        p = self._permit(permit_id)
+        if p.status!='ACTIVE':raise ValueError('PERMIT_'+p.status)
+        current = self.committed_tree()
+        if not current or current['tree_version']!=p.tree_version:raise ValueError('TREE_VERSION_REJECT')
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        self.validate_tree(CapabilityTree.from_dict(current['tree']))
+        for k,v in expected.items():
+            if getattr(p,k)!=v:raise ValueError('PERMIT_BINDING_REJECT:'+k)
+        for path,h in p.input_hashes.items():
+>           if file_hash(path)!=h:raise ValueError('INPUT_BINDING_REJECT')
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: INPUT_BINDING_REJECT
+
+cgkn\runtime\node_authority.py:343: ValueError
+______________________ test_I12_one_task_revised_history ______________________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I12_one_task_revised_hist0')
+
+    def test_I12_one_task_revised_history(tmp_path):
+        f=setup(tmp_path,8);check(f);r1=sample(f)
+        check(f,7,'attempt-0002');r2=sample(f,2)
+        report=trusted_effectiveness(f['store'],'p','r',[r2,r1,r2])
+>       assert report['n_settled']==1 and report['successes']==1 and len(report['history'])==2
+E       assert (0 == 1)
+
+tests\state\test_provenance_v5.py:188: AssertionError
+________________ test_I14_concurrent_immutable_and_acceptance _________________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I14_concurrent_immutable_0')
+
+    def test_I14_concurrent_immutable_and_acceptance(tmp_path):
+        f=setup(tmp_path);check(f)
+        def write(i):
+            store=FileRunStore(f['store'].root)
+            return put_evidence(store,'p','r',{'kind':'event','identity':i%5})
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:refs=list(pool.map(write,range(40)))
+        assert len({r['path'] for r in refs})==5
+        for ref in refs:assert ProvenanceGate(f['store'],'p','r').resolve(ref,'event')['identity'] in range(5)
+        result=f['store'].load_result('p','r','checker')
+        def notify(_):
+            a=GoalAcceptance(FileRunStore(f['store'].root),'p','r',f['binding']['requirements'],{'c':'measure.file@1'})
+            return a.record('g',result,executor_ref='measure.file@1')
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:list(pool.map(notify,range(20)))
+        f['acceptance']._reload();assert len(f['acceptance'].data['checks'])==1
+        def independent(i):
+            local=dict(f,acceptance=GoalAcceptance(FileRunStore(f['store'].root),'p','r',f['binding']['requirements'],{'c':'measure.file@1'}))
+            return check(local,node='independent'+str(i))
+>       with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:list(pool.map(independent,range(3)))
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_provenance_v5.py:219: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\anaconda\Lib\concurrent\futures\_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\concurrent\futures\_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+D:\anaconda\Lib\concurrent\futures\thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\state\test_provenance_v5.py:218: in independent
+    return check(local,node='independent'+str(i))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\fixtures\provenance.py:37: in check
+    result=execute_measurement(f['store'],req,f['artifact'],lambda:executor.execute(req))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\governed_measurement_support.py:71: in execute_measurement
+    with governed_node(a,tree=tree,tree_version=version,proposal=proposal,node_id=request.node_id,contract=c,
+cgkn\runtime\governed.py:61: in governed_node
+    return GovernedNodeSession(authority,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\governed.py:12: in __init__
+    aid,admitted=authority.admit(tree,tree_version,proposal,known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x00000290FEE2A5A0>
+tree = CapabilityTree(goal='ROOT', nodes=(CapabilityNode(id='ROOT', parent_id='', capability_ref='', depends_on=(), config=ma...omains': ('filesystem',), 'executor_ref': 'measure.file@1', 'dependencies': ()}), 'executor_ref': 'measure.file@1'}))))
+version = 3
+proposal = ProjectProposal(proposal_id='fixture-independent0-3', project_id='p', base_tree_version=3, goal_reference='ROOT', obse...file@1',), exploration_reason='measure public predicate', exploration_budget=1, exploration_measure='goal observation')
+
+    def admit(self, tree, version, proposal, *, known_capabilities, catalog, policy):
+        """Call real Admission, persist its result, never accept an admitted=True claim."""
+        from cgkn.agent.project_agent import admit_proposal
+        with self._lock():
+            if proposal.project_id != self.project_id:
+                raise ValueError('PROJECT_SCOPE_REJECT')
+            current = self.committed_tree()
+            if current and (current['tree'] != tree.as_dict() or current['tree_version'] != version):
+>               raise ValueError('UNMANAGED_TREE_MUTATION')
+E               ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:112: ValueError
+___________________ test_I5_existing_and_or_parent_negative ___________________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I5_existing_and_or_parent0')
+
+    def test_I5_existing_and_or_parent_negative(tmp_path):
+        from tests.telemetry.test_acv4_independent import test_I1_parent_integration_cannot_be_outvoted_and_mapping_not_weakened,test_I1_or_and_frozen_original_contract
+>       test_I1_parent_integration_cannot_be_outvoted_and_mapping_not_weakened(tmp_path/'and')
+
+tests\state\test_provenance_v5.py:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\telemetry\test_acv4_independent.py:191: in test_I1_parent_integration_cannot_be_outvoted_and_mapping_not_weakened
+    a.store.save_result(result);a.record(goal,result,executor_ref='check@1')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:24: in update
+    return method(self,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:180: in record
+    ExecutionAuthority(self.store,self.project_id,self.run_id).validate_execution_result(result)
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:760: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x00000290FEE2BD70>
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'parent'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+>       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError
+____________ test_I18_unknown_effect_alias_matrix[same_operation] _____________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I18_unknown_effect_alias_0')
+mode = 'same_operation'
+
+    @pytest.mark.parametrize('mode',['same_operation','changed_executor','shared_resource','same_capability'])
+    def test_I18_unknown_effect_alias_matrix(tmp_path,mode):
+        from tests.runtime.test_graph_commit import Recorder,run
+        from cgkn.execution import ExecutionError,ExecutionErrorCode,BlockStatus
+        from cgkn.orchestration.capability_tree import CapabilityTree,CapabilityNode
+        from cgkn.executors import ExecutorRegistry,ExecutorDescriptor
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self,request):
+                r=super().execute(request)
+                if request.node_id=='a':return replace(r,status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+                return r
+        executor=Unknown();other=Recorder();other.descriptor=ExecutorDescriptor('other@1','deterministic',('*',))
+        registry=ExecutorRegistry();registry.register(executor);registry.register(other)
+>       runner=probe_runner(registry,FileRunStore(tmp_path))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_provenance_v5.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\qualification_support.py:62: in probe_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_legacy(*, project_id='NOT_APPLICABLE',run_id='NOT_APPLICABLE'):
+        context=_legacy.get()
+>       if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+
+D:\VeriArbor\src\veriarbor\governance.py:194: GovernanceError
+___________ test_I18_unknown_effect_alias_matrix[changed_executor] ____________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I18_unknown_effect_alias_1')
+mode = 'changed_executor'
+
+    @pytest.mark.parametrize('mode',['same_operation','changed_executor','shared_resource','same_capability'])
+    def test_I18_unknown_effect_alias_matrix(tmp_path,mode):
+        from tests.runtime.test_graph_commit import Recorder,run
+        from cgkn.execution import ExecutionError,ExecutionErrorCode,BlockStatus
+        from cgkn.orchestration.capability_tree import CapabilityTree,CapabilityNode
+        from cgkn.executors import ExecutorRegistry,ExecutorDescriptor
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self,request):
+                r=super().execute(request)
+                if request.node_id=='a':return replace(r,status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+                return r
+        executor=Unknown();other=Recorder();other.descriptor=ExecutorDescriptor('other@1','deterministic',('*',))
+        registry=ExecutorRegistry();registry.register(executor);registry.register(other)
+>       runner=probe_runner(registry,FileRunStore(tmp_path))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_provenance_v5.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\qualification_support.py:62: in probe_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_legacy(*, project_id='NOT_APPLICABLE',run_id='NOT_APPLICABLE'):
+        context=_legacy.get()
+>       if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+
+D:\VeriArbor\src\veriarbor\governance.py:194: GovernanceError
+____________ test_I18_unknown_effect_alias_matrix[shared_resource] ____________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I18_unknown_effect_alias_2')
+mode = 'shared_resource'
+
+    @pytest.mark.parametrize('mode',['same_operation','changed_executor','shared_resource','same_capability'])
+    def test_I18_unknown_effect_alias_matrix(tmp_path,mode):
+        from tests.runtime.test_graph_commit import Recorder,run
+        from cgkn.execution import ExecutionError,ExecutionErrorCode,BlockStatus
+        from cgkn.orchestration.capability_tree import CapabilityTree,CapabilityNode
+        from cgkn.executors import ExecutorRegistry,ExecutorDescriptor
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self,request):
+                r=super().execute(request)
+                if request.node_id=='a':return replace(r,status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+                return r
+        executor=Unknown();other=Recorder();other.descriptor=ExecutorDescriptor('other@1','deterministic',('*',))
+        registry=ExecutorRegistry();registry.register(executor);registry.register(other)
+>       runner=probe_runner(registry,FileRunStore(tmp_path))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_provenance_v5.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\qualification_support.py:62: in probe_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_legacy(*, project_id='NOT_APPLICABLE',run_id='NOT_APPLICABLE'):
+        context=_legacy.get()
+>       if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+
+D:\VeriArbor\src\veriarbor\governance.py:194: GovernanceError
+____________ test_I18_unknown_effect_alias_matrix[same_capability] ____________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23521/test_I18_unknown_effect_alias_3')
+mode = 'same_capability'
+
+    @pytest.mark.parametrize('mode',['same_operation','changed_executor','shared_resource','same_capability'])
+    def test_I18_unknown_effect_alias_matrix(tmp_path,mode):
+        from tests.runtime.test_graph_commit import Recorder,run
+        from cgkn.execution import ExecutionError,ExecutionErrorCode,BlockStatus
+        from cgkn.orchestration.capability_tree import CapabilityTree,CapabilityNode
+        from cgkn.executors import ExecutorRegistry,ExecutorDescriptor
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self,request):
+                r=super().execute(request)
+                if request.node_id=='a':return replace(r,status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+                return r
+        executor=Unknown();other=Recorder();other.descriptor=ExecutorDescriptor('other@1','deterministic',('*',))
+        registry=ExecutorRegistry();registry.register(executor);registry.register(other)
+>       runner=probe_runner(registry,FileRunStore(tmp_path))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_provenance_v5.py:351: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\qualification_support.py:62: in probe_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_legacy(*, project_id='NOT_APPLICABLE',run_id='NOT_APPLICABLE'):
+        context=_legacy.get()
+>       if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+
+D:\VeriArbor\src\veriarbor\governance.py:194: GovernanceError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\checker-revisions.xml -
+=========================== short test summary info ===========================
+FAILED tests/application/software_project/test_milestone_consumer.py::test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[import json,sys,pathlib,runpy\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\nactual=runpy.run_path(str(pathlib.Path(request['workspace'])/'module.py'))['value']()\nprint(json.dumps({'execution':'VALID','observed':{'value':actual==7,'actual':actual,'hidden_answer':'PRIVATE-CHECKER-MARKER'}}))\n\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n]
+FAILED tests/state/test_provenance_v5.py::test_I12_one_task_revised_history
+FAILED tests/state/test_provenance_v5.py::test_I14_concurrent_immutable_and_acceptance
+FAILED tests/state/test_provenance_v5.py::test_I5_existing_and_or_parent_negative
+FAILED tests/state/test_provenance_v5.py::test_I18_unknown_effect_alias_matrix[same_operation]
+FAILED tests/state/test_provenance_v5.py::test_I18_unknown_effect_alias_matrix[changed_executor]
+FAILED tests/state/test_provenance_v5.py::test_I18_unknown_effect_alias_matrix[shared_resource]
+FAILED tests/state/test_provenance_v5.py::test_I18_unknown_effect_alias_matrix[same_capability]
+8 failed, 83 passed in 49.11s

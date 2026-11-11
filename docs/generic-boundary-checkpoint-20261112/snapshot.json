@@ -1,0 +1,36 @@
+{
+  "task": "VERIARBOR_GENERIC_BOUNDARY_CLOSURE_V1",
+  "status": "IN_PROGRESS_NOT_QUALIFIED",
+  "publication_purpose": "User-requested backup before continuing repairs; not release or C01-C10 completion",
+  "source_files": {
+    ".agents/skills/veriarbor-boundary-closure/SKILL.md": "46a9c5e4ffd99f715db85b7de8efb6cf8225f5df87ba95276b5320a7695affd5",
+    "AGENTS.md": "99e27f1afc305d1563ad7a8ccb85f092e2189924743161f90bf714d7b3897a38",
+    "README.md": "5e0103b50be9ebdfd89f14e3f54830869ec33e82cf1fc9dca6cab45b1dc92d99",
+    "docs/ARCHITECTURE.md": "106c717c1face62b67d53efad4c5e2f988fd21f6332cae43d6b718d5b66fd9cf",
+    "docs/CAPABILITY_GATES_AND_SKILLS.md": "8223d5dfbc2ef3283064cd4f5a48b7bcfcafa632c6116eaff84b5bef343f537d",
+    "docs/CORE_GOVERNANCE_V1.md": "5ca1efb749700912521ab62355514b10eb76128b78c798a3a7d25c8f8cab3762",
+    "src/veriarbor/__init__.py": "b910e7bd92ab0f610dccdb3a46765fef50b30c73ea6c980d117a5dc582006fda",
+    "src/veriarbor/capability.py": "188dd1ac2e2f5e417dfb2790d81fee39f35bce6c8fe54d7348a5776adbdd7cf8",
+    "src/veriarbor/compatibility.py": "9b9cd79f3ab9ba53834550ddca2367e48201e5f0c44d7e8f77e61a63c1ff0530",
+    "src/veriarbor/execution_authority.py": "79c09a7d2c70b6c7dcbae19c1abd8af373d4ee2dfd68675fad53ea54b9a1c014",
+    "src/veriarbor/governance.py": "a04073d3bbd6e718f82772fca58bb2de591444382df7942fe3841cceef40f501",
+    "src/veriarbor/model.py": "c4ece7ba79da722cd286b26a03d1ca369d497bf42004a180588bf6bc6be0abf7",
+    "src/veriarbor/port.py": "2a250a6228e0c0838ffc5d6c67c75d316b07f8c493305204e8edeb8fb63a259d",
+    "src/veriarbor/skills.py": "9829f8c2c92ffeb2c09f4fd34043ba6677a004bec16e2fad3393e0ed0eebfc93",
+    "tests/conftest.py": "fb991e277ca7ab0a58885ab741e6a24e76ab641e8ec91658bd61e8d5f35c2c29",
+    "tests/fixtures/anny_ranking_replay.json": "b634a0859df278ba8c6892575037932154fc25674961f4ee4297003bd482e70f",
+    "tests/unit/test_capability_skills.py": "4025211b6d439ad00ff040452519501f68f277106a5b05e97f7e9a0e4270b872",
+    "tests/unit/test_execution_authority.py": "2fbcc135913a99b63f07cd75083166727b7377cc2be2a51a5a7994a56cc360d1",
+    "tests/unit/test_governance_completion.py": "836f90e332430eeac156fc4e303f1dd1c3dc5368d14074a1c1f5f35cc48b4282",
+    "tools/verify_boundary_closure.py": "7200414b9a60534a349110fd61de1b88350922a7baec7cb6443fddbe560a9af9",
+    "tools/verify_capability_consolidation.py": "3586a1fcb3e153cc299e59fc452da5795d96c6bb6110762dcb81a687335095f3"
+  },
+  "local_only_count": 0,
+  "branch": "codex/generic-boundary-checkpoint-20261112",
+  "no_paid_provider_calls": true,
+  "business_scope_excluded": [
+    "ACFV",
+    "CharacterCut"
+  ],
+  "original_workspace_preserved": true
+}

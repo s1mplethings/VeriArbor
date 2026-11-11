@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="6" time="16.105" timestamp="2026-11-11T23:57:22.826258+08:00" hostname="test"><testcase classname="tests.providers.test_iter118_acceptance" name="test_six_slots_real_contract_handoff_and_no_seventh_post" time="12.676"><failure message="AssertionError: {'case_id': 'ITER118-04', 'job_id': 'ISOLATED_TEST_ONLY', 'receipt': {'agent_calls': 2, 'agent_input_tokens': 'TOKEN_U...m\\pytest-23558\\test_six_slots_real_contract_h0\\acceptance\\task\\seeded_repair\\seeded_repair-1e4250f247e7-r0', ...}&#10;assert 'BLOCKED_PROVIDER' == 'PASS'&#10;  &#10;  - PASS&#10;  + BLOCKED_PROVIDER">tests\providers\test_iter118_acceptance.py:67: in test_six_slots_real_contract_handoff_and_no_seventh_post
+    assert result['status']=='PASS',result
+E   AssertionError: {'case_id': 'ITER118-04', 'job_id': 'ISOLATED_TEST_ONLY', 'receipt': {'agent_calls': 2, 'agent_input_tokens': 'TOKEN_U...m\\pytest-23558\\test_six_slots_real_contract_h0\\acceptance\\task\\seeded_repair\\seeded_repair-1e4250f247e7-r0', ...}
+E   assert 'BLOCKED_PROVIDER' == 'PASS'
+E     
+E     - PASS
+E     + BLOCKED_PROVIDER</failure></testcase><testcase classname="tests.providers.test_iter119_pair" name="test_preflight_shared_budget_and_no_oversized_request" time="0.149" /><testcase classname="tests.providers.test_iter119_pair" name="test_no_authorization_no_generation" time="0.125" /><testcase classname="tests.providers.test_iter119_pair" name="test_exact_pair_through_tls_dag_and_full_input_reservation" time="1.142"><failure message="cgkn.orchestration.leaf_contract.LeafContractError: NEEDS_DECOMPOSITION:contract-preview:artifact bound exceeded or independent effect domains">tests\providers\test_iter119_pair.py:41: in test_exact_pair_through_tls_dag_and_full_input_reservation
+    result=pair.execute_pair(value,client,'offline-iter119')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments\api_acceptance\iter119_pair.py:154: in execute_pair
+    tree = CapabilityTree('Two independent authorized API observations', tuple(
+experiments\api_acceptance\iter119_pair.py:157: in &lt;genexpr&gt;
+    'leaf_contract':build_leaf_contract(goal='Observe a schema-valid bounded response',kind='INSPECTION',
+cgkn\orchestration\leaf_contract.py:53: in build_leaf_contract
+    validate_leaf(CapabilityNode('contract-preview', capability_ref='contract.preview@1',
+cgkn\orchestration\leaf_contract.py:111: in validate_leaf
+    raise LeafContractError(node.id,'NEEDS_DECOMPOSITION',['artifact bound exceeded or independent effect domains'])
+E   cgkn.orchestration.leaf_contract.LeafContractError: NEEDS_DECOMPOSITION:contract-preview:artifact bound exceeded or independent effect domains</failure></testcase><testcase classname="tests.providers.test_iter119_pair" name="test_mcp_permanent_claim_prevents_second_worker" time="0.118" /><testcase classname="tests.providers.test_iter119_pair" name="test_reservation_job_attempt_identity_reaches_clock" time="0.821" /></testsuite></testsuites>

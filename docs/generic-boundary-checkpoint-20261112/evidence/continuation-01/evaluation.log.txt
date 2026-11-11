@@ -1,0 +1,82 @@
+.......F...F                                                             [100%]
+================================== FAILURES ===================================
+__ test_evaluation_changes_next_real_executor_route_only_for_supported_class __
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23508/test_evaluation_changes_next_r0')
+
+    def test_evaluation_changes_next_real_executor_route_only_for_supported_class(tmp_path):
+        store=FileRunStore(tmp_path/'state');ledger=CapabilityLedger(store,'p')
+        configs={'default':ModelRoleConfig('worker','P',model_id='M1'),'supported':ModelRoleConfig('worker','P',model_id='M2')}
+        assert ledger.route('json',configs,'default',operation='inspect',capability_scope=SCOPE)['selected_config']=='default'
+        for i in range(3):
+>           f,fact,a=attempt(store,'r'+str(i),configs['supported']);r,c=evaluate(store,f,fact,a);assert r.status==BlockStatus.SUCCEEDED
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_capability_routing_qualification.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\agent\test_capability_routing_qualification.py:35: in attempt
+    store.save_result(checked);a.record('g',checked,executor_ref='fixture@1')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:24: in update
+    return method(self,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:180: in record
+    ExecutionAuthority(self.store,self.project_id,self.run_id).validate_execution_result(result)
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:760: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002903AE46750>
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'check'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+>       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError
+___________ test_concurrent_ledger_publication_and_revision_history ___________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23508/test_concurrent_ledger_publica0')
+
+    def test_concurrent_ledger_publication_and_revision_history(tmp_path):
+        store=FileRunStore(tmp_path);config=ModelRoleConfig('worker','P',model_id='M')
+>       fixtures=[attempt(store,'r'+str(i),config) for i in range(8)]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_capability_routing_qualification.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\agent\test_capability_routing_qualification.py:35: in attempt
+    store.save_result(checked);a.record('g',checked,executor_ref='fixture@1')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:24: in update
+    return method(self,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:180: in record
+    ExecutionAuthority(self.store,self.project_id,self.run_id).validate_execution_result(result)
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:760: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002903AE1AC30>
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'check'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+>       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\evaluation.xml -
+=========================== short test summary info ===========================
+FAILED tests/agent/test_capability_routing_qualification.py::test_evaluation_changes_next_real_executor_route_only_for_supported_class
+FAILED tests/agent/test_capability_routing_qualification.py::test_concurrent_ledger_publication_and_revision_history
+2 failed, 10 passed in 3.70s

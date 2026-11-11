@@ -1,0 +1,15 @@
+...........F.................................................            [100%]
+================================== FAILURES ===================================
+_______ test_success_builds_strict_schema_payload_and_normalizes_usage ________
+tests\providers\test_client.py:113: in test_success_builds_strict_schema_payload_and_normalizes_usage
+    assert result.usage == {'input_tokens':2,'output_tokens':1,'total_tokens':3} and result.attempts == 1
+E   AssertionError: assert ({'completion_...kens': 2, ...} == {'input_token...al_tokens': 3}
+E     
+E     Omitting 3 identical items, use -vv to show
+E     Left contains 2 more items:
+E     {'completion_tokens': 1, 'prompt_tokens': 2}
+E     Use -v to get more diff)
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\compat-client.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_client.py::test_success_builds_strict_schema_payload_and_normalizes_usage
+1 failed, 60 passed in 20.86s

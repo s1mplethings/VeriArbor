@@ -1,0 +1,13 @@
+F..                                                                      [100%]
+================================== FAILURES ===================================
+_ test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls _
+tests\providers\test_domestic_final.py:201: in test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+    assert acceptance.execute(root,'never-read',phase='finish')['state']=='FINISHED'
+E   AssertionError: assert 'BLOCKED' == 'FINISHED'
+E     
+E     - FINISHED
+E     + BLOCKED
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\planning-pause.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_domestic_final.py::test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+1 failed, 2 passed in 7.79s

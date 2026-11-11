@@ -1,0 +1,482 @@
+..........................FFFF.FFF.................FF...FF........FF.... [ 19%]
+...F..FFF............................................................... [ 38%]
+................................F.....FFFF.....F........................ [ 58%]
+...........F.FFFF..........FF..................................F........ [ 77%]
+....FF................................F................................. [ 96%]
+............                                                             [100%]
+================================== FAILURES ===================================
+__________________ test_complete_rejects_missing_credentials __________________
+tests\providers\test_client.py:69: in test_complete_rejects_missing_credentials
+    OpenAICompatibleClient().complete(system="s", user="u", schema_name="x", schema={}, config=CONFIG)
+cgkn\providers\legacy_client.py:14: in complete
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+_____________________ test_transport_failure_is_redacted ______________________
+tests\providers\test_client.py:78: in test_transport_failure_is_redacted
+    OpenAICompatibleClient().complete(system="s", user="u", schema_name="x", schema={}, config=CONFIG)
+cgkn\providers\legacy_client.py:14: in complete
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+__________________ test_empty_provider_response_is_rejected ___________________
+tests\providers\test_client.py:85: in test_empty_provider_response_is_rejected
+    OpenAICompatibleClient().complete(system="s", user="u", schema_name="x", schema={}, config=CONFIG)
+cgkn\providers\legacy_client.py:14: in complete
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+_______ test_success_builds_strict_schema_payload_and_normalizes_usage ________
+tests\providers\test_client.py:91: in test_success_builds_strict_schema_payload_and_normalizes_usage
+    result = OpenAICompatibleClient().complete(system="s", user="u", schema_name="shape", schema={"type": "object"}, config=CONFIG)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\providers\legacy_client.py:14: in complete
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+_______ test_current_profile_formal_cli_budget_and_false_pass[budgeted] _______
+tests\providers\test_current_profile_budget.py:37: in test_current_profile_formal_cli_budget_and_false_pass
+    cli.main()
+scripts\run_codex_conversation_generation.py:147: in main
+    result = codex_conversation.run_formal_generation_once(
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:849: in run_formal_generation_once
+    result = service.run_profile(core_profile, goal=goal, on_started=on_started)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:347: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:181: in run_project
+    policy,planning=self._execution_authorities(project_id,run_id,store,execution_authorization)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:225: in _execution_authorities
+    return assemble_execution_authorities(project_id,run_id,store,raw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:24: in assemble_execution_authorities
+    raise ValueError('EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED')
+E   ValueError: EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED
+_________ test_current_profile_formal_cli_budget_and_false_pass[none] _________
+tests\providers\test_current_profile_budget.py:37: in test_current_profile_formal_cli_budget_and_false_pass
+    cli.main()
+scripts\run_codex_conversation_generation.py:147: in main
+    result = codex_conversation.run_formal_generation_once(
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:849: in run_formal_generation_once
+    result = service.run_profile(core_profile, goal=goal, on_started=on_started)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:347: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:181: in run_project
+    policy,planning=self._execution_authorities(project_id,run_id,store,execution_authorization)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:225: in _execution_authorities
+    return assemble_execution_authorities(project_id,run_id,store,raw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:24: in assemble_execution_authorities
+    raise ValueError('EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED')
+E   ValueError: EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED
+______ test_current_profile_formal_cli_budget_and_false_pass[exhausted] _______
+tests\providers\test_current_profile_budget.py:37: in test_current_profile_formal_cli_budget_and_false_pass
+    cli.main()
+scripts\run_codex_conversation_generation.py:147: in main
+    result = codex_conversation.run_formal_generation_once(
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:849: in run_formal_generation_once
+    result = service.run_profile(core_profile, goal=goal, on_started=on_started)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:347: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:181: in run_project
+    policy,planning=self._execution_authorities(project_id,run_id,store,execution_authorization)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:225: in _execution_authorities
+    return assemble_execution_authorities(project_id,run_id,store,raw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:24: in assemble_execution_authorities
+    raise ValueError('EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED')
+E   ValueError: EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED
+______ test_local_gateway_reopen_in_new_process_never_resubmits[unknown] ______
+tests\providers\test_domestic_final.py:94: in test_local_gateway_reopen_in_new_process_never_resubmits
+    first=run();second=run()
+          ^^^^^
+tests\providers\test_domestic_final.py:92: in run
+    assert p.returncode==0,p.stderr
+E   AssertionError: Traceback (most recent call last):
+E       File "<string>", line 7, in <module>
+E       File "F:\CGKN-LeanLoop-V1-20261101\cgkn\providers\gateway_client.py", line 225, in complete
+E         require_provider_context(execution_mode)
+E       File "F:\CGKN-LeanLoop-V1-20261101\cgkn\execution\node_effects.py", line 48, in require_provider_context
+E         if execution_mode!='GOVERNED' or _scope.get() is None:raise ValueError('PERMIT_REQUIRED')
+E                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     ValueError: PERMIT_REQUIRED
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['D:\\anaconda\\python.exe', '-X', 'utf8', '-c', "import json\nfrom cgkn.providers.gateway_clien...                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: PERMIT_REQUIRED\n').returncode
+__ test_local_gateway_reopen_in_new_process_never_resubmits[completed_cache] __
+tests\providers\test_domestic_final.py:94: in test_local_gateway_reopen_in_new_process_never_resubmits
+    first=run();second=run()
+          ^^^^^
+tests\providers\test_domestic_final.py:92: in run
+    assert p.returncode==0,p.stderr
+E   AssertionError: Traceback (most recent call last):
+E       File "<string>", line 7, in <module>
+E       File "F:\CGKN-LeanLoop-V1-20261101\cgkn\providers\gateway_client.py", line 225, in complete
+E         require_provider_context(execution_mode)
+E       File "F:\CGKN-LeanLoop-V1-20261101\cgkn\execution\node_effects.py", line 48, in require_provider_context
+E         if execution_mode!='GOVERNED' or _scope.get() is None:raise ValueError('PERMIT_REQUIRED')
+E                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E     ValueError: PERMIT_REQUIRED
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['D:\\anaconda\\python.exe', '-X', 'utf8', '-c', "import json\nfrom cgkn.providers.gateway_clien...                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: PERMIT_REQUIRED\n').returncode
+_ test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls _
+tests\providers\test_domestic_final.py:152: in test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+    root=tmp_path/'run';acceptance.prepare(root)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\domestic_task_acceptance.py:103: in prepare
+    if not oracle.is_file():raise ValueError('INDEPENDENT_ORACLE_REQUIRED_BEFORE_PREPARATION')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: INDEPENDENT_ORACLE_REQUIRED_BEFORE_PREPARATION
+______ test_tampered_fixture_cannot_be_attributed_to_a_future_model_run _______
+tests\providers\test_domestic_final.py:190: in test_tampered_fixture_cannot_be_attributed_to_a_future_model_run
+    acceptance.prepare(tmp_path/'run');root=tmp_path/'run';plan=json.loads((root/'plan.json').read_text())
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\domestic_task_acceptance.py:103: in prepare
+    if not oracle.is_file():raise ValueError('INDEPENDENT_ORACLE_REQUIRED_BEFORE_PREPARATION')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: INDEPENDENT_ORACLE_REQUIRED_BEFORE_PREPARATION
+_ test_network_failure_blocks_worker_without_task_writes_or_automatic_retry[network_unavailable_before_send-False] _
+tests\providers\test_domestic_mode.py:93: in test_network_failure_blocks_worker_without_task_writes_or_automatic_retry
+    assert result.status==BlockStatus.BLOCKED and not result.retryable and client.calls==1
+E   AssertionError: assert (<BlockStatus.FAILED: 'FAILED'> == <BlockStatus....ED: 'BLOCKED'>
+E     
+E     - BLOCKED
+E     + FAILED)
+_ test_network_failure_blocks_worker_without_task_writes_or_automatic_retry[provider_outcome_unknown-True] _
+tests\providers\test_domestic_mode.py:93: in test_network_failure_blocks_worker_without_task_writes_or_automatic_retry
+    assert result.status==BlockStatus.BLOCKED and not result.retryable and client.calls==1
+E   AssertionError: assert (<BlockStatus.FAILED: 'FAILED'> == <BlockStatus....ED: 'BLOCKED'>
+E     
+E     - BLOCKED
+E     + FAILED)
+___________ test_failover_and_recovery_preserve_completed_cgkn_task ___________
+tests\providers\test_domestic_mode.py:211: in test_failover_and_recovery_preserve_completed_cgkn_task
+    restored=fixture.probe_runner(runner.registry,fixture.FileRunStore(tmp_path/'state'))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\qualification_support.py:62: in probe_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+____ test_unmodified_formal_controller_reaches_budgeted_provider[budgeted] ____
+tests\providers\test_domestic_repair.py:106: in test_unmodified_formal_controller_reaches_budgeted_provider
+    cli.main()
+scripts\run_codex_conversation_generation.py:147: in main
+    result = codex_conversation.run_formal_generation_once(
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:854: in run_formal_generation_once
+    raise ValueError('PROJECT_SESSION_PROFILE_REQUIRED: configure .cgkn/project-session.json; legacy project lifecycle is retired')
+E   ValueError: PROJECT_SESSION_PROFILE_REQUIRED: configure .cgkn/project-session.json; legacy project lifecycle is retired
+______ test_unmodified_formal_controller_reaches_budgeted_provider[none] ______
+tests\providers\test_domestic_repair.py:106: in test_unmodified_formal_controller_reaches_budgeted_provider
+    cli.main()
+scripts\run_codex_conversation_generation.py:147: in main
+    result = codex_conversation.run_formal_generation_once(
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:854: in run_formal_generation_once
+    raise ValueError('PROJECT_SESSION_PROFILE_REQUIRED: configure .cgkn/project-session.json; legacy project lifecycle is retired')
+E   ValueError: PROJECT_SESSION_PROFILE_REQUIRED: configure .cgkn/project-session.json; legacy project lifecycle is retired
+___ test_unmodified_formal_controller_reaches_budgeted_provider[exhausted] ____
+tests\providers\test_domestic_repair.py:106: in test_unmodified_formal_controller_reaches_budgeted_provider
+    cli.main()
+scripts\run_codex_conversation_generation.py:147: in main
+    result = codex_conversation.run_formal_generation_once(
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:854: in run_formal_generation_once
+    raise ValueError('PROJECT_SESSION_PROFILE_REQUIRED: configure .cgkn/project-session.json; legacy project lifecycle is retired')
+E   ValueError: PROJECT_SESSION_PROFILE_REQUIRED: configure .cgkn/project-session.json; legacy project lifecycle is retired
+__________ test_six_slots_real_contract_handoff_and_no_seventh_post ___________
+tests\providers\test_iter118_acceptance.py:64: in test_six_slots_real_contract_handoff_and_no_seventh_post
+    assert result['status']=='PASS',result
+E   AssertionError: {'case_id': 'ITER118-04', 'error_code': '', 'error_type': 'ValueError', 'job_id': 'ISOLATED_TEST_ONLY', ...}
+E   assert 'FAIL' == 'PASS'
+E     
+E     - PASS
+E     + FAIL
+____________ test_preflight_shared_budget_and_no_oversized_request ____________
+tests\providers\test_iter119_pair.py:15: in test_preflight_shared_budget_and_no_oversized_request
+    value=plan();result=pair.preflight(value)
+          ^^^^^^
+tests\providers\test_iter119_pair.py:11: in plan
+    return pair.read(pair.ROOT/'artifacts/api-progress-clock-20261029/live-authorized-01/plan.json')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments\api_acceptance\iter119_pair.py:20: in read
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'F:\\CGKN-LeanLoop-V1-20261101\\artifacts\\api-progress-clock-20261029\\live-authorized-01\\plan.json'
+_____________________ test_no_authorization_no_generation _____________________
+tests\providers\test_iter119_pair.py:28: in test_no_authorization_no_generation
+    (tmp_path/'plan.json').write_text(json.dumps(plan()))
+                                                 ^^^^^^
+tests\providers\test_iter119_pair.py:11: in plan
+    return pair.read(pair.ROOT/'artifacts/api-progress-clock-20261029/live-authorized-01/plan.json')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments\api_acceptance\iter119_pair.py:20: in read
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'F:\\CGKN-LeanLoop-V1-20261101\\artifacts\\api-progress-clock-20261029\\live-authorized-01\\plan.json'
+_________ test_exact_pair_through_tls_dag_and_full_input_reservation __________
+tests\providers\test_iter119_pair.py:36: in test_exact_pair_through_tls_dag_and_full_input_reservation
+    value=plan();monkeypatch.setattr(pair,'RUN',runtime['tmp'])
+          ^^^^^^
+tests\providers\test_iter119_pair.py:11: in plan
+    return pair.read(pair.ROOT/'artifacts/api-progress-clock-20261029/live-authorized-01/plan.json')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments\api_acceptance\iter119_pair.py:20: in read
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'F:\\CGKN-LeanLoop-V1-20261101\\artifacts\\api-progress-clock-20261029\\live-authorized-01\\plan.json'
+_______________ test_mcp_permanent_claim_prevents_second_worker _______________
+tests\providers\test_iter119_pair.py:60: in test_mcp_permanent_claim_prevents_second_worker
+    (tmp_path/'plan.json').write_text(json.dumps(plan()))
+                                                 ^^^^^^
+tests\providers\test_iter119_pair.py:11: in plan
+    return pair.read(pair.ROOT/'artifacts/api-progress-clock-20261029/live-authorized-01/plan.json')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments\api_acceptance\iter119_pair.py:20: in read
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'F:\\CGKN-LeanLoop-V1-20261101\\artifacts\\api-progress-clock-20261029\\live-authorized-01\\plan.json'
+____________________ test_formal_installed_parallel_matrix ____________________
+tests\providers\test_iter120_formal_parallel.py:165: in test_formal_installed_parallel_matrix
+    plan=pair.read(pair.ROOT/'artifacts/api-progress-clock-20261029/live-authorized-01/plan.json')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+experiments\api_acceptance\iter119_pair.py:20: in read
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'F:\\CGKN-LeanLoop-V1-20261101\\artifacts\\api-progress-clock-20261029\\live-authorized-01\\plan.json'
+___________ test_tls_dag_parallel_clocks_and_sequential_comparison ____________
+tests\providers\test_progress_clock.py:153: in test_tls_dag_parallel_clocks_and_sequential_comparison
+    root,run=execute_pair(runtime,monkeypatch,'parallel',2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\providers\test_progress_clock.py:143: in execute_pair
+    runner=measurement_runner(registry,FileRunStore(root/'state'),
+tests\qualification_support.py:75: in measurement_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+_______ test_one_provider_failure_or_idle_does_not_block_other[stalled] _______
+tests\providers\test_progress_clock.py:239: in test_one_provider_failure_or_idle_does_not_block_other
+    root,run=execute_pair(runtime,monkeypatch,mode,2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\providers\test_progress_clock.py:143: in execute_pair
+    runner=measurement_runner(registry,FileRunStore(root/'state'),
+tests\qualification_support.py:75: in measurement_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+_________ test_one_provider_failure_or_idle_does_not_block_other[eof] _________
+tests\providers\test_progress_clock.py:239: in test_one_provider_failure_or_idle_does_not_block_other
+    root,run=execute_pair(runtime,monkeypatch,mode,2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\providers\test_progress_clock.py:143: in execute_pair
+    runner=measurement_runner(registry,FileRunStore(root/'state'),
+tests\qualification_support.py:75: in measurement_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+______ test_one_provider_failure_or_idle_does_not_block_other[heartbeat] ______
+tests\providers\test_progress_clock.py:239: in test_one_provider_failure_or_idle_does_not_block_other
+    root,run=execute_pair(runtime,monkeypatch,mode,2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\providers\test_progress_clock.py:143: in execute_pair
+    runner=measurement_runner(registry,FileRunStore(root/'state'),
+tests\qualification_support.py:75: in measurement_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+_____ test_one_provider_failure_or_idle_does_not_block_other[http_error] ______
+tests\providers\test_progress_clock.py:239: in test_one_provider_failure_or_idle_does_not_block_other
+    root,run=execute_pair(runtime,monkeypatch,mode,2)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\providers\test_progress_clock.py:143: in execute_pair
+    runner=measurement_runner(registry,FileRunStore(root/'state'),
+tests\qualification_support.py:75: in measurement_runner
+    return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:49: in __init__
+    require_legacy()
+D:\VeriArbor\src\veriarbor\governance.py:194: in require_legacy
+    if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required
+__________ test_actual_gateway_close_cancels_inflight_formal_client ___________
+tests\providers\test_progress_transport.py:127: in test_actual_gateway_close_cancels_inflight_formal_client
+    assert runtime['posts']
+E   assert []
+_________ test_gateway_process_crash_and_new_session_preserve_unknown _________
+tests\providers\test_progress_transport.py:191: in test_gateway_process_crash_and_new_session_preserve_unknown
+    assert len(runtime['posts'])==1 and process.poll() is None
+E   assert (0 == 1)
+E    +  where 0 = len([])
+_____________ test_installed_mcp_actual_worker_streaming_contract _____________
+tests\providers\test_streaming_installed_plugin.py:98: in test_installed_mcp_actual_worker_streaming_contract
+    assert runtime['posts'],'Installed worker did not reach streaming upstream'
+E   AssertionError: Installed worker did not reach streaming upstream
+E   assert []
+_ test_progress_never_overrides_terminal_contract[events1-stream_incomplete_or_tool_finish] _
+tests\providers\test_streaming_progress_only.py:112: in test_progress_never_overrides_terminal_contract
+    with pytest.raises(StreamError,match=code):collect_chat_completions(events)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\providers\streaming_sse.py:357: in collect_chat_completions
+    raise StreamError(code, response={'partial_text':''.join(parts), 'model':model,
+E   cgkn.providers.streaming_sse.StreamError: stream_unknown_finish
+
+During handling of the above exception, another exception occurred:
+tests\providers\test_streaming_progress_only.py:112: in test_progress_never_overrides_terminal_contract
+    with pytest.raises(StreamError,match=code):collect_chat_completions(events)
+E   AssertionError: Regex pattern did not match.
+E    Regex: 'stream_incomplete_or_tool_finish'
+E    Input: 'stream_unknown_finish'
+_ test_progress_never_overrides_terminal_contract[events2-stream_incomplete_or_tool_finish] _
+tests\providers\test_streaming_progress_only.py:112: in test_progress_never_overrides_terminal_contract
+    with pytest.raises(StreamError,match=code):collect_chat_completions(events)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\providers\streaming_sse.py:357: in collect_chat_completions
+    raise StreamError(code, response={'partial_text':''.join(parts), 'model':model,
+E   cgkn.providers.streaming_sse.StreamError: stream_output_token_limit
+
+During handling of the above exception, another exception occurred:
+tests\providers\test_streaming_progress_only.py:112: in test_progress_never_overrides_terminal_contract
+    with pytest.raises(StreamError,match=code):collect_chat_completions(events)
+E   AssertionError: Regex pattern did not match.
+E    Regex: 'stream_incomplete_or_tool_finish'
+E    Input: 'stream_output_token_limit'
+___ test_original_agent_dag_worker_and_independent_acceptance_over_tls_sse ____
+tests\providers\test_streaming_runtime.py:316: in test_original_agent_dag_worker_and_independent_acceptance_over_tls_sse
+    result=SoftwareProjectGenerationService(ROOT,runtime['tmp']/'artifacts',client=runtime['client'],routing=routing).run_case('seeded_repair',max_repair_rounds=0)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:487: in run_case
+    shutil.copytree(self.repository_root / case.seeded_fixture, workspace)
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:519: in _run_round
+    composer = SoftwareProjectAgentComposer(run_client, high)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:225: in _execution_authorities
+    return assemble_execution_authorities(project_id,run_id,store,raw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:24: in assemble_execution_authorities
+    raise ValueError('EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED')
+E   ValueError: EXPLICIT_EXECUTION_AUTHORIZATION_REQUIRED
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\providers-remaining-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_client.py::test_complete_rejects_missing_credentials
+FAILED tests/providers/test_client.py::test_transport_failure_is_redacted - v...
+FAILED tests/providers/test_client.py::test_empty_provider_response_is_rejected
+FAILED tests/providers/test_client.py::test_success_builds_strict_schema_payload_and_normalizes_usage
+FAILED tests/providers/test_current_profile_budget.py::test_current_profile_formal_cli_budget_and_false_pass[budgeted]
+FAILED tests/providers/test_current_profile_budget.py::test_current_profile_formal_cli_budget_and_false_pass[none]
+FAILED tests/providers/test_current_profile_budget.py::test_current_profile_formal_cli_budget_and_false_pass[exhausted]
+FAILED tests/providers/test_domestic_final.py::test_local_gateway_reopen_in_new_process_never_resubmits[unknown]
+FAILED tests/providers/test_domestic_final.py::test_local_gateway_reopen_in_new_process_never_resubmits[completed_cache]
+FAILED tests/providers/test_domestic_final.py::test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+FAILED tests/providers/test_domestic_final.py::test_tampered_fixture_cannot_be_attributed_to_a_future_model_run
+FAILED tests/providers/test_domestic_mode.py::test_network_failure_blocks_worker_without_task_writes_or_automatic_retry[network_unavailable_before_send-False]
+FAILED tests/providers/test_domestic_mode.py::test_network_failure_blocks_worker_without_task_writes_or_automatic_retry[provider_outcome_unknown-True]
+FAILED tests/providers/test_domestic_mode.py::test_failover_and_recovery_preserve_completed_cgkn_task
+FAILED tests/providers/test_domestic_repair.py::test_unmodified_formal_controller_reaches_budgeted_provider[budgeted]
+FAILED tests/providers/test_domestic_repair.py::test_unmodified_formal_controller_reaches_budgeted_provider[none]
+FAILED tests/providers/test_domestic_repair.py::test_unmodified_formal_controller_reaches_budgeted_provider[exhausted]
+FAILED tests/providers/test_iter118_acceptance.py::test_six_slots_real_contract_handoff_and_no_seventh_post
+FAILED tests/providers/test_iter119_pair.py::test_preflight_shared_budget_and_no_oversized_request
+FAILED tests/providers/test_iter119_pair.py::test_no_authorization_no_generation
+FAILED tests/providers/test_iter119_pair.py::test_exact_pair_through_tls_dag_and_full_input_reservation
+FAILED tests/providers/test_iter119_pair.py::test_mcp_permanent_claim_prevents_second_worker
+FAILED tests/providers/test_iter120_formal_parallel.py::test_formal_installed_parallel_matrix
+FAILED tests/providers/test_progress_clock.py::test_tls_dag_parallel_clocks_and_sequential_comparison
+FAILED tests/providers/test_progress_clock.py::test_one_provider_failure_or_idle_does_not_block_other[stalled]
+FAILED tests/providers/test_progress_clock.py::test_one_provider_failure_or_idle_does_not_block_other[eof]
+FAILED tests/providers/test_progress_clock.py::test_one_provider_failure_or_idle_does_not_block_other[heartbeat]
+FAILED tests/providers/test_progress_clock.py::test_one_provider_failure_or_idle_does_not_block_other[http_error]
+FAILED tests/providers/test_progress_transport.py::test_actual_gateway_close_cancels_inflight_formal_client
+FAILED tests/providers/test_progress_transport.py::test_gateway_process_crash_and_new_session_preserve_unknown
+FAILED tests/providers/test_streaming_installed_plugin.py::test_installed_mcp_actual_worker_streaming_contract
+FAILED tests/providers/test_streaming_progress_only.py::test_progress_never_overrides_terminal_contract[events1-stream_incomplete_or_tool_finish]
+FAILED tests/providers/test_streaming_progress_only.py::test_progress_never_overrides_terminal_contract[events2-stream_incomplete_or_tool_finish]
+FAILED tests/providers/test_streaming_runtime.py::test_original_agent_dag_worker_and_independent_acceptance_over_tls_sse
+34 failed, 338 passed, 1 deselected in 190.83s (0:03:10)

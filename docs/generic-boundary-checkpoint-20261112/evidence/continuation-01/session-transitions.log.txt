@@ -1,0 +1,393 @@
+F.F.FF....FFFF......F......F                                             [100%]
+================================== FAILURES ===================================
+______ test_existing_session_declares_checks_and_appends_next_milestone _______
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_existing_session_declares0')
+
+    def test_existing_session_declares_checks_and_appends_next_milestone(tmp_path):
+        session,a,client,events=setup_session(tmp_path)
+>       result=session.run(project_id='p',run_id='r',goal=INTENT['overall_goal'],project_intent=INTENT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_session.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB0F68440>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+_ test_independent_acceptance_is_unavailable_until_all_declared_artifacts_exist _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_independent_acceptance_is0')
+
+    def test_independent_acceptance_is_unavailable_until_all_declared_artifacts_exist(tmp_path):
+        from types import SimpleNamespace
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        session,a,client,events=setup_session(tmp_path)
+>       session.run(project_id='p',run_id='r',goal=INTENT['overall_goal'],project_intent=INTENT)
+
+tests\agent\test_milestone_session.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB130A8D0>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+______ test_failed_independent_measurement_does_not_admit_next_milestone ______
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_failed_independent_measur0')
+
+    def test_failed_independent_measurement_does_not_admit_next_milestone(tmp_path):
+        session,a,client,events=setup_session(tmp_path,bad_record=True)
+        session.max_decisions=3
+>       result=session.run(project_id='p',run_id='r',goal=INTENT['overall_goal'],project_intent=INTENT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_session.py:223: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB13599A0>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+_ test_dependent_milestone_receives_public_contract_and_binds_upstream_identity _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_dependent_milestone_recei0')
+
+    def test_dependent_milestone_receives_public_contract_and_binds_upstream_identity(tmp_path):
+        session,a,client,events=setup_session(tmp_path,dependencies=True)
+>       result=session.run(project_id='p',run_id='r',goal=INTENT['overall_goal'],project_intent=INTENT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_session.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB25C0140>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+_ test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay[False] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_worker_unknown_stops_plan0')
+continuous = False
+
+    @pytest.mark.parametrize('continuous', [False, True])
+    def test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay(tmp_path, continuous):
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        session, acceptance, client, events = setup_session(tmp_path)
+        session.continuous = continuous
+        executor = session.runner.registry.resolve('measure@1', 'measure@1')
+        def unknown(request):
+            return BlockExecutionResult(project_id=request.project_id, run_id=request.run_id,
+                node_id=request.node_id, attempt_id=request.attempt_id, executor_ref='measure@1',
+                status=BlockStatus.BLOCKED,
+                error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR, 'stream interrupted',
+                    {'outcome_unknown': True, 'failure_domain': 'TRANSPORT'}))
+        executor.execute = unknown
+>       result = session.run(project_id='p', run_id='r', goal=INTENT['overall_goal'], project_intent=INTENT)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_session.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB1308D10>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+_ test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay[True] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_worker_unknown_stops_plan1')
+continuous = True
+
+    @pytest.mark.parametrize('continuous', [False, True])
+    def test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay(tmp_path, continuous):
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        session, acceptance, client, events = setup_session(tmp_path)
+        session.continuous = continuous
+        executor = session.runner.registry.resolve('measure@1', 'measure@1')
+        def unknown(request):
+            return BlockExecutionResult(project_id=request.project_id, run_id=request.run_id,
+                node_id=request.node_id, attempt_id=request.attempt_id, executor_ref='measure@1',
+                status=BlockStatus.BLOCKED,
+                error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR, 'stream interrupted',
+                    {'outcome_unknown': True, 'failure_domain': 'TRANSPORT'}))
+        executor.execute = unknown
+>       result = session.run(project_id='p', run_id='r', goal=INTENT['overall_goal'], project_intent=INTENT)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_session.py:313: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB24C8FE0>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+__ test_interrupted_context_is_immutable_and_requires_explicit_new_decision ___
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_interrupted_context_is_im0')
+
+    def test_interrupted_context_is_immutable_and_requires_explicit_new_decision(tmp_path):
+        session, acceptance, client, events = setup_session(tmp_path)
+        session.continuous = True
+        original = session.composer.decide
+        def stop(context):
+            raise KeyboardInterrupt('controller lost before decision persisted')
+        session.composer.decide = stop
+        with pytest.raises(KeyboardInterrupt):
+            session.run(project_id='p', run_id='r', goal=INTENT['overall_goal'], project_intent=INTENT)
+        root = session.store.run_dir('p', 'r')
+        first = (root/'agent/context-01.json').read_bytes()
+        session.composer.decide = original
+        blocked = session.run(project_id='p', run_id='r', goal=INTENT['overall_goal'], resume=True)
+        assert blocked.status == 'BLOCKED' and 'PLANNER_CONTEXT_INTERRUPTED' in blocked.escalation_reason
+        assert not client.requests
+        feedback = {'redecision': {'strategy_revision': 'd'*64, 'reason': 'Read-only interrupted planning reconciled',
+                                  'evidence_refs': ['audit/interrupted-request.json']}}
+>       result = session.run(project_id='p', run_id='r', goal=INTENT['overall_goal'], resume=True,
+                             continuation_feedback=feedback)
+
+tests\agent\test_milestone_session.py:366: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB24D0C50>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+___ test_repeated_blocked_runs_without_execution_are_bounded_and_preserved ____
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_repeated_blocked_runs_wit0')
+
+    def test_repeated_blocked_runs_without_execution_are_bounded_and_preserved(tmp_path):
+        from cgkn.agent.composer import AgentDecision
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        session, acceptance, client, events = setup_session(tmp_path)
+        session.continuous=True
+        executor=session.runner.registry.resolve('measure@1','measure@1')
+        def blocked(request):
+            return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                status=BlockStatus.BLOCKED,error=ExecutionError(ExecutionErrorCode.POLICY_BLOCKED,'known blocked prerequisite'))
+        executor.execute=blocked
+        original=session.composer.decide;seen=[]
+        def decide(context):
+            seen.append(context.decision_number)
+            if context.run_summary:
+                return AgentDecision('keep-'+str(context.decision_number),'keep','fixture',(),True,False,False,'',{},'',0)
+            return original(context)
+        session.composer.decide=decide
+>       result=session.run(project_id='p',run_id='r',goal=INTENT['overall_goal'],project_intent=INTENT)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_session.py:394: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB130BE60>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+______ test_custom_worker_descriptor_counted_without_counting_evaluation ______
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23530/test_custom_worker_descriptor_0')
+
+    def test_custom_worker_descriptor_counted_without_counting_evaluation(tmp_path):
+        from cgkn.executors import ExecutorRegistry
+        from cgkn.executors.protocol import ExecutorDescriptor
+        from cgkn.execution import BlockExecutionResult,BlockStatus
+        from cgkn.runtime import DAGRunner
+        class LocalFixture:
+            def __init__(self,ref):self.descriptor=ExecutorDescriptor(ref,'bounded_llm',('c@1',))
+            def execute(self,r):
+                return BlockExecutionResult(project_id=r.project_id,run_id=r.run_id,node_id=r.node_id,attempt_id=r.attempt_id,executor_ref=r.executor_ref,status=BlockStatus.SUCCEEDED,outputs={'node':r.node_id})
+        registry=ExecutorRegistry()
+        for ref in ['custom.worker@1','task.evaluate@1']:registry.register(LocalFixture(ref))
+        edits=[TreeEdit('e'+str(i),'add_node',node,{'capability_ref':'c@1','parent_id':'','depends_on':[], 'config':probe_node(node,capability_ref='c@1',config={'executor_ref':ref}).as_dict()['config']},{'actor':'agent'}) for i,(node,ref) in enumerate([('work','custom.worker@1'),('eval','task.evaluate@1')])]
+        store=FileRunStore(tmp_path)
+        agent=AgentProjectLoop(Composer([decision(edits=edits,run=True),decision(finish=True)]),probe_runner(registry,store,execution_mode='GOVERNED'),store,known_capabilities={'c@1'},worker_model='worker',admission_policy=policy())
+>       result=agent.run(project_id='p',run_id='r',goal='controlled counter fixture')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_project_loop_boundaries.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.dag_runner.DAGRunner object at 0x000001DDB250EA80>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+_ ProjectSessionBudgetTests.test_budget_block_stops_without_another_planner_call _
+
+self = <test_session_budget.ProjectSessionBudgetTests testMethod=test_budget_block_stops_without_another_planner_call>
+
+    def test_budget_block_stops_without_another_planner_call(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = FileRunStore(pathlib.Path(tmp) / "state")
+            composer = _Composer()
+            runner = _Runner(store)
+            session = ProjectSession(composer, runner, store,
+                                     known_capabilities={"demo.write@1"},
+                                     worker_model="deepseek", max_decisions=4,
+                                     admission_policy=AdmissionPolicy(project_id='p',execution_budget={'calls':0},
+                                         capability_contracts={'demo.write@1':asdict(CapabilityContract('demo.write@1',
+                                             'Budget denial fixture',critical=False,positive_controls=('budget stop',)))}))
+>           result = session.run(project_id="p", run_id="r", goal="demo")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\project_agent\test_session_budget.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:439: in _run
+    self.runner.validate_graph_transition(project_id=project_id,run_id=run_id,tree=proposed,dag=dag,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_session_budget._Runner object at 0x000001DDB24D3500>
+
+    def validate_graph_transition(self, *, project_id, run_id, tree, dag, retry_node=None, accept_edits=False):
+        """Read-only precommit check using the existing graph-binding rules."""
+>       if compile_tree(tree).as_dict()!=dag.as_dict():
+           ^^^^^^^^^^^^
+E       NameError: name 'compile_tree' is not defined
+
+cgkn\runtime\dag_runner.py:404: NameError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\session-transitions.xml -
+=========================== short test summary info ===========================
+FAILED tests/agent/test_milestone_session.py::test_existing_session_declares_checks_and_appends_next_milestone
+FAILED tests/agent/test_milestone_session.py::test_independent_acceptance_is_unavailable_until_all_declared_artifacts_exist
+FAILED tests/agent/test_milestone_session.py::test_failed_independent_measurement_does_not_admit_next_milestone
+FAILED tests/agent/test_milestone_session.py::test_dependent_milestone_receives_public_contract_and_binds_upstream_identity
+FAILED tests/agent/test_milestone_session.py::test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay[False]
+FAILED tests/agent/test_milestone_session.py::test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay[True]
+FAILED tests/agent/test_milestone_session.py::test_interrupted_context_is_immutable_and_requires_explicit_new_decision
+FAILED tests/agent/test_milestone_session.py::test_repeated_blocked_runs_without_execution_are_bounded_and_preserved
+FAILED tests/agent/test_project_loop_boundaries.py::test_custom_worker_descriptor_counted_without_counting_evaluation
+FAILED tests/project_agent/test_session_budget.py::ProjectSessionBudgetTests::test_budget_block_stops_without_another_planner_call
+10 failed, 18 passed in 8.77s

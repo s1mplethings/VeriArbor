@@ -1,0 +1,12 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_____________ test_installed_mcp_actual_worker_streaming_contract _____________
+tests\providers\test_streaming_installed_plugin.py:123: in test_installed_mcp_actual_worker_streaming_contract
+    assert runtime.get('long_streams') and runtime['long_streams'][0]['seconds']>90
+E   AssertionError: assert (None)
+E    +  where None = <built-in method get of dict object at 0x0000022DCC885840>('long_streams')
+E    +    where <built-in method get of dict object at 0x0000022DCC885840> = {'cert_path': 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23553\\test_installed_mcp_actual_work0\...ing=None, setup_seconds=60, initial_progress_seconds=180, progress_idle_seconds=120), 'delay': 0.02, 'events': [], ...}.get
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\installed.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_streaming_installed_plugin.py::test_installed_mcp_actual_worker_streaming_contract
+1 failed, 1 passed in 228.56s (0:03:48)

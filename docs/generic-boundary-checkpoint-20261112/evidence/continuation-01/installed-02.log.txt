@@ -1,0 +1,14 @@
+F.............                                                           [100%]
+================================== FAILURES ===================================
+_____________ test_installed_mcp_actual_worker_streaming_contract _____________
+tests\providers\test_streaming_installed_plugin.py:129: in test_installed_mcp_actual_worker_streaming_contract
+    assert doc.get('state') == 'REWORK_BLOCKED', doc
+E   AssertionError: {'attempt_id': 'generation-attempt-8764a65d54c34be285d1a4932bbfb318', 'candidate_present': False, 'formal_evidence_status': 'NOT_EVALUATED', 'job_id': 'generation-job-232d1d1f8741494a9429d669343d9bec', ...}
+E   assert 'BLOCKED' == 'REWORK_BLOCKED'
+E     
+E     - REWORK_BLOCKED
+E     + BLOCKED
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\installed-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_streaming_installed_plugin.py::test_installed_mcp_actual_worker_streaming_contract
+1 failed, 13 passed in 105.94s (0:01:45)

@@ -1,0 +1,20 @@
+[
+  {
+    "path": "F:\\CharacterCut\\acfv\\AGENTS.md",
+    "expected": "e92b29cab1f0befd67897973a5aae7e54be52800ad44c9dac4a39594ff22da6b",
+    "actual": "e92b29cab1f0befd67897973a5aae7e54be52800ad44c9dac4a39594ff22da6b",
+    "unchanged": true
+  },
+  {
+    "path": "F:\\CharacterCut\\acfv\\src\\acfv\\clips\\governed.py",
+    "expected": "d0e5a98745663451e58979cd99e6d595ab6f33f353c2ff570f17db31a55d6f1b",
+    "actual": "d0e5a98745663451e58979cd99e6d595ab6f33f353c2ff570f17db31a55d6f1b",
+    "unchanged": true
+  },
+  {
+    "path": "F:\\CharacterCut\\acfv\\tests\\unit\\test_governed_request_boundary.py",
+    "expected": "7aa9615cdb9deea7448cd737b9c6d7383addc32e0b390e533bb717f16f881fb3",
+    "actual": "7aa9615cdb9deea7448cd737b9c6d7383addc32e0b390e533bb717f16f881fb3",
+    "unchanged": true
+  }
+]

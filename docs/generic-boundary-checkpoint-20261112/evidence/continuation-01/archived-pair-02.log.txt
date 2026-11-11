@@ -1,0 +1,20 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+__________ test_six_slots_real_contract_handoff_and_no_seventh_post ___________
+tests\providers\test_iter118_acceptance.py:66: in test_six_slots_real_contract_handoff_and_no_seventh_post
+    assert result['status']=='PASS',result
+E   AssertionError: {'case_id': 'ITER118-04', 'job_id': 'ISOLATED_TEST_ONLY', 'receipt': {'agent_calls': 1, 'agent_input_tokens': 'TOKEN_U...m\\pytest-23548\\test_six_slots_real_contract_h0\\acceptance\\task\\seeded_repair\\seeded_repair-866afda1eda8-r0', ...}
+E   assert 'BLOCKED_PROVIDER' == 'PASS'
+E     
+E     - PASS
+E     + BLOCKED_PROVIDER
+____________________ test_formal_installed_parallel_matrix ____________________
+tests\providers\test_iter120_formal_parallel.py:210: in test_formal_installed_parallel_matrix
+    assert not any(e['phase']=='connection.connect_tcp.started' for e in events)
+E   assert not True
+E    +  where True = any(<generator object test_formal_installed_parallel_matrix.<locals>.<genexpr> at 0x000001FDBE95AB50>)
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\archived-pair-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_iter118_acceptance.py::test_six_slots_real_contract_handoff_and_no_seventh_post
+FAILED tests/providers/test_iter120_formal_parallel.py::test_formal_installed_parallel_matrix
+2 failed in 23.23s

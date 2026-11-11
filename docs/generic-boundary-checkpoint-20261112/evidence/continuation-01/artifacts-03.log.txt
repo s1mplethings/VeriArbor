@@ -1,0 +1,173 @@
+..F...........F..............                                            [100%]
+================================== FAILURES ===================================
+____________ test_unknown_is_not_replayed_by_new_adapter_instance _____________
+
+self = <tests.artifact_authority_support.artifact_runner object at 0x000001EF3E2AEED0>
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -> dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+>           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:295: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+cgkn\runtime\governed.py:74: in admit_declared_tree
+    authority.validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001EF3E35B1D0>
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_project_snapshot', parent_i...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+>           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:210: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23516/test_unknown_is_not_replayed_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EF3E3A1820>
+
+            lambda *a: (_ for _ in ()).throw(RuntimeError('controlled local failure')))
+        with pytest.raises(ModuleExecutionError, match='controlled local failure'):
+            runner.run(inputs)
+        state = state_store(runner).load_run('artifact-flow', 'session')
+        assert state.nodes['n_requirement_interpretation'].status == 'FAILED'
+        assert state.nodes['n_project_snapshot'].status == 'SUCCEEDED'
+        assert state.nodes['n_problem_analysis'].status == 'BLOCKED'
+    
+    
+    def test_unknown_is_not_replayed_by_new_adapter_instance(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+        class UnknownTransport(RuntimeError):
+            outcome_unknown = True
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+            lambda *a: (_ for _ in ()).throw(UnknownTransport('response lost')))
+>       with pytest.raises(ModuleExecutionError):
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_artifact_dag_authority.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <tests.artifact_authority_support.artifact_runner object at 0x000001EF3E2AEED0>
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -> dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+>           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\runner.py:110: ModuleExecutionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23516/test_unknown_is_not_replayed_b0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EF3E3A1820>
+
+            lambda *a: (_ for _ in ()).throw(RuntimeError('controlled local failure')))
+        with pytest.raises(ModuleExecutionError, match='controlled local failure'):
+            runner.run(inputs)
+        state = state_store(runner).load_run('artifact-flow', 'session')
+        assert state.nodes['n_requirement_interpretation'].status == 'FAILED'
+        assert state.nodes['n_project_snapshot'].status == 'SUCCEEDED'
+        assert state.nodes['n_problem_analysis'].status == 'BLOCKED'
+    
+    
+    def test_unknown_is_not_replayed_by_new_adapter_instance(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+        class UnknownTransport(RuntimeError):
+            outcome_unknown = True
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+>           lambda *a: (_ for _ in ()).throw(UnknownTransport('response lost')))
+E           AssertionError: Regex pattern did not match.
+E            Regex: 'UNRESOLVED_OUTCOME'
+E            Input: 'UNMANAGED_TREE_MUTATION'
+
+tests\runtime\test_artifact_dag_authority.py:59: AssertionError
+_______ test_upstream_change_invalidates_only_descendants_and_explains ________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23516/test_upstream_change_invalidat0')
+
+    def test_upstream_change_invalidates_only_descendants_and_explains(tmp_path: pathlib.Path) -> None:
+        store, _, runner, result = initial_run(tmp_path)
+        old = store.resolve_artifact_ref(result["outputs"]["requirement_interpretation"])
+        content = dict(old.content)
+        content["constraints"] = ["confirmation required"]
+        changed = ArtifactInstance(
+            id=store.allocate_id(old.artifact_type), artifact_type=old.artifact_type, run_id=store.run_dir.name,
+            producer=old.producer, content=content, provenance=old.provenance, supersedes=old.id,
+        )
+>       changed_ref = store.write_artifact(changed)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\artifacts\store.py:103: in write_artifact
+    authority,permit_id=require_provider_context()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+execution_mode = 'GOVERNED'
+
+    def require_provider_context(execution_mode='GOVERNED'):
+        if execution_mode=='LEGACY':
+            from veriarbor.governance import require_legacy
+            require_legacy();return None
+>       if execution_mode!='GOVERNED' or _scope.get() is None:raise ValueError('PERMIT_REQUIRED')
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: PERMIT_REQUIRED
+
+cgkn\execution\node_effects.py:48: ValueError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\artifacts-03.xml -
+=========================== short test summary info ===========================
+FAILED tests/runtime/test_artifact_dag_authority.py::test_unknown_is_not_replayed_by_new_adapter_instance
+FAILED tests/runtime/test_artifact_runtime_contract.py::test_upstream_change_invalidates_only_descendants_and_explains
+2 failed, 27 passed in 315.71s (0:05:15)

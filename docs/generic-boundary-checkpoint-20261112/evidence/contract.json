@@ -1,0 +1,71 @@
+{
+  "kind": "BoundaryClosureContract",
+  "task": "VERIARBOR_GENERIC_BOUNDARY_CLOSURE_V1",
+  "version": 2,
+  "supersedes": {
+    "path": "D:\\VeriArbor\\reports\\boundary-closure-v1\\contract.json",
+    "sha256": "e3111cf921367750add4f97682f4d367c31e4bdc9f5ef93abef53ddd0d90b8ee"
+  },
+  "change_authority": "Explicit user scope correction in current chat; replaces all ACFV business requirements",
+  "criteria": [
+    {
+      "id": "C01",
+      "requirement": "目标和反馈：原目标、要求、需求→Gap绑定、反馈来源与版本一致；适配器不能偷偷缩小目标；有效成果可发现并复用。",
+      "points": 10
+    },
+    {
+      "id": "C02",
+      "requirement": "入口一致：所有已声明正式入口、恢复入口和兼容入口使用同一组权威服务；没有未登记的正式执行/写入旁路或静默LEGACY回退。",
+      "points": 10
+    },
+    {
+      "id": "C03",
+      "requirement": "请求一致：Planner、Worker、修复、翻译/评估及其他现有模型角色都实际经过共用的动态请求准备、精确封包预检、权限与预算控制；不是开关偶然打开才成立。",
+      "points": 10
+    },
+    {
+      "id": "C04",
+      "requirement": "响应与账本：原始响应、解析、结构校验、错误分类、用量、预留和结算完整且幂等；已知未发送、已完成与UNKNOWN明确区分。",
+      "points": 10
+    },
+    {
+      "id": "C05",
+      "requirement": "输入与输出：正式输入身份可校验，关键写入经标准effects，只有合法Host提交才能成为正式产物；消费者、预览与导出使用准确产物身份。",
+      "points": 10
+    },
+    {
+      "id": "C06",
+      "requirement": "生命周期与修复：成功不重复生产，失败保留，版本失效与局部重验正确；停止、恢复、后继运行、补丁应用不重置授权/预算或混用源码身份。",
+      "points": 10
+    },
+    {
+      "id": "C07",
+      "requirement": "验收与奖励：目标证据、Checker、Outcome及用户反馈分工清楚；模型不能自评分晋升；奖励不可通过改标准、重复提交或无关产物刷取。",
+      "points": 10
+    },
+    {
+      "id": "C08",
+      "requirement": "防回退：实际入口覆盖、依赖/导入约束、运行时拒绝和代表性绕过负例进入正常验证入口；新增入口不接公共路径会使检查失败。",
+      "points": 10
+    },
+    {
+      "id": "C09",
+      "requirement": "通用能力继承与装配一致性：已有动态上下文、请求计量、反馈、产物复用和恢复机制，必须在声明支持的公共入口与模型角色中实际生效；不依赖业务项目专用补丁或特殊配置。",
+      "points": 10
+    },
+    {
+      "id": "C10",
+      "requirement": "通用端到端验证与交付：领域无关的小型任务验证完整执行、输入输出、反馈修复、预算及恢复，不依赖 ACFV 素材、库或业务环境。真实 Provider 调用仅使用明确覆盖本次通用收口的有效授权。",
+      "points": 10
+    }
+  ],
+  "excluded": [
+    "ACFV product development, media selection, audio/chat/subtitles/editing",
+    "Real ACFV run, strategy application or new media as completion criteria",
+    "Inheritance of any prior ACFV business budget"
+  ],
+  "historical_requests": "Read-only sanitized regression data only; no ACFV startup or dependency",
+  "budget_authority": "No prior business authorization carried over; only explicitly applicable generic authorization",
+  "reward": "10 points per fully evidenced generic PASS, once per requirement/root-goal; no business/call/node rewards",
+  "stop": "Freeze and deliver supported generic entry points when fixed generic criteria pass; no automatic next product task"
+}

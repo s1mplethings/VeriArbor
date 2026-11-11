@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="52" time="23.858" timestamp="2026-11-11T22:42:41.399898+08:00" hostname="test"><testcase classname="tests.runtime.test_graph_commit" name="test_R1_save_reload_executes_once" time="0.789" /><testcase classname="tests.runtime.test_graph_commit" name="test_R2_missing_executor_correction_and_append" time="0.712"><failure message="AssertionError: assert 'FAILED' == 'SUCCEEDED'&#10;  &#10;  - SUCCEEDED&#10;  + FAILED">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_R2_missing_executor_corre0')
+
+    def test_R2_missing_executor_correction_and_append(tmp_path):
+        e,r=setup(tmp_path);t=CapabilityTree('goal',(probe_node('a',capability_ref='c@1'),))
+        assert run(r,t).failed_nodes==('a',);assert e.calls==[]
+&gt;       assert run(r,tree('a','b'),resume=True,accept_edits=True).status=='SUCCEEDED'
+E       AssertionError: assert 'FAILED' == 'SUCCEEDED'
+E         
+E         - SUCCEEDED
+E         + FAILED
+
+tests\runtime\test_graph_commit.py:34: AssertionError</failure></testcase><testcase classname="tests.runtime.test_graph_commit" name="test_R3_append_reuses_completed_and_initializes_dependencies" time="0.921" /><testcase classname="tests.runtime.test_graph_commit" name="test_R4_committed_graph_reload_and_atomic_write_failure" time="0.375"><failure message="ValueError: explicit edit commit required">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_R4_committed_graph_reload0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F10530B890&gt;
+
+    def test_R4_committed_graph_reload_and_atomic_write_failure(tmp_path,monkeypatch):
+        e,r=setup(tmp_path);run(r,tree('a'));state=r.store.load_run('p','r')
+        before=(tmp_path/'p/r/run_state.json').read_bytes()
+        original=r.store.save_run
+        monkeypatch.setattr(r.store,'save_run',lambda state: (_ for _ in ()).throw(OSError('controlled precommit failure')))
+        with pytest.raises(OSError):r._bind_graph(state,compile_tree(tree('a','b')),accept_edits=True,retry_node=None)
+        assert (tmp_path/'p/r/run_state.json').read_bytes()==before
+        monkeypatch.setattr(r.store,'save_run',original)
+        r._bind_graph(r.store.load_run('p','r'),compile_tree(tree('a','b')),accept_edits=True,retry_node=None)
+        # Definition mirror still old: committed state is authoritative on restart.
+        restored=governed_probe_runner(r.registry,FileRunStore(tmp_path))
+&gt;       assert run(restored,tree('a','b'),resume=True).actual_executions==('b',)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_graph_commit.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_graph_commit.py:24: in run
+    def run(r,t,identity='r',**kw):return run_calibration(r,project_id='p',run_id=identity,tree=t,dag=compile_tree(t),**kw)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+runner = &lt;cgkn.runtime.dag_runner.DAGRunner object at 0x000001F10533C200&gt;
+project_id = 'p', run_id = 'r'
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='a', parent_id='', capability_ref='c@1', depends_on=(), config=ma...e', 'output_identity': 'probe/b', 'effect_domains': ('probe/b',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+dag = ExecutionDAG(goal='goal', nodes=(ExecutionNode(id='a', capability_ref='c@1', depends_on=(), config=mappingproxy({'exec...e', 'output_identity': 'probe/b', 'effect_domains': ('probe/b',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+kwargs = {'resume': True}
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F10533C110&gt;
+current = {'admission_id': 'admission-c2d05ef34f3e42bfb911bcf55e81ddb0', 'tree': {'goal': 'goal', 'kind': 'CGKNCapabilityTree', ...': [], 'effect_domains': [...], ...}}, 'depends_on': [], 'id': 'a', ...}], 'schema_version': '1.0'}, 'tree_version': 2}
+state = RunState(project_id='p', run_id='r', status='PENDING', nodes={'a': NodeExecutionRecord(node_id='a', status='SUCCEEDED'...PECTION'}}, 'depends_on': [], 'id': 'b'}], 'schema_version': '1.0', 'topological_order': ['a', 'b']}, graph_revision=2)
+
+    def run_calibration(runner, *, project_id, run_id, tree, dag, **kwargs):
+        if runner.execution_mode!='GOVERNED':raise ValueError('Calibration requires real governed execution')
+        if compile_tree(tree).as_dict()!=dag.as_dict():raise ValueError('execution DAG does not match executable CapabilityTree nodes')
+        authority=ExecutionAuthority(runner.store,project_id,run_id)
+        current=authority.committed_tree()
+        try:state=runner.store.load_run(project_id,run_id)
+        except StateStoreError:state=None
+        if state and (kwargs.get('resume') or kwargs.get('retry_node')):
+            runner._bind_graph(state,dag,accept_edits=kwargs.get('accept_edits',False),
+                retry_node=kwargs.get('retry_node'),validate_only=True)
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        operations=[]
+        if current and tree.as_dict()!=base.as_dict() and not kwargs.get('accept_edits'):
+&gt;           raise ValueError('explicit edit commit required')
+E           ValueError: explicit edit commit required
+
+tests\calibration_admission.py:29: ValueError</failure></testcase><testcase classname="tests.runtime.test_graph_commit" name="test_R5_real_mismatch_and_success_edit_rejected_without_state_change" time="0.380" /><testcase classname="tests.runtime.test_graph_commit" name="test_R6_same_node_ids_separate_run_states" time="1.326" /><testcase classname="tests.runtime.test_graph_commit" name="test_explicit_independent_tasks_actually_overlap" time="0.553" /><testcase classname="tests.runtime.test_graph_commit" name="test_unknown_receipt_retry_is_rejected_before_graph_mutation" time="0.294" /><testcase classname="tests.runtime.test_graph_commit" name="test_unknown_operation_cannot_escape_by_adding_new_node_name[None]" time="0.379"><failure message="AssertionError: Fixture admission changed the requested graph">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_unknown_operation_cannot_0')
+operation = None
+
+    @pytest.mark.parametrize('operation',[None,'business-op'])
+    def test_unknown_operation_cannot_escape_by_adding_new_node_name(tmp_path,operation):
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self, request):
+                return replace(super().execute(request),status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+        e=Unknown();reg=ExecutorRegistry();reg.register(e);r=governed_probe_runner(reg,FileRunStore(tmp_path))
+        first=probe_node('a',capability_ref='c@1',config={'executor_ref':'record@1',**({'operation_id':operation} if operation else {})})
+        t=CapabilityTree('goal',(first,));run(r,t)
+        renamed=CapabilityTree('goal',(first,replace(first,id='new-name')))
+        with pytest.raises(ValueError,match='UNRESOLVED_OPERATION'):run(r,renamed,resume=True,accept_edits=True)
+        assert e.calls==[('r','a')]
+        independent=CapabilityTree('goal',(first,probe_node('independent',capability_ref='other@1',config={'executor_ref':'record@1'})))
+&gt;       run(r,independent,resume=True,accept_edits=True)
+
+tests\runtime\test_graph_commit.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_graph_commit.py:24: in run
+    def run(r,t,identity='r',**kw):return run_calibration(r,project_id='p',run_id=identity,tree=t,dag=compile_tree(t),**kw)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+runner = &lt;cgkn.runtime.dag_runner.DAGRunner object at 0x000001F105312DB0&gt;
+project_id = 'p', run_id = 'r'
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='a', parent_id='', capability_ref='c@1', depends_on=(), config=ma...': 'probe/independent', 'effect_domains': ('probe/independent',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+dag = ExecutionDAG(goal='goal', nodes=(ExecutionNode(id='a', capability_ref='c@1', depends_on=(), config=mappingproxy({'exec...': 'probe/independent', 'effect_domains': ('probe/independent',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+kwargs = {'accept_edits': True, 'resume': True}
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F10533BDA0&gt;
+current = {'admission_id': 'admission-f26ef8936d57425c859a65a7bdd95a0a', 'tree': {'goal': 'goal', 'kind': 'CGKNCapabilityTree', ...'effect_domains': [...], ...}}, 'depends_on': [], 'id': 'new-name', ...}], 'schema_version': '1.0'}, 'tree_version': 3}
+state = RunState(project_id='p', run_id='r', status='FAILED', nodes={'a': NodeExecutionRecord(node_id='a', status='FAILED', at... 'INSPECTION'}}, 'depends_on': [], 'id': 'a'}], 'schema_version': '1.0', 'topological_order': ['a']}, graph_revision=1)
+
+    def run_calibration(runner, *, project_id, run_id, tree, dag, **kwargs):
+        if runner.execution_mode!='GOVERNED':raise ValueError('Calibration requires real governed execution')
+        if compile_tree(tree).as_dict()!=dag.as_dict():raise ValueError('execution DAG does not match executable CapabilityTree nodes')
+        authority=ExecutionAuthority(runner.store,project_id,run_id)
+        current=authority.committed_tree()
+        try:state=runner.store.load_run(project_id,run_id)
+        except StateStoreError:state=None
+        if state and (kwargs.get('resume') or kwargs.get('retry_node')):
+            runner._bind_graph(state,dag,accept_edits=kwargs.get('accept_edits',False),
+                retry_node=kwargs.get('retry_node'),validate_only=True)
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        operations=[]
+        if current and tree.as_dict()!=base.as_dict() and not kwargs.get('accept_edits'):
+            raise ValueError('explicit edit commit required')
+        for node in tree.nodes:
+            if not node.executable:continue
+            old=base.by_id.get(node.id)
+            if old is None:
+                operations.append(dict(operation='add_node',node_id=node.id,parent_id=node.parent_id,
+                    capability_ref=node.capability_ref,depends_on=list(node.depends_on),config=node.as_dict()['config']))
+            elif old.as_dict()!=node.as_dict():
+                if old.depends_on!=node.depends_on:raise ValueError('Calibration dependency edits require an explicit dedicated proposal')
+                operations.append(dict(operation='update_config',node_id=node.id,config=node.as_dict()['config']))
+        if kwargs.get('retry_node'):operations.append(dict(operation='retry_node',node_id=kwargs['retry_node']))
+        if operations:
+            contracts={n.capability_ref:asdict(CapabilityContract(n.capability_ref,'Bounded scheduler observation',
+                critical=False,positive_controls=('independent fixture observation',))) for n in tree.nodes if n.executable}
+            domains={d for n in tree.nodes if n.executable for d in n.config['leaf_contract']['effect_domains']}
+            policy=AdmissionPolicy(project_id=project_id,capability_contracts=contracts,incremental_mode=False,
+                max_new_nodes=len(tree.nodes),allowed_effect_domains=frozenset(domains),execution_budget={'calls':0})
+            cap=next(iter(contracts))
+            proposal=ProjectProposal('calibration-'+str(version),project_id,version,tree.goal,(),tuple(operations),
+                reason_summary='Explicit scheduler test operation',target_capability_id=cap,strategy_capabilities=tuple(contracts),
+                exploration_reason='Bounded independent scheduler calibration',exploration_budget=1,
+                exploration_measure='Original test assertions and registered deliverable checks')
+            aid,result=authority.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+            if not result.valid:raise ValueError(result.code+': '+result.message)
+            committed=authority.commit_tree(aid)
+&gt;           assert committed.as_dict()==tree.as_dict(),'Fixture admission changed the requested graph'
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Fixture admission changed the requested graph
+
+tests\calibration_admission.py:54: AssertionError</failure></testcase><testcase classname="tests.runtime.test_graph_commit" name="test_unknown_operation_cannot_escape_by_adding_new_node_name[business-op]" time="0.372"><failure message="AssertionError: Fixture admission changed the requested graph">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_unknown_operation_cannot_1')
+operation = 'business-op'
+
+    @pytest.mark.parametrize('operation',[None,'business-op'])
+    def test_unknown_operation_cannot_escape_by_adding_new_node_name(tmp_path,operation):
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self, request):
+                return replace(super().execute(request),status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+        e=Unknown();reg=ExecutorRegistry();reg.register(e);r=governed_probe_runner(reg,FileRunStore(tmp_path))
+        first=probe_node('a',capability_ref='c@1',config={'executor_ref':'record@1',**({'operation_id':operation} if operation else {})})
+        t=CapabilityTree('goal',(first,));run(r,t)
+        renamed=CapabilityTree('goal',(first,replace(first,id='new-name')))
+        with pytest.raises(ValueError,match='UNRESOLVED_OPERATION'):run(r,renamed,resume=True,accept_edits=True)
+        assert e.calls==[('r','a')]
+        independent=CapabilityTree('goal',(first,probe_node('independent',capability_ref='other@1',config={'executor_ref':'record@1'})))
+&gt;       run(r,independent,resume=True,accept_edits=True)
+
+tests\runtime\test_graph_commit.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_graph_commit.py:24: in run
+    def run(r,t,identity='r',**kw):return run_calibration(r,project_id='p',run_id=identity,tree=t,dag=compile_tree(t),**kw)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+runner = &lt;cgkn.runtime.dag_runner.DAGRunner object at 0x000001F105308C80&gt;
+project_id = 'p', run_id = 'r'
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='a', parent_id='', capability_ref='c@1', depends_on=(), config=ma...': 'probe/independent', 'effect_domains': ('probe/independent',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+dag = ExecutionDAG(goal='goal', nodes=(ExecutionNode(id='a', capability_ref='c@1', depends_on=(), config=mappingproxy({'exec...': 'probe/independent', 'effect_domains': ('probe/independent',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+kwargs = {'accept_edits': True, 'resume': True}
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F105292450&gt;
+current = {'admission_id': 'admission-e0751629aeee4dd3a1ed97fc6d8c3c1c', 'tree': {'goal': 'goal', 'kind': 'CGKNCapabilityTree', ...'operation_id': 'business-op'}, 'depends_on': [], 'id': 'new-name', ...}], 'schema_version': '1.0'}, 'tree_version': 3}
+state = RunState(project_id='p', run_id='r', status='FAILED', nodes={'a': NodeExecutionRecord(node_id='a', status='FAILED', at... 'business-op'}, 'depends_on': [], 'id': 'a'}], 'schema_version': '1.0', 'topological_order': ['a']}, graph_revision=1)
+
+    def run_calibration(runner, *, project_id, run_id, tree, dag, **kwargs):
+        if runner.execution_mode!='GOVERNED':raise ValueError('Calibration requires real governed execution')
+        if compile_tree(tree).as_dict()!=dag.as_dict():raise ValueError('execution DAG does not match executable CapabilityTree nodes')
+        authority=ExecutionAuthority(runner.store,project_id,run_id)
+        current=authority.committed_tree()
+        try:state=runner.store.load_run(project_id,run_id)
+        except StateStoreError:state=None
+        if state and (kwargs.get('resume') or kwargs.get('retry_node')):
+            runner._bind_graph(state,dag,accept_edits=kwargs.get('accept_edits',False),
+                retry_node=kwargs.get('retry_node'),validate_only=True)
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        operations=[]
+        if current and tree.as_dict()!=base.as_dict() and not kwargs.get('accept_edits'):
+            raise ValueError('explicit edit commit required')
+        for node in tree.nodes:
+            if not node.executable:continue
+            old=base.by_id.get(node.id)
+            if old is None:
+                operations.append(dict(operation='add_node',node_id=node.id,parent_id=node.parent_id,
+                    capability_ref=node.capability_ref,depends_on=list(node.depends_on),config=node.as_dict()['config']))
+            elif old.as_dict()!=node.as_dict():
+                if old.depends_on!=node.depends_on:raise ValueError('Calibration dependency edits require an explicit dedicated proposal')
+                operations.append(dict(operation='update_config',node_id=node.id,config=node.as_dict()['config']))
+        if kwargs.get('retry_node'):operations.append(dict(operation='retry_node',node_id=kwargs['retry_node']))
+        if operations:
+            contracts={n.capability_ref:asdict(CapabilityContract(n.capability_ref,'Bounded scheduler observation',
+                critical=False,positive_controls=('independent fixture observation',))) for n in tree.nodes if n.executable}
+            domains={d for n in tree.nodes if n.executable for d in n.config['leaf_contract']['effect_domains']}
+            policy=AdmissionPolicy(project_id=project_id,capability_contracts=contracts,incremental_mode=False,
+                max_new_nodes=len(tree.nodes),allowed_effect_domains=frozenset(domains),execution_budget={'calls':0})
+            cap=next(iter(contracts))
+            proposal=ProjectProposal('calibration-'+str(version),project_id,version,tree.goal,(),tuple(operations),
+                reason_summary='Explicit scheduler test operation',target_capability_id=cap,strategy_capabilities=tuple(contracts),
+                exploration_reason='Bounded independent scheduler calibration',exploration_budget=1,
+                exploration_measure='Original test assertions and registered deliverable checks')
+            aid,result=authority.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+            if not result.valid:raise ValueError(result.code+': '+result.message)
+            committed=authority.commit_tree(aid)
+&gt;           assert committed.as_dict()==tree.as_dict(),'Fixture admission changed the requested graph'
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Fixture admission changed the requested graph
+
+tests\calibration_admission.py:54: AssertionError</failure></testcase><testcase classname="tests.runtime.test_event_frontier" name="test_event_frontier_and_no_side_effect_replay" time="2.117" /><testcase classname="tests.runtime.test_event_frontier" name="test_shared_resource_claims" time="0.001" /><testcase classname="tests.runtime.test_event_frontier" name="test_unknown_dispatch_is_not_replayed" time="0.157" /><testcase classname="tests.runtime.test_event_frontier" name="test_receipt_committed_before_state_failure_is_recovered_without_replay" time="0.355" /><testcase classname="tests.runtime.test_event_frontier" name="test_pre_dispatch_cancel_and_coordinator_lock" time="0.137" /><testcase classname="tests.runtime.test_event_frontier" name="test_inflight_cancel_preserves_observed_result_without_success" time="0.029"><failure message="ValueError: UNMANAGED_TREE_MUTATION">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_inflight_cancel_preserves0')
+
+    def test_inflight_cancel_preserves_observed_result_without_success(tmp_path):
+        cancel = threading.Event()
+    
+        class Cancelling(Witness):
+            def execute(self, request):
+                result = super().execute(request)
+                cancel.set()
+                return result
+    
+        tree = CapabilityTree('late cancel', (probe_node('c', capability_ref='work@1',
+            config={'executor_ref': 'witness@1'}),))
+        store = FileRunStore(tmp_path)
+        registry = ExecutorRegistry()
+        registry.register(Cancelling())
+&gt;       result = governed_probe_runner(registry, store).run(project_id='p', run_id='r', tree=tree, dag=compile_tree(tree), cancel=cancel)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_event_frontier.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:67: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:71: in _run
+    self._authority(project_id, run_id).validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F10536B350&gt;
+tree = CapabilityTree(goal='late cancel', nodes=(CapabilityNode(id='c', parent_id='', capability_ref='work@1', depends_on=(),..., 'output_identity': 'probe/c', 'effect_domains': ('probe/c',), 'executor_ref': 'witness@1', 'dependencies': ()})})),))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+&gt;           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:166: ValueError</failure></testcase><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_runner_uses_registered_default_but_preserves_explicit_node_budget[60-None-60]" time="0.018"><failure message="ValueError: UNMANAGED_TREE_MUTATION">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_runner_uses_registered_de0')
+declared = 60, explicit = None, expected = 60
+
+    @pytest.mark.parametrize("declared,explicit,expected", [(60,None,60),(60,7,7),(30,None,30)])
+    def test_runner_uses_registered_default_but_preserves_explicit_node_budget(tmp_path,declared,explicit,expected):
+        seen=[]
+        class Probe:
+            descriptor=ExecutorDescriptor("budget@1","probe",("probe@1",),default_timeout_seconds=declared)
+            def execute(self,request):
+                seen.append(request.timeout_seconds)
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref=self.descriptor.executor_ref,
+                    status=BlockStatus.SUCCEEDED,outputs={"node":request.node_id,"timeout":request.timeout_seconds})
+        config={"executor_ref":"budget@1"}
+        if explicit is not None:config["timeout_seconds"]=explicit
+        tree=CapabilityTree("budget qualification",(probe_node("check",capability_ref="probe@1",config=config),))
+        registry=ExecutorRegistry();registry.register(Probe());store=FileRunStore(tmp_path)
+&gt;       result=governed_probe_runner(registry,store).run(project_id="p",run_id="r",tree=tree,dag=compile_tree(tree))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_executor_timeout_defaults.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:67: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:71: in _run
+    self._authority(project_id, run_id).validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F105372C00&gt;
+tree = CapabilityTree(goal='budget qualification', nodes=(CapabilityNode(id='check', parent_id='', capability_ref='probe@1', ...ut_identity': 'probe/check', 'effect_domains': ('probe/check',), 'executor_ref': 'budget@1', 'dependencies': ()})})),))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+&gt;           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:166: ValueError</failure></testcase><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_runner_uses_registered_default_but_preserves_explicit_node_budget[60-7-7]" time="0.019"><failure message="ValueError: UNMANAGED_TREE_MUTATION">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_runner_uses_registered_de1')
+declared = 60, explicit = 7, expected = 7
+
+    @pytest.mark.parametrize("declared,explicit,expected", [(60,None,60),(60,7,7),(30,None,30)])
+    def test_runner_uses_registered_default_but_preserves_explicit_node_budget(tmp_path,declared,explicit,expected):
+        seen=[]
+        class Probe:
+            descriptor=ExecutorDescriptor("budget@1","probe",("probe@1",),default_timeout_seconds=declared)
+            def execute(self,request):
+                seen.append(request.timeout_seconds)
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref=self.descriptor.executor_ref,
+                    status=BlockStatus.SUCCEEDED,outputs={"node":request.node_id,"timeout":request.timeout_seconds})
+        config={"executor_ref":"budget@1"}
+        if explicit is not None:config["timeout_seconds"]=explicit
+        tree=CapabilityTree("budget qualification",(probe_node("check",capability_ref="probe@1",config=config),))
+        registry=ExecutorRegistry();registry.register(Probe());store=FileRunStore(tmp_path)
+&gt;       result=governed_probe_runner(registry,store).run(project_id="p",run_id="r",tree=tree,dag=compile_tree(tree))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_executor_timeout_defaults.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:67: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:71: in _run
+    self._authority(project_id, run_id).validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F10532FD40&gt;
+tree = CapabilityTree(goal='budget qualification', nodes=(CapabilityNode(id='check', parent_id='', capability_ref='probe@1', ...ut_identity': 'probe/check', 'effect_domains': ('probe/check',), 'executor_ref': 'budget@1', 'dependencies': ()})})),))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+&gt;           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:166: ValueError</failure></testcase><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_runner_uses_registered_default_but_preserves_explicit_node_budget[30-None-30]" time="0.016"><failure message="ValueError: UNMANAGED_TREE_MUTATION">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_runner_uses_registered_de2')
+declared = 30, explicit = None, expected = 30
+
+    @pytest.mark.parametrize("declared,explicit,expected", [(60,None,60),(60,7,7),(30,None,30)])
+    def test_runner_uses_registered_default_but_preserves_explicit_node_budget(tmp_path,declared,explicit,expected):
+        seen=[]
+        class Probe:
+            descriptor=ExecutorDescriptor("budget@1","probe",("probe@1",),default_timeout_seconds=declared)
+            def execute(self,request):
+                seen.append(request.timeout_seconds)
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref=self.descriptor.executor_ref,
+                    status=BlockStatus.SUCCEEDED,outputs={"node":request.node_id,"timeout":request.timeout_seconds})
+        config={"executor_ref":"budget@1"}
+        if explicit is not None:config["timeout_seconds"]=explicit
+        tree=CapabilityTree("budget qualification",(probe_node("check",capability_ref="probe@1",config=config),))
+        registry=ExecutorRegistry();registry.register(Probe());store=FileRunStore(tmp_path)
+&gt;       result=governed_probe_runner(registry,store).run(project_id="p",run_id="r",tree=tree,dag=compile_tree(tree))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_executor_timeout_defaults.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:67: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:71: in _run
+    self._authority(project_id, run_id).validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F1052D2BA0&gt;
+tree = CapabilityTree(goal='budget qualification', nodes=(CapabilityNode(id='check', parent_id='', capability_ref='probe@1', ...ut_identity': 'probe/check', 'effect_domains': ('probe/check',), 'executor_ref': 'budget@1', 'dependencies': ()})})),))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+&gt;           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:166: ValueError</failure></testcase><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_invalid_registered_timeout_rejected[True]" time="0.001" /><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_invalid_registered_timeout_rejected[0]" time="0.001" /><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_invalid_registered_timeout_rejected[-1]" time="0.001" /><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_invalid_registered_timeout_rejected[nan]" time="0.001" /><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_invalid_registered_timeout_rejected[inf]" time="0.001" /><testcase classname="tests.runtime.test_executor_timeout_defaults" name="test_invalid_registered_timeout_rejected[60]" time="0.001" /><testcase classname="tests.runtime.test_executor_context" name="test_parallel_dispatch_inherits_context_and_isolates_mutation" time="0.017"><failure message="ValueError: UNMANAGED_TREE_MUTATION">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23502/test_parallel_dispatch_inherit0')
+
+    def test_parallel_dispatch_inherits_context_and_isolates_mutation(tmp_path):
+        scope = ContextVar('request_scope', default='missing')
+        token = scope.set('parent-audit')
+        barrier = Barrier(2, timeout=10)
+        observations = {}
+    
+        class Worker:
+            descriptor = ExecutorDescriptor('ctx@1', 'local', ('ctx@1',))
+            def execute(self, request):
+                inherited = scope.get()
+                scope.set(request.node_id)
+                barrier.wait()
+                observations[request.node_id] = (inherited, scope.get())
+                return BlockExecutionResult(project_id=request.project_id, run_id=request.run_id,
+                    node_id=request.node_id, attempt_id=request.attempt_id,
+                    executor_ref=request.executor_ref, status=BlockStatus.SUCCEEDED,
+                    outputs={'node':request.node_id})
+    
+        registry = ExecutorRegistry()
+        registry.register(Worker())
+        tree = CapabilityTree('context propagation', tuple(probe_node(n, capability_ref='ctx@1',
+            config={'executor_ref':'ctx@1', 'parallel_safe':True, 'resources':{n:'write'}}) for n in ('a','b')))
+        try:
+&gt;           result = governed_probe_runner(registry, FileRunStore(tmp_path), max_parallel=2).run(
+                project_id='p', run_id='r', tree=tree, dag=compile_tree(tree))
+
+tests\runtime\test_executor_context.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:67: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\dag_runner.py:71: in _run
+    self._authority(project_id, run_id).validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001F1042061E0&gt;
+tree = CapabilityTree(goal='context propagation', nodes=(CapabilityNode(id='a', parent_id='', capability_ref='ctx@1', depends...robe', 'output_identity': 'probe/b', 'effect_domains': ('probe/b',), 'executor_ref': 'ctx@1', 'dependencies': ()})}))))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+&gt;           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:166: ValueError</failure></testcase><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change0-INVALID_CONTRACT]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change1-INVALID_CONTRACT]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change2-INVALID_CONTRACT]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change3-NEEDS_DECOMPOSITION]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change4-NEEDS_DECOMPOSITION]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change5-INVALID_CONTRACT]" time="0.002" /><testcase classname="tests.runtime.test_execution_continuity" name="test_composite_rejected_and_split_children_compile" time="0.002" /><testcase classname="tests.runtime.test_execution_continuity" name="test_pure_function_checked_and_version_reuse_guard" time="0.468" /><testcase classname="tests.runtime.test_execution_continuity" name="test_partial_two_files_retained_and_continued_without_rewrite" time="0.815" /><testcase classname="tests.runtime.test_execution_continuity" name="test_no_delta_is_failed_deliverable_and_next_decision_feedback" time="0.690" /><testcase classname="tests.runtime.test_execution_continuity" name="test_readonly_evidence_not_false_no_progress" time="0.406" /><testcase classname="tests.runtime.test_execution_continuity" name="test_parallel_join_failure_isolation_targeted_repair" time="3.126" /><testcase classname="tests.runtime.test_execution_continuity" name="test_three_independent_branches_join_current_versions_and_no_sibling_replay" time="4.239" /><testcase classname="tests.runtime.test_execution_continuity" name="test_parent_requires_children_and_own_acceptance" time="0.419" /><testcase classname="tests.runtime.test_execution_continuity" name="test_out_of_scope_write_is_rejected_before_any_write" time="0.330" /><testcase classname="tests.runtime.test_execution_continuity" name="test_old_graph_load_is_readonly_not_requalified" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_contract_executor_projects_legacy_alias_without_changing_identity" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_worker_receives_current_contract_goal_not_stale_legacy_alias" time="0.379" /><testcase classname="tests.runtime.test_execution_continuity" name="test_check_task_requires_observable_subject_and_rule" time="0.381" /><testcase classname="tests.runtime.test_execution_continuity" name="test_output_limit_preserves_partial_text_and_unknown_without_replay" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_checker_failure_preserves_worker_usage_and_classifies_harness" time="0.305" /><testcase classname="tests.runtime.test_execution_continuity" name="test_unregistered_checker_rejected_before_worker" time="0.058" /><testcase classname="tests.runtime.test_execution_continuity" name="test_legacy_ledger_scope_cannot_promote_unrelated_route" time="0.006" /><testcase classname="tests.runtime.test_execution_continuity" name="test_real_sqlite_process_acceptance_positive_negative" time="1.047" /><testcase classname="tests.runtime.test_execution_continuity" name="test_progress_is_received_by_next_canonical_planner_decision" time="0.394" /><testcase classname="tests.runtime.test_execution_continuity" name="test_partial_output_limit_retains_verified_artifact_and_blocks_blind_retry" time="0.704" /></testsuite></testsuites>

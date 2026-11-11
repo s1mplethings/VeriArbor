@@ -1,0 +1,84 @@
+{
+  "task": "VERIARBOR_GENERIC_BOUNDARY_CLOSURE_V1",
+  "profile": "full",
+  "commands": [
+    {
+      "component": "host",
+      "cwd": "F:\\CGKN-LeanLoop-V1-20261101",
+      "command": [
+        "D:/anaconda/python.exe",
+        "-m",
+        "pytest",
+        "tests/providers",
+        "tests/protocol",
+        "tests/agent",
+        "tests/project_agent",
+        "tests/runtime",
+        "tests/state",
+        "tests/executors",
+        "tests/execution",
+        "tests/architecture",
+        "tests/test_provider_api_budget.py",
+        "tests/application/test_goal_driven.py",
+        "tests/application/test_generic_gateway_chain.py",
+        "--run-profile-marked",
+        "-m",
+        "not live_provider and not provider and not stress and not soak and not benchmark and not longrun and not long_journey",
+        "-q",
+        "--junitxml=D:\\VeriArbor\\reports\\generic-boundary-closure-v1\\full-audit-04\\host.xml"
+      ],
+      "exit_code": 1,
+      "seconds": 510.4875888824463
+    },
+    {
+      "component": "core",
+      "cwd": "D:\\VeriArbor",
+      "command": [
+        "D:\\VeriArbor\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests",
+        "-q",
+        "--junitxml=D:\\VeriArbor\\reports\\generic-boundary-closure-v1\\full-audit-04\\core.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 1.986299753189087
+    },
+    {
+      "component": "gateway",
+      "cwd": "D:\\cgkn-provider-api-lab",
+      "command": [
+        "D:/anaconda/python.exe",
+        "-m",
+        "pytest",
+        "tests",
+        "-q",
+        "-p",
+        "no:pytest-qt",
+        "-p",
+        "no:opik",
+        "-p",
+        "no:langsmith",
+        "-p",
+        "no:dash",
+        "--junitxml=D:\\VeriArbor\\reports\\generic-boundary-closure-v1\\full-audit-04\\gateway.xml"
+      ],
+      "exit_code": 0,
+      "seconds": 20.877517461776733
+    },
+    {
+      "component": "product-direction",
+      "cwd": "F:\\CGKN-LeanLoop-V1-20261101",
+      "command": [
+        "D:/anaconda/python.exe",
+        "scripts/product_direction_gate.py"
+      ],
+      "exit_code": 0,
+      "seconds": 10.234069347381592
+    }
+  ],
+  "source_unchanged": true,
+  "source_identity_sha256": "e275072bc1409177f2d73d03e259a8879a0cb242a999a268f8a7512f96073b50",
+  "passed": false,
+  "closure_qualification": "NOT_GRANTED: test profile alone does not establish C01-C10"
+}

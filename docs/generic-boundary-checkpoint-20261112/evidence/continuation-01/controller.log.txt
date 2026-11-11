@@ -1,0 +1,3 @@
+.................                                                        [100%]
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\controller.xml -
+17 passed in 17.76s

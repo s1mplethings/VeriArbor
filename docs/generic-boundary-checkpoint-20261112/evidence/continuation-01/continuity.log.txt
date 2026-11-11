@@ -1,0 +1,135 @@
+.........FF.......F.....F.                                               [100%]
+================================== FAILURES ===================================
+_______ test_no_delta_is_failed_deliverable_and_next_decision_feedback ________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_no_delta_is_failed_delive0')
+
+    def test_no_delta_is_failed_deliverable_and_next_decision_feedback(tmp_path):
+        root,store,runner=setup(tmp_path,Client([]));(root/'f.py').write_text('def f(x): return x + 1\n')
+        assert run(runner,[node()]).status=='FAILED'
+        r=store.load_result('p','r','n')
+>       assert r.metadata['execution_status']=='EXECUTION_SUCCESS'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'execution_status'
+
+tests\runtime\test_execution_continuity.py:116: KeyError
+________________ test_readonly_evidence_not_false_no_progress _________________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_readonly_evidence_not_fal0')
+
+    def test_readonly_evidence_not_false_no_progress(tmp_path):
+        root,store,runner=setup(tmp_path,Client([{'action':'read_file','path':'f.py'}]));(root/'f.py').write_text('def f(x): return x + 1\n')
+>       assert run(runner,[node(kind='RESEARCH')]).status=='SUCCEEDED'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_execution_continuity.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_execution_continuity.py:69: in run
+    tree=admit_fixture_tree(runner.store,tree)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+store = <cgkn.state.store.FileRunStore object at 0x000001D93F823260>
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='n', parent_id='', capability_ref='code@1', depends_on=(), config...unction', 'source_refs': ('public:source',), 'completion_criterion': 'evidence recorded'}), 'parallel_safe': True})),))
+
+    def admit_fixture_tree(store,tree,*,operations=None):
+        """Explicit bounded batch policy for scheduler fixtures, not Session defaults."""
+        a=ExecutionAuthority(store,'p','r');current=a.committed_tree()
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        contracts={n.capability_ref:asdict(CapabilityContract(n.capability_ref,'Bounded scheduler fixture',critical=False,
+            positive_controls=('independent-observation',))) for n in tree.nodes if n.executable}
+        ops=operations or tuple({'operation':'add_node','node_id':n.id,'capability_ref':n.capability_ref,
+            'parent_id':n.parent_id,'depends_on':list(n.depends_on),'config':n.as_dict()['config']} for n in tree.nodes if n.executable)
+        cap=next(iter(contracts))
+        proposal=ProjectProposal('fixture-tree-'+str(version),'p',version,tree.goal,(),tuple(ops),reason_summary='explicit bounded test graph',
+            target_capability_id=cap,strategy_capabilities=(cap,),exploration_reason='scheduler calibration',exploration_budget=1,
+            exploration_measure='independent deliverable observation')
+        domains={d for n in tree.nodes if n.executable for d in n.config['leaf_contract']['effect_domains']}
+        policy=AdmissionPolicy(project_id='p',capability_contracts=contracts,incremental_mode=False,
+            max_new_nodes=len(tree.nodes),allowed_effect_domains=frozenset(domains),allow_remote_effects=True,execution_budget={'calls':20})
+        aid,result=a.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+>       if not result.valid:raise ValueError(result.code+':'+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains
+
+tests\governed_measurement_support.py:29: ValueError
+____________ test_check_task_requires_observable_subject_and_rule _____________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_check_task_requires_obser0')
+
+    def test_check_task_requires_observable_subject_and_rule(tmp_path):
+        root,store,runner=setup(tmp_path,Client([]));(root/'f.py').write_text('def f(x): return x + 1\n')
+>       assert run(runner,[node(kind='TEST')]).status=='SUCCEEDED'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_execution_continuity.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_execution_continuity.py:69: in run
+    tree=admit_fixture_tree(runner.store,tree)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+store = <cgkn.state.store.FileRunStore object at 0x000001D93F90B800>
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='n', parent_id='', capability_ref='code@1', depends_on=(), config...ect': 'f.py', 'expected_observation': 'works', 'pass_fail_rule': 'independent predicate'}), 'parallel_safe': True})),))
+
+    def admit_fixture_tree(store,tree,*,operations=None):
+        """Explicit bounded batch policy for scheduler fixtures, not Session defaults."""
+        a=ExecutionAuthority(store,'p','r');current=a.committed_tree()
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        contracts={n.capability_ref:asdict(CapabilityContract(n.capability_ref,'Bounded scheduler fixture',critical=False,
+            positive_controls=('independent-observation',))) for n in tree.nodes if n.executable}
+        ops=operations or tuple({'operation':'add_node','node_id':n.id,'capability_ref':n.capability_ref,
+            'parent_id':n.parent_id,'depends_on':list(n.depends_on),'config':n.as_dict()['config']} for n in tree.nodes if n.executable)
+        cap=next(iter(contracts))
+        proposal=ProjectProposal('fixture-tree-'+str(version),'p',version,tree.goal,(),tuple(ops),reason_summary='explicit bounded test graph',
+            target_capability_id=cap,strategy_capabilities=(cap,),exploration_reason='scheduler calibration',exploration_budget=1,
+            exploration_measure='independent deliverable observation')
+        domains={d for n in tree.nodes if n.executable for d in n.config['leaf_contract']['effect_domains']}
+        policy=AdmissionPolicy(project_id='p',capability_contracts=contracts,incremental_mode=False,
+            max_new_nodes=len(tree.nodes),allowed_effect_domains=frozenset(domains),allow_remote_effects=True,execution_budget={'calls':20})
+        aid,result=a.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+>       if not result.valid:raise ValueError(result.code+':'+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains
+
+tests\governed_measurement_support.py:29: ValueError
+________ test_progress_is_received_by_next_canonical_planner_decision _________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_progress_is_received_by_n0')
+
+    def test_progress_is_received_by_next_canonical_planner_decision(tmp_path):
+        from cgkn.agent.composer import AgentComposer
+        from cgkn.agent.project_loop import AgentProjectLoop
+        from cgkn.agent.project_agent import AdmissionPolicy
+        from veriarbor.capability import CapabilityContract
+        from dataclasses import asdict
+        n=node();contexts=[]
+        class Planner:
+            def complete(self,**kw):
+                context=json.loads(kw['user']);contexts.append(context)
+                first=len(contexts)==1
+                edits=[dict(edit_id='add',operation='add_node',node_id='n',payload={k:v for k,v in CapabilityTree('g',(n,)).as_dict()['nodes'][0].items() if k!='id'},provenance={'actor':'fixture'})] if first else []
+                value=dict(schema_version='1.0',decision_id=str(len(contexts)),summary='fixture',reason='public facts',edits=edits,request_run=first,finish=False,needs_escalation=not first,escalation_reason='' if first else 'change strategy')
+                value['decision_audit']={'capability_claim':{'target_capability_id':'code@1','strategy_capabilities':['code@1'],
+                    'exploration_reason':'Measure no-progress feedback','exploration_budget':1,'exploration_measure':'Independent file predicate'}}
+                return ProviderCompletion(json.dumps(value),'fake-planner')
+        root,store,runner=setup(tmp_path,Client([]))
+        policy=AdmissionPolicy(project_id='p',capability_contracts={'code@1':asdict(CapabilityContract('code@1','bounded function',critical=False,
+            positive_controls=('independent file predicate',)))},allow_remote_effects=True,execution_budget={'calls':4})
+        loop=AgentProjectLoop(AgentComposer(Planner(),ModelRoleConfig('agent','fake')),runner,store,known_capabilities={'code@1'},worker_model='fake',max_decisions=2,admission_policy=policy)
+        loop.run(project_id='p',run_id='r',goal='g')
+        assert len(contexts)==2
+>       assert contexts[1]['task_feedback']['items'][0]['implementation_progress']['verdict']=='NO_IMPLEMENTATION_PROGRESS'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests\runtime\test_execution_continuity.py:293: IndexError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\continuity.xml -
+=========================== short test summary info ===========================
+FAILED tests/runtime/test_execution_continuity.py::test_no_delta_is_failed_deliverable_and_next_decision_feedback
+FAILED tests/runtime/test_execution_continuity.py::test_readonly_evidence_not_false_no_progress
+FAILED tests/runtime/test_execution_continuity.py::test_check_task_requires_observable_subject_and_rule
+FAILED tests/runtime/test_execution_continuity.py::test_progress_is_received_by_next_canonical_planner_decision
+4 failed, 22 passed in 13.89s

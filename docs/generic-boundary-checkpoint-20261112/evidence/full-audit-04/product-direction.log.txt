@@ -1,0 +1,5 @@
+{
+  "kind": "CGKNProductDirectionGate",
+  "status": "PASS",
+  "errors": []
+}

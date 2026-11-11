@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="1.466" timestamp="2026-11-11T22:58:51.281237+08:00" hostname="test"><testcase classname="tests.agent.test_evaluation_loop" name="test_failure_evaluation_returns_to_real_planner_loop" time="1.032" /></testsuite></testsuites>

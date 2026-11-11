@@ -1,0 +1,88 @@
+.......F...F........                                                     [100%]
+================================== FAILURES ===================================
+__ test_evaluation_changes_next_real_executor_route_only_for_supported_class __
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23509/test_evaluation_changes_next_r0')
+
+    def test_evaluation_changes_next_real_executor_route_only_for_supported_class(tmp_path):
+        store=FileRunStore(tmp_path/'state');ledger=CapabilityLedger(store,'p')
+        configs={'default':ModelRoleConfig('worker','P',model_id='M1'),'supported':ModelRoleConfig('worker','P',model_id='M2')}
+        assert ledger.route('json',configs,'default',operation='inspect',capability_scope=SCOPE)['selected_config']=='default'
+        for i in range(3):
+>           f,fact,a=attempt(store,'r'+str(i),configs['supported']);r,c=evaluate(store,f,fact,a);assert r.status==BlockStatus.SUCCEEDED
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_capability_routing_qualification.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+store = <cgkn.state.store.FileRunStore object at 0x00000181F5C15250>, run = 'r0'
+config = ModelRoleConfig(role='worker', model='P', timeout_seconds=45, max_output_tokens=2200, temperature=0.0, reasoning_effort='none', model_id='M2')
+domain = 'NONE', task_class = 'json', meta = False
+
+    def attempt(store,run,config,domain='NONE',task_class='json',meta=False):
+        f=TaskFeedback(store,'p',run)
+        error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'controlled',{'failure_domain':domain,'outcome_unknown':domain=='UNKNOWN'}) if domain in {'TRANSPORT','HARNESS','UNKNOWN'} else None
+        result=BlockExecutionResult(project_id='p',run_id=run,node_id='work',attempt_id='attempt-0001',executor_ref='fixture@1',
+            status=BlockStatus.FAILED if error else BlockStatus.SUCCEEDED,error=error,
+            usage={'model':config.model_id,'config_hash':digest(asdict(config)),'routing':{'provider_id':config.model,'requested_model':config.model_id,'bound_model':config.model_id,'actual_model':config.model_id,'identity_status':'MATCH'}},outputs={'private':'HIDDEN CHECKER CONTENT'})
+        store.save_result(result)
+        node=CapabilityNode('work',capability_ref=task_class,config={'task_class':task_class,'meta_operation':meta,'operation':'inspect',**SCOPE})
+        fact=f.terminal(result,node)
+        a=GoalAcceptance(store,'p',run,{'R':{'must':True}},{'c':'fixture@1'});a.bind_subjects({'object':'v1'})
+        a.commit(a.propose({'phases':[{'id':'phase','depends_on':[]}],'goals':[{'id':'g','phase_id':'phase','requirement_refs':['R'],'acceptance':'fixture','subject_refs':['object'],'checker':'c','task_refs':['work']}]},CapabilityTree('g',(node,))))
+        if domain in {'NONE','BUSINESS'}:
+            checked=BlockExecutionResult(project_id='p',run_id=run,node_id='check',attempt_id='attempt-0001',executor_ref='fixture@1',status=BlockStatus.SUCCEEDED,
+                outputs={'goal_check':{'goal_id':'g','condition_hash':identity('fixture'),'subjects':{'object':'v1'},'execution':'VALID','evidence_refs':['actual-fixture-check'],
+                    'observed':'controlled qualification only','verdict':'VERIFIED' if domain=='NONE' else 'FAILED','task_receipts':[digest(result.as_dict())]}})
+            from tests.governed_measurement_support import execute_measurement
+            control=store.run_dir('p',run)/'routing-control.json'
+            store.immutable_json(control,{'verdict': 'VERIFIED' if domain=='NONE' else 'FAILED'})
+>           request=BlockExecutionRequest(project_id='p',run_id=run,node_id='check',attempt_id='attempt-0001',
+                executor_ref='fixture@1',component_ref='routing.measurement@1')
+E           TypeError: BlockExecutionRequest.__init__() missing 1 required positional argument: 'task_context'
+
+tests\agent\test_capability_routing_qualification.py:38: TypeError
+___________ test_concurrent_ledger_publication_and_revision_history ___________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23509/test_concurrent_ledger_publica0')
+
+    def test_concurrent_ledger_publication_and_revision_history(tmp_path):
+        store=FileRunStore(tmp_path);config=ModelRoleConfig('worker','P',model_id='M')
+>       fixtures=[attempt(store,'r'+str(i),config) for i in range(8)]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_capability_routing_qualification.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+store = <cgkn.state.store.FileRunStore object at 0x00000181F5C142F0>, run = 'r0'
+config = ModelRoleConfig(role='worker', model='P', timeout_seconds=45, max_output_tokens=2200, temperature=0.0, reasoning_effort='none', model_id='M')
+domain = 'NONE', task_class = 'json', meta = False
+
+    def attempt(store,run,config,domain='NONE',task_class='json',meta=False):
+        f=TaskFeedback(store,'p',run)
+        error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'controlled',{'failure_domain':domain,'outcome_unknown':domain=='UNKNOWN'}) if domain in {'TRANSPORT','HARNESS','UNKNOWN'} else None
+        result=BlockExecutionResult(project_id='p',run_id=run,node_id='work',attempt_id='attempt-0001',executor_ref='fixture@1',
+            status=BlockStatus.FAILED if error else BlockStatus.SUCCEEDED,error=error,
+            usage={'model':config.model_id,'config_hash':digest(asdict(config)),'routing':{'provider_id':config.model,'requested_model':config.model_id,'bound_model':config.model_id,'actual_model':config.model_id,'identity_status':'MATCH'}},outputs={'private':'HIDDEN CHECKER CONTENT'})
+        store.save_result(result)
+        node=CapabilityNode('work',capability_ref=task_class,config={'task_class':task_class,'meta_operation':meta,'operation':'inspect',**SCOPE})
+        fact=f.terminal(result,node)
+        a=GoalAcceptance(store,'p',run,{'R':{'must':True}},{'c':'fixture@1'});a.bind_subjects({'object':'v1'})
+        a.commit(a.propose({'phases':[{'id':'phase','depends_on':[]}],'goals':[{'id':'g','phase_id':'phase','requirement_refs':['R'],'acceptance':'fixture','subject_refs':['object'],'checker':'c','task_refs':['work']}]},CapabilityTree('g',(node,))))
+        if domain in {'NONE','BUSINESS'}:
+            checked=BlockExecutionResult(project_id='p',run_id=run,node_id='check',attempt_id='attempt-0001',executor_ref='fixture@1',status=BlockStatus.SUCCEEDED,
+                outputs={'goal_check':{'goal_id':'g','condition_hash':identity('fixture'),'subjects':{'object':'v1'},'execution':'VALID','evidence_refs':['actual-fixture-check'],
+                    'observed':'controlled qualification only','verdict':'VERIFIED' if domain=='NONE' else 'FAILED','task_receipts':[digest(result.as_dict())]}})
+            from tests.governed_measurement_support import execute_measurement
+            control=store.run_dir('p',run)/'routing-control.json'
+            store.immutable_json(control,{'verdict': 'VERIFIED' if domain=='NONE' else 'FAILED'})
+>           request=BlockExecutionRequest(project_id='p',run_id=run,node_id='check',attempt_id='attempt-0001',
+                executor_ref='fixture@1',component_ref='routing.measurement@1')
+E           TypeError: BlockExecutionRequest.__init__() missing 1 required positional argument: 'task_context'
+
+tests\agent\test_capability_routing_qualification.py:38: TypeError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\evaluation-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/agent/test_capability_routing_qualification.py::test_evaluation_changes_next_real_executor_route_only_for_supported_class
+FAILED tests/agent/test_capability_routing_qualification.py::test_concurrent_ledger_publication_and_revision_history
+2 failed, 18 passed in 37.78s

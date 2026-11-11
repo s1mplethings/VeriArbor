@@ -1,0 +1,18 @@
+..........F.................                                             [100%]
+================================== FAILURES ===================================
+________________ test_readonly_evidence_not_false_no_progress _________________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23500/test_readonly_evidence_not_fal0')
+
+    def test_readonly_evidence_not_false_no_progress(tmp_path):
+        root,store,runner=setup(tmp_path,Client([{'action':'read_file','path':'f.py'}]));(root/'f.py').write_text('def f(x): return x + 1\n')
+>       assert run(runner,[node(kind='RESEARCH')]).status=='SUCCEEDED'
+E       AssertionError: assert 'FAILED' == 'SUCCEEDED'
+E         
+E         - SUCCEEDED
+E         + FAILED
+
+tests\runtime\test_execution_continuity.py:126: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/runtime/test_execution_continuity.py::test_readonly_evidence_not_false_no_progress
+1 failed, 27 passed in 27.15s

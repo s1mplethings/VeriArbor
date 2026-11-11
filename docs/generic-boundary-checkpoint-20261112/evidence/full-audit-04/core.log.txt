@@ -1,0 +1,13 @@
+........................................................................ [ 75%]
+.......................                                                  [100%]
+============================== warnings summary ===============================
+tests/unit/test_capability_skills.py::SkillTests::test_candidate_generation
+tests/unit/test_capability_skills.py::SkillTests::test_dependency_and_strategy_changes_prevent_promotion
+tests/unit/test_capability_skills.py::SkillTests::test_immature_single_and_duplicate_success_rejected
+tests/unit/test_capability_skills.py::SkillTests::test_lazy_load_and_invalidation
+tests/unit/test_capability_skills.py::SkillTests::test_promotion_and_shared_isolation
+  D:\VeriArbor\src\veriarbor\skills.py:115: RuntimeWarning: LEGACY Skill promotion has no node receipt lineage
+    warnings.warn('LEGACY Skill promotion has no node receipt lineage',RuntimeWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+95 passed, 5 warnings in 1.32s

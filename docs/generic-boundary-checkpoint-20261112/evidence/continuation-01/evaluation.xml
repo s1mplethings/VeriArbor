@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="12" time="3.691" timestamp="2026-11-11T22:56:30.263280+08:00" hostname="test"><testcase classname="tests.agent.test_evaluation_recovery" name="test_late_evaluation_uses_exact_attempt_after_retry" time="0.271" /><testcase classname="tests.agent.test_evaluation_recovery" name="test_evaluation_rejects_changed_receipt_binding_before_call[reference]" time="0.164" /><testcase classname="tests.agent.test_evaluation_recovery" name="test_evaluation_rejects_changed_receipt_binding_before_call[hash]" time="0.178" /><testcase classname="tests.agent.test_evaluation_recovery" name="test_evaluation_rejects_changed_receipt_binding_before_call[identity]" time="0.163" /><testcase classname="tests.agent.test_evaluation_recovery" name="test_evaluation_recovery_never_repeats_generation[commit_failure]" time="0.335" /><testcase classname="tests.agent.test_evaluation_recovery" name="test_evaluation_recovery_never_repeats_generation[no_response]" time="0.259" /><testcase classname="tests.agent.test_evaluation_recovery" name="test_evaluation_recovery_never_repeats_generation[invalid_response]" time="0.269" /><testcase classname="tests.agent.test_capability_routing_qualification" name="test_evaluation_changes_next_real_executor_route_only_for_supported_class" time="0.056"><failure message="ValueError: RECEIPT_ID_REQUIRED">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23508/test_evaluation_changes_next_r0')
+
+    def test_evaluation_changes_next_real_executor_route_only_for_supported_class(tmp_path):
+        store=FileRunStore(tmp_path/'state');ledger=CapabilityLedger(store,'p')
+        configs={'default':ModelRoleConfig('worker','P',model_id='M1'),'supported':ModelRoleConfig('worker','P',model_id='M2')}
+        assert ledger.route('json',configs,'default',operation='inspect',capability_scope=SCOPE)['selected_config']=='default'
+        for i in range(3):
+&gt;           f,fact,a=attempt(store,'r'+str(i),configs['supported']);r,c=evaluate(store,f,fact,a);assert r.status==BlockStatus.SUCCEEDED
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_capability_routing_qualification.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\agent\test_capability_routing_qualification.py:35: in attempt
+    store.save_result(checked);a.record('g',checked,executor_ref='fixture@1')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:24: in update
+    return method(self,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:180: in record
+    ExecutionAuthority(self.store,self.project_id,self.run_id).validate_execution_result(result)
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:760: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002903AE46750&gt;
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'check'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+&gt;       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError</failure></testcase><testcase classname="tests.agent.test_capability_routing_qualification" name="test_nonbusiness_not_charged_to_model_ability_and_evaluator_cannot_override[UNKNOWN]" time="0.423" /><testcase classname="tests.agent.test_capability_routing_qualification" name="test_nonbusiness_not_charged_to_model_ability_and_evaluator_cannot_override[TRANSPORT]" time="0.382" /><testcase classname="tests.agent.test_capability_routing_qualification" name="test_nonbusiness_not_charged_to_model_ability_and_evaluator_cannot_override[HARNESS]" time="0.398" /><testcase classname="tests.agent.test_capability_routing_qualification" name="test_concurrent_ledger_publication_and_revision_history" time="0.042"><failure message="ValueError: RECEIPT_ID_REQUIRED">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23508/test_concurrent_ledger_publica0')
+
+    def test_concurrent_ledger_publication_and_revision_history(tmp_path):
+        store=FileRunStore(tmp_path);config=ModelRoleConfig('worker','P',model_id='M')
+&gt;       fixtures=[attempt(store,'r'+str(i),config) for i in range(8)]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_capability_routing_qualification.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\agent\test_capability_routing_qualification.py:35: in attempt
+    store.save_result(checked);a.record('g',checked,executor_ref='fixture@1')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:24: in update
+    return method(self,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:180: in record
+    ExecutionAuthority(self.store,self.project_id,self.run_id).validate_execution_result(result)
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:760: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002903AE1AC30&gt;
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'check'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+&gt;       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError</failure></testcase></testsuite></testsuites>

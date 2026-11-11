@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="31" time="21.739" timestamp="2026-11-11T23:11:22.258479+08:00" hostname="test"><testcase classname="tests.state.test_provenance_v5" name="test_I12_one_task_revised_history" time="1.473" /><testcase classname="tests.state.test_provenance_v5" name="test_I14_concurrent_immutable_and_acceptance" time="1.967"><failure message="ValueError: TREE_VERSION_REJECT">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23522/test_I14_concurrent_immutable_0')
+
+    def test_I14_concurrent_immutable_and_acceptance(tmp_path):
+        f=setup(tmp_path);check(f)
+        def write(i):
+            store=FileRunStore(f['store'].root)
+            return put_evidence(store,'p','r',{'kind':'event','identity':i%5})
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:refs=list(pool.map(write,range(40)))
+        assert len({r['path'] for r in refs})==5
+        for ref in refs:assert ProvenanceGate(f['store'],'p','r').resolve(ref,'event')['identity'] in range(5)
+        result=f['store'].load_result('p','r','checker')
+        def notify(_):
+            a=GoalAcceptance(FileRunStore(f['store'].root),'p','r',f['binding']['requirements'],{'c':'measure.file@1'})
+            return a.record('g',result,executor_ref='measure.file@1')
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:list(pool.map(notify,range(20)))
+        f['acceptance']._reload();assert len(f['acceptance'].data['checks'])==1
+        def independent(i):
+            local=dict(f,acceptance=GoalAcceptance(FileRunStore(f['store'].root),'p','r',f['binding']['requirements'],{'c':'measure.file@1'}))
+            return check(local,node='independent'+str(i))
+&gt;       with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:list(pool.map(independent,range(3)))
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_provenance_v5.py:219: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\anaconda\Lib\concurrent\futures\_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\concurrent\futures\_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+D:\anaconda\Lib\concurrent\futures\thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\state\test_provenance_v5.py:218: in independent
+    return check(local,node='independent'+str(i))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\fixtures\provenance.py:37: in check
+    result=execute_measurement(f['store'],req,f['artifact'],lambda:executor.execute(req))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\governed_measurement_support.py:78: in execute_measurement
+    packet=a.staging_dir(node.permit_id)/'outputs.json'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:367: in staging_dir
+    p=self.validate_permit(permit_id)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002A17FA2A600&gt;
+permit_id = 'permit-546aa54c27c24f40809f58faafa3bb13', expected = {}
+p = NodeExecutionPermit(permit_id='permit-546aa54c27c24f40809f58faafa3bb13', run_id='r', project_id='p', node_id='independ...ion_id='resource-de370fde4682463f8d7c32b849c8a542', previous_permit_id=None, checker_identities={}, schema_version='2')
+current = {'admission_id': 'admission-65dadabfa776411b81d20c754b20ddd1', 'tree': {'goal': 'ROOT', 'kind': 'CGKNCapabilityTree', ...ect_domains': [...], ...}}, 'depends_on': [], 'id': 'independent2', ...}], 'schema_version': '1.0'}, 'tree_version': 5}
+
+    def validate_permit(self, permit_id, **expected):
+        if not isinstance(permit_id,str):raise ValueError('PERMIT_ID_REQUIRED')
+        p = self._permit(permit_id)
+        if p.status!='ACTIVE':raise ValueError('PERMIT_'+p.status)
+        current = self.committed_tree()
+&gt;       if not current or current['tree_version']!=p.tree_version:raise ValueError('TREE_VERSION_REJECT')
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: TREE_VERSION_REJECT
+
+cgkn\runtime\node_authority.py:337: ValueError</failure></testcase><testcase classname="tests.state.test_provenance_v5" name="test_I18_unknown_effect_alias_matrix[same_operation]" time="0.945" /><testcase classname="tests.state.test_provenance_v5" name="test_I18_unknown_effect_alias_matrix[changed_executor]" time="0.687" /><testcase classname="tests.state.test_provenance_v5" name="test_I18_unknown_effect_alias_matrix[shared_resource]" time="0.709" /><testcase classname="tests.state.test_provenance_v5" name="test_I18_unknown_effect_alias_matrix[same_capability]" time="0.790" /><testcase classname="tests.state.test_checker_revision" name="test_revised_consumer_uses_same_goal_and_preserves_original_receipt[7-VERIFIED]" time="1.878" /><testcase classname="tests.state.test_checker_revision" name="test_revised_consumer_uses_same_goal_and_preserves_original_receipt[6-FAILED]" time="1.979" /><testcase classname="tests.state.test_checker_revision" name="test_unqualified_or_stale_revision_cannot_activate[missing_negative]" time="0.087" /><testcase classname="tests.state.test_checker_revision" name="test_unqualified_or_stale_revision_cannot_activate[failed_mutation]" time="0.080" /><testcase classname="tests.state.test_checker_revision" name="test_unqualified_or_stale_revision_cannot_activate[changed_requirements]" time="0.087" /><testcase classname="tests.state.test_checker_revision" name="test_unqualified_or_stale_revision_cannot_activate[missing_evidence]" time="0.079" /><testcase classname="tests.state.test_checker_revision" name="test_unqualified_or_stale_revision_cannot_activate[stale_source]" time="0.059" /><testcase classname="tests.state.test_checker_revision" name="test_unqualified_or_stale_revision_cannot_activate[changed_predicate]" time="0.079" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_scoped_revision_preserves_unrelated_checker_identity[scope0-qualified-revision-1]" time="0.955" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_scoped_revision_preserves_unrelated_checker_identity[scope1-1]" time="0.938" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_malformed_scope_cannot_activate[scope0]" time="0.092" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_malformed_scope_cannot_activate[R]" time="0.123" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_malformed_scope_cannot_activate[scope2]" time="0.098" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_malformed_scope_cannot_activate[scope3]" time="0.114" /><testcase classname="tests.state.test_scoped_checker_revision" name="test_scope_tamper_cannot_select_old_checker" time="0.126" /><testcase classname="tests.state.test_current_scoped_coverage" name="test_scoped_observer_needs_current_measurement_preserving_history[7-VERIFIED-INSUFFICIENT_EVIDENCE]" time="1.748" /><testcase classname="tests.state.test_current_scoped_coverage" name="test_scoped_observer_needs_current_measurement_preserving_history[6-FAILED-FAILED]" time="1.788" /><testcase classname="tests.state.test_current_scoped_coverage" name="test_unrelated_scoped_revision_preserves_existing_pass" time="0.835" /><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_frozen_external_consumer_measures_actual_file_without_private_leak[7-VERIFIED]" time="0.589" /><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_frozen_external_consumer_measures_actual_file_without_private_leak[6-FAILED]" time="0.583" /><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[print(&quot;OK&quot;)]" time="0.437" /><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[print('{&quot;execution&quot;:&quot;VALID&quot;,&quot;observed&quot;:{&quot;value&quot;:&quot;true&quot;}}')]" time="0.459" /><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[import sys;print('{&quot;execution&quot;:&quot;VALID&quot;,&quot;observed&quot;:{&quot;value&quot;:true}}');sys.exit(1)]" time="0.493" /><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[import json,sys,pathlib,runpy\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\nactual=runpy.run_path(str(pathlib.Path(request['workspace'])/'module.py'))['value']()\nprint(json.dumps({'execution':'VALID','observed':{'value':actual==7,'actual':actual,'hidden_answer':'PRIVATE-CHECKER-MARKER'}}))\n\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n]" time="0.402"><failure message="ValueError: INPUT_BINDING_REJECT">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23522/test_exit_zero_or_invalid_harn3')
+program = "import json,sys,pathlib,runpy\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\nactual=runp...idden_answer':'PRIVATE-CHECKER-MARKER'}}))\n\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n"
+
+    @pytest.mark.parametrize('program',[
+        'print("OK")',
+        'print(\'{"execution":"VALID","observed":{"value":"true"}}\')',
+        'import sys;print(\'{"execution":"VALID","observed":{"value":true}}\');sys.exit(1)',
+        CONSUMER+"\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\n",
+    ])
+    def test_exit_zero_or_invalid_harness_cannot_verify_a_candidate(tmp_path,program):
+        executor,request,acceptance,workspace=setup(tmp_path,program)
+&gt;       result=measure(executor,request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\application\software_project\test_milestone_consumer.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\governed_measurement_support.py:48: in execute_external_measurement
+    return execute_measurement(executor.session_acceptance.store,request,
+tests\governed_measurement_support.py:78: in execute_measurement
+    packet=a.staging_dir(node.permit_id)/'outputs.json'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:367: in staging_dir
+    p=self.validate_permit(permit_id)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002A17FABB890&gt;
+permit_id = 'permit-48f8593ecb314d56b39b66f76ca5a86e', expected = {}
+p = NodeExecutionPermit(permit_id='permit-48f8593ecb314d56b39b66f76ca5a86e', run_id='r', project_id='p', node_id='check', ...ion_id='resource-7da38477840a4238867a4a714382664d', previous_permit_id=None, checker_identities={}, schema_version='2')
+current = {'admission_id': 'admission-8efa82ce5265497388f86f66e9892be4', 'tree': {'goal': 'ROOT', 'kind': 'CGKNCapabilityTree', ...], 'effect_domains': [...], ...}}, 'depends_on': [], 'id': 'check', ...}], 'schema_version': '1.0'}, 'tree_version': 2}
+CapabilityTree = &lt;class 'cgkn.orchestration.capability_tree.CapabilityTree'&gt;
+path = 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23522\\test_exit_zero_or_invalid_harn3\\candidate\\module.py'
+h = '26a85f6b4cf414a039edfa361ac3753d35e6c207d5a7bd11bd13186424a85ba1'
+
+    def validate_permit(self, permit_id, **expected):
+        if not isinstance(permit_id,str):raise ValueError('PERMIT_ID_REQUIRED')
+        p = self._permit(permit_id)
+        if p.status!='ACTIVE':raise ValueError('PERMIT_'+p.status)
+        current = self.committed_tree()
+        if not current or current['tree_version']!=p.tree_version:raise ValueError('TREE_VERSION_REJECT')
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        self.validate_tree(CapabilityTree.from_dict(current['tree']))
+        for k,v in expected.items():
+            if getattr(p,k)!=v:raise ValueError('PERMIT_BINDING_REJECT:'+k)
+        for path,h in p.input_hashes.items():
+&gt;           if file_hash(path)!=h:raise ValueError('INPUT_BINDING_REJECT')
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: INPUT_BINDING_REJECT
+
+cgkn\runtime\node_authority.py:343: ValueError</failure></testcase><testcase classname="tests.application.software_project.test_milestone_consumer" name="test_frozen_consumer_tamper_fails_before_measurement_with_raw_ref" time="0.254" /></testsuite></testsuites>

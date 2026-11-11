@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="29" time="315.678" timestamp="2026-11-11T23:03:03.171795+08:00" hostname="test"><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_artifact_execution_and_repeat_use_canonical_state" time="28.654" /><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_failed_branch_does_not_erase_independent_success" time="1.704" /><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_unknown_is_not_replayed_by_new_adapter_instance" time="2.007"><failure message="AssertionError: Regex pattern did not match.&#10; Regex: 'UNRESOLVED_OUTCOME'&#10; Input: 'UNMANAGED_TREE_MUTATION'">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x000001EF3E2AEED0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:295: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+cgkn\runtime\governed.py:74: in admit_declared_tree
+    authority.validate_tree(tree)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001EF3E35B1D0&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_project_snapshot', parent_i...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def validate_tree(self, tree):
+        current = self.committed_tree()
+        if not current or current['tree'] != tree.as_dict():
+&gt;           raise ValueError('UNMANAGED_TREE_MUTATION')
+E           ValueError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\node_authority.py:210: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23516/test_unknown_is_not_replayed_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF3E3A1820&gt;
+
+            lambda *a: (_ for _ in ()).throw(RuntimeError('controlled local failure')))
+        with pytest.raises(ModuleExecutionError, match='controlled local failure'):
+            runner.run(inputs)
+        state = state_store(runner).load_run('artifact-flow', 'session')
+        assert state.nodes['n_requirement_interpretation'].status == 'FAILED'
+        assert state.nodes['n_project_snapshot'].status == 'SUCCEEDED'
+        assert state.nodes['n_problem_analysis'].status == 'BLOCKED'
+    
+    
+    def test_unknown_is_not_replayed_by_new_adapter_instance(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+        class UnknownTransport(RuntimeError):
+            outcome_unknown = True
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+            lambda *a: (_ for _ in ()).throw(UnknownTransport('response lost')))
+&gt;       with pytest.raises(ModuleExecutionError):
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_artifact_dag_authority.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x000001EF3E2AEED0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: UNMANAGED_TREE_MUTATION
+
+cgkn\runtime\runner.py:110: ModuleExecutionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23516/test_unknown_is_not_replayed_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001EF3E3A1820&gt;
+
+            lambda *a: (_ for _ in ()).throw(RuntimeError('controlled local failure')))
+        with pytest.raises(ModuleExecutionError, match='controlled local failure'):
+            runner.run(inputs)
+        state = state_store(runner).load_run('artifact-flow', 'session')
+        assert state.nodes['n_requirement_interpretation'].status == 'FAILED'
+        assert state.nodes['n_project_snapshot'].status == 'SUCCEEDED'
+        assert state.nodes['n_problem_analysis'].status == 'BLOCKED'
+    
+    
+    def test_unknown_is_not_replayed_by_new_adapter_instance(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+        class UnknownTransport(RuntimeError):
+            outcome_unknown = True
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+&gt;           lambda *a: (_ for _ in ()).throw(UnknownTransport('response lost')))
+E           AssertionError: Regex pattern did not match.
+E            Regex: 'UNRESOLVED_OUTCOME'
+E            Input: 'UNMANAGED_TREE_MUTATION'
+
+tests\runtime\test_artifact_dag_authority.py:59: AssertionError</failure></testcase><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_tampered_artifact_cannot_be_reused" time="30.214" /><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_changed_loaded_implementation_requires_explicit_redecision" time="26.285" /><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_changed_input_identity_is_not_silently_rebound" time="23.672" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_runtime_materializes_outputs_and_index_consumers" time="26.555" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_checkpoint_contains_refs_not_business_content" time="29.857" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_provider_output_gets_one_bounded_schema_repair" time="0.285" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_provider_invalid_output_creates_diagnostic_and_no_artifact" time="0.258" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_context_uses_only_declared_required_artifacts_and_projection" time="0.095" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_context_budget_and_trace_are_enforced" time="0.066" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_same_fingerprint_hits_cache_and_changes_miss" time="31.347" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_fingerprint_changes_with_input_module_and_prompt" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_upstream_change_invalidates_only_descendants_and_explains" time="22.563"><failure message="ValueError: PERMIT_REQUIRED">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23516/test_upstream_change_invalidat0')
+
+    def test_upstream_change_invalidates_only_descendants_and_explains(tmp_path: pathlib.Path) -&gt; None:
+        store, _, runner, result = initial_run(tmp_path)
+        old = store.resolve_artifact_ref(result["outputs"]["requirement_interpretation"])
+        content = dict(old.content)
+        content["constraints"] = ["confirmation required"]
+        changed = ArtifactInstance(
+            id=store.allocate_id(old.artifact_type), artifact_type=old.artifact_type, run_id=store.run_dir.name,
+            producer=old.producer, content=content, provenance=old.provenance, supersedes=old.id,
+        )
+&gt;       changed_ref = store.write_artifact(changed)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:275: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\artifacts\store.py:103: in write_artifact
+    authority,permit_id=require_provider_context()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+execution_mode = 'GOVERNED'
+
+    def require_provider_context(execution_mode='GOVERNED'):
+        if execution_mode=='LEGACY':
+            from veriarbor.governance import require_legacy
+            require_legacy();return None
+&gt;       if execution_mode!='GOVERNED' or _scope.get() is None:raise ValueError('PERMIT_REQUIRED')
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: PERMIT_REQUIRED
+
+cgkn\execution\node_effects.py:48: ValueError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_invalidation_dry_run_does_not_mutate" time="22.053" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_stale_artifact_blocks_delivery_readiness" time="22.082" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_complete_lineage_passes_and_tree_reaches_inputs" time="24.192" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_missing_artifact_blocks_delivery" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_effect_cardinality_accepts_node_and_run_scopes" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_effect_cardinality_violation_blocks_execution" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_run_manifest_and_feed_forward_report_exist" time="21.511" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_run_failure_marks_manifest_failed" time="1.400" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_cache_rejects_empty_missing_stale_and_tampered_entries" time="0.060" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_context_shrink_decision_ledger_and_scalar_paths" time="0.041" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_delivery_detects_hash_tamper" time="0.039" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_artifact_invalidator_uses_direct_consumers_when_producer_is_external" time="0.044" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_reference_adapter_conditional_branches" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_artifact_runner_adapter_helper_boundaries" time="0.001" /></testsuite></testsuites>

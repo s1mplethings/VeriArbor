@@ -1,0 +1,9 @@
+.....................................................                    [100%]
+============================== warnings summary ===============================
+tests/runtime/test_node_execution_authority.py::test_goal_acceptance_rejects_receiptless_and_legacy_reopen
+  F:\CGKN-LeanLoop-V1-20261101\cgkn\state\acceptance.py:36: RuntimeWarning: LEGACY GoalAcceptance: no node receipt boundary
+    warnings.warn('LEGACY GoalAcceptance: no node receipt boundary',RuntimeWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\failure-evidence.xml -
+53 passed, 1 warning in 18.87s

@@ -1,0 +1,16 @@
+......................FF................                                 [100%]
+================================== FAILURES ===================================
+__________ test_actual_gateway_close_cancels_inflight_formal_client ___________
+tests\providers\test_progress_transport.py:128: in test_actual_gateway_close_cancels_inflight_formal_client
+    assert runtime['posts']
+E   assert []
+_________ test_gateway_process_crash_and_new_session_preserve_unknown _________
+tests\providers\test_progress_transport.py:192: in test_gateway_process_crash_and_new_session_preserve_unknown
+    assert len(runtime['posts'])==1 and process.poll() is None
+E   assert (0 == 1)
+E    +  where 0 = len([])
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\provider-scopes.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_progress_transport.py::test_actual_gateway_close_cancels_inflight_formal_client
+FAILED tests/providers/test_progress_transport.py::test_gateway_process_crash_and_new_session_preserve_unknown
+2 failed, 38 passed in 45.16s

@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "product_version": "0.2.0-rc.2",
+  "active_authorities": {
+    "requirement": "PRODUCT_GOAL.md",
+    "assumption": "cgkn.agent.composer:AgentComposer",
+    "planning": "cgkn.agent.composer:AgentComposer",
+    "execution": "cgkn.runtime.dag_runner:DAGRunner",
+    "provider_scheduler": "scripts.provider_jobs:ProviderJob",
+    "evidence": "cgkn.state.store:FileRunStore",
+    "acceptance": "cgkn.state.acceptance:GoalAcceptance",
+    "promotion": "scripts.local_packager:main",
+    "packaging": "scripts.local_packager:main",
+    "delivery": "scripts.codex_conversation:evaluate_public_delivery_gate",
+    "clarification": null
+  },
+  "compatibility_items": [
+    "legacy-status-reader",
+    "legacy-question-projections"
+  ],
+  "expired_compatibility": [],
+  "superseded_production_refs": [],
+  "duplicate_authorities": [],
+  "stale_current_docs": [],
+  "legacy_producers": [],
+  "version_mismatches": [],
+  "retired_paths_present": [],
+  "registry_missing_paths": [],
+  "failures": []
+}
+canonical_version_gate: PASS (0 failures)

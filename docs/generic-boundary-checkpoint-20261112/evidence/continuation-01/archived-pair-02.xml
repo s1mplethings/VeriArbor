@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="23.226" timestamp="2026-11-11T23:45:07.000203+08:00" hostname="test"><testcase classname="tests.providers.test_iter118_acceptance" name="test_six_slots_real_contract_handoff_and_no_seventh_post" time="2.551"><failure message="AssertionError: {'case_id': 'ITER118-04', 'job_id': 'ISOLATED_TEST_ONLY', 'receipt': {'agent_calls': 1, 'agent_input_tokens': 'TOKEN_U...m\\pytest-23548\\test_six_slots_real_contract_h0\\acceptance\\task\\seeded_repair\\seeded_repair-866afda1eda8-r0', ...}&#10;assert 'BLOCKED_PROVIDER' == 'PASS'&#10;  &#10;  - PASS&#10;  + BLOCKED_PROVIDER">tests\providers\test_iter118_acceptance.py:66: in test_six_slots_real_contract_handoff_and_no_seventh_post
+    assert result['status']=='PASS',result
+E   AssertionError: {'case_id': 'ITER118-04', 'job_id': 'ISOLATED_TEST_ONLY', 'receipt': {'agent_calls': 1, 'agent_input_tokens': 'TOKEN_U...m\\pytest-23548\\test_six_slots_real_contract_h0\\acceptance\\task\\seeded_repair\\seeded_repair-866afda1eda8-r0', ...}
+E   assert 'BLOCKED_PROVIDER' == 'PASS'
+E     
+E     - PASS
+E     + BLOCKED_PROVIDER</failure></testcase><testcase classname="tests.providers.test_iter120_formal_parallel" name="test_formal_installed_parallel_matrix" time="19.989"><failure message="assert not True&#10; +  where True = any(&lt;generator object test_formal_installed_parallel_matrix.&lt;locals&gt;.&lt;genexpr&gt; at 0x000001FDBE95AB50&gt;)">tests\providers\test_iter120_formal_parallel.py:210: in test_formal_installed_parallel_matrix
+    assert not any(e['phase']=='connection.connect_tcp.started' for e in events)
+E   assert not True
+E    +  where True = any(&lt;generator object test_formal_installed_parallel_matrix.&lt;locals&gt;.&lt;genexpr&gt; at 0x000001FDBE95AB50&gt;)</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,3 @@
+.....s..............                                                     [100%]
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\planning-budget.xml -
+19 passed, 1 skipped in 5.90s

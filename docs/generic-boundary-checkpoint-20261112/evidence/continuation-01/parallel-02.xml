@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="45.167" timestamp="2026-11-11T22:54:22.639586+08:00" hostname="test"><testcase classname="tests.runtime.test_parallel_qualification" name="test_two_node_barrier_total_wall_below_serial_executor_sum" time="3.151" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_barrier_failure_isolation_retry_and_join" time="8.230" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_real_local_process_file_sqlite_and_conflict[False]" time="5.801" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_real_local_process_file_sqlite_and_conflict[True]" time="10.246" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_resource_capacity_and_event_appends" time="4.954" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_unknown_effect_checked_before_reconciliation_not_replayed" time="0.655" /><testcase classname="tests.runtime.test_parallel_qualification" name="test_evaluation_overlaps_unrelated_business_and_route_waits" time="10.478"><failure message="AssertionError: assert 'FAILED' == 'SUCCEEDED'&#10;  &#10;  - SUCCEEDED&#10;  + FAILED">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23506/test_evaluation_overlaps_unrel0')
+
+    def test_evaluation_overlaps_unrelated_business_and_route_waits(tmp_path):
+        from cgkn.executors.task_evaluation import TaskEvaluationExecutor
+        from cgkn.providers import ModelRoleConfig
+        from tests.agent.test_capability_routing_qualification import Evaluator
+        store=FileRunStore(tmp_path/'state');started=threading.Event();routed=threading.Event();times={}
+        class Work:
+            descriptor=ExecutorDescriptor('work@1','deterministic',('*',))
+            def execute(self,r):
+                times[r.node_id+'_start']=time.monotonic()
+                if r.node_id=='B':started.set();assert routed.wait(10)
+                if r.node_id=='route':
+                    assert list((store.run_dir('p','r')/'evaluations').glob('*/*.json'));routed.set()
+                times[r.node_id+'_end']=time.monotonic()
+                return BlockExecutionResult(project_id='p',run_id='r',node_id=r.node_id,attempt_id=r.attempt_id,executor_ref=r.executor_ref,status=BlockStatus.SUCCEEDED,outputs={'node':r.node_id})
+        class Client(Evaluator):
+            def complete(self,**kw):
+                assert started.wait(5);times['evaluation_start']=time.monotonic();out=super().complete(**kw);times['evaluation_end']=time.monotonic();return out
+        reg=ExecutorRegistry();reg.register(Work());reg.register(TaskEvaluationExecutor(store,Client(),ModelRoleConfig('worker','fake')))
+        tree=tree_of([('A',()),('B',()),('evaluate',('A',)),('route',('evaluate',))],ref='work@1')
+        tree=CapabilityTree(tree.goal,tuple(probe_node(n.id,capability_ref='task.evaluate@1',depends_on=n.depends_on,config={**n.config,'executor_ref':'task.evaluate@1','meta_operation':True,'inputs':{'feedback_identity':digest(['p','r','A','attempt-0001']),'evaluation_contract':'2'}}) if n.id=='evaluate' else n for n in tree.nodes))
+&gt;       assert run_calibration(probe_runner(reg,store,max_parallel=3,execution_mode='GOVERNED'),project_id='p',run_id='r',tree=tree,dag=compile_tree(tree)).status=='SUCCEEDED'
+E       AssertionError: assert 'FAILED' == 'SUCCEEDED'
+E         
+E         - SUCCEEDED
+E         + FAILED
+
+tests\runtime\test_parallel_qualification.py:184: AssertionError</failure></testcase><testcase classname="tests.runtime.test_parallel_qualification" name="test_real_controller_process_loss_preserves_completed_sibling" time="1.177" /></testsuite></testsuites>

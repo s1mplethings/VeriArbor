@@ -1,0 +1,112 @@
+...............................F........................................ [ 69%]
+.................F..............                                         [100%]
+================================== FAILURES ===================================
+____ test_negative_business_measurement_survives_dag_deliverable_rejection ____
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23525/test_negative_business_measure0')
+
+    def test_negative_business_measurement_survives_dag_deliverable_rejection(tmp_path):
+        f,result=measured(tmp_path)
+        gate=ProvenanceGate(f['store'],'p','r');report=gate.verify_check(result,f['goal'],f['acceptance'].data['subjects'])
+        assert report['status']=='TRUSTED',report
+        assert report['chain']['verdict']=='FAILED'
+        f['acceptance'].record('g',result,executor_ref='measure.file@1')
+        view=f['acceptance'].view()
+        assert view['hard_verdict']=='FAILED' and view['evidence_coverage']==1 and not view['complete']
+        from cgkn.runtime.node_authority import ExecutionAuthority
+        authority=ExecutionAuthority(f['store'],'p','r')
+        assert authority.validate_failed_execution(result)==result.metadata['node_failure_receipt_id']
+        assert 'node_commit_receipt_id' not in result.metadata
+        with pytest.raises(ValueError,match='RECEIPT_ID_REQUIRED'):
+            authority.validate_execution_result(result)
+        with pytest.raises(ValueError,match='FAILED_EXECUTION_RECEIPT_REQUIRED'):
+>           authority.validate_failed_execution(replace(result,status=BlockStatus.SUCCEEDED))
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\state\test_negative_business_provenance.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+D:\anaconda\Lib\dataclasses.py:1581: in replace
+    return obj.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:20: in __init__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = BlockExecutionResult(project_id='p', run_id='r', attempt_id='attempt-0001', node_id='checker', executor_ref='measure.f...mpt-0001.json', 'sha256': '66ed9ca520430442e455f322756d41e2a07380176396225407128a7c233b9be4'})}), schema_version='1.0')
+
+    def __post_init__(self) -> None:
+        if not all((self.project_id, self.run_id, self.attempt_id, self.node_id, self.executor_ref)):
+            raise ValueError("result identity and executor_ref are required")
+        if self.status in {BlockStatus.FAILED, BlockStatus.BLOCKED, BlockStatus.TIMED_OUT} and self.error is None:
+            raise ValueError("non-success result requires an error")
+        if self.status in {BlockStatus.SUCCEEDED, BlockStatus.SKIPPED} and self.error is not None:
+>           raise ValueError("success or skipped result must not contain an error")
+E           ValueError: success or skipped result must not contain an error
+
+cgkn\execution\contracts.py:175: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23525/test_negative_business_measure0')
+
+    def test_negative_business_measurement_survives_dag_deliverable_rejection(tmp_path):
+        f,result=measured(tmp_path)
+        gate=ProvenanceGate(f['store'],'p','r');report=gate.verify_check(result,f['goal'],f['acceptance'].data['subjects'])
+        assert report['status']=='TRUSTED',report
+        assert report['chain']['verdict']=='FAILED'
+        f['acceptance'].record('g',result,executor_ref='measure.file@1')
+        view=f['acceptance'].view()
+        assert view['hard_verdict']=='FAILED' and view['evidence_coverage']==1 and not view['complete']
+        from cgkn.runtime.node_authority import ExecutionAuthority
+        authority=ExecutionAuthority(f['store'],'p','r')
+        assert authority.validate_failed_execution(result)==result.metadata['node_failure_receipt_id']
+        assert 'node_commit_receipt_id' not in result.metadata
+        with pytest.raises(ValueError,match='RECEIPT_ID_REQUIRED'):
+            authority.validate_execution_result(result)
+>       with pytest.raises(ValueError,match='FAILED_EXECUTION_RECEIPT_REQUIRED'):
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'FAILED_EXECUTION_RECEIPT_REQUIRED'
+E        Input: 'success or skipped result must not contain an error'
+
+tests\state\test_negative_business_provenance.py:54: AssertionError
+___________________ test_I5_existing_and_or_parent_negative ___________________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23525/test_I5_existing_and_or_parent0')
+
+    def test_I5_existing_and_or_parent_negative(tmp_path):
+        from tests.telemetry.test_acv4_independent import test_I1_parent_integration_cannot_be_outvoted_and_mapping_not_weakened,test_I1_or_and_frozen_original_contract
+>       test_I1_parent_integration_cannot_be_outvoted_and_mapping_not_weakened(tmp_path/'and')
+
+tests\state\test_provenance_v5.py:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\telemetry\test_acv4_independent.py:191: in test_I1_parent_integration_cannot_be_outvoted_and_mapping_not_weakened
+    a.store.save_result(result);a.record(goal,result,executor_ref='check@1')
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:24: in update
+    return method(self,*args,**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\state\acceptance.py:181: in record
+    if result.succeeded:authority.validate_execution_result(result)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:749: in validate_execution_result
+    return self._validate_execution_result(result,require_current_epoch=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:790: in _validate_execution_result
+    r=self._validate_receipt(result.metadata.get('node_commit_receipt_id'),node_id=result.node_id,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x000002884F454A10>
+receipt_id = None, output_path = None, output_hash = None
+require_current_epoch = True, expected = {'node_id': 'parent'}
+
+    def _validate_receipt(self, receipt_id, *, output_path=None, output_hash=None, require_current_epoch=True, **expected):
+>       if not isinstance(receipt_id,str):raise ValueError('RECEIPT_ID_REQUIRED')
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: RECEIPT_ID_REQUIRED
+
+cgkn\runtime\node_authority.py:716: ValueError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\state-03.xml -
+=========================== short test summary info ===========================
+FAILED tests/state/test_negative_business_provenance.py::test_negative_business_measurement_survives_dag_deliverable_rejection
+FAILED tests/state/test_provenance_v5.py::test_I5_existing_and_or_parent_negative
+2 failed, 102 passed in 40.87s

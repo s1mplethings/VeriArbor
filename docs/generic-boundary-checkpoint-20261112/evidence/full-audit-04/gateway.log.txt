@@ -1,0 +1,2 @@
+........................................................                 [100%]
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\full-audit-04\gateway.xml -

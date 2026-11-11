@@ -1,0 +1,11 @@
+.......................F.                                                [100%]
+================================== FAILURES ===================================
+__ test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit ___
+tests\execution\test_observation_contract.py:76: in test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit
+    tree=CapabilityTree('typed feedback chain',(probe_node('observe',capability_ref='process@1',effect_domains=['local_process'],config={'executor_ref':'local.command@1','command':[sys.executable,'-c','print("7b2261223a317d")']}),))
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: probe_node() got an unexpected keyword argument 'effect_domains'
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\observations.xml -
+=========================== short test summary info ===========================
+FAILED tests/execution/test_observation_contract.py::test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit
+1 failed, 24 passed in 1.76s

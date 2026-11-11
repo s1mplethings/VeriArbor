@@ -1,0 +1,11 @@
+.......................F.                                                [100%]
+================================== FAILURES ===================================
+__ test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit ___
+tests\execution\test_observation_contract.py:77: in test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit
+    tree.nodes[0].config['leaf_contract']['effect_domains']=['local_process']
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: 'mappingproxy' object does not support item assignment
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\observations-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/execution/test_observation_contract.py::test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit
+1 failed, 24 passed in 1.70s

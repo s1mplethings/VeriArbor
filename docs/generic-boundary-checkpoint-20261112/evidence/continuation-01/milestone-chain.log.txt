@@ -1,0 +1,1616 @@
+FFFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+___________ test_offline_gateway_contract_core_to_existing_delivery ___________
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_offline_gateway_contract_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42CA4E600>
+explicit_probe = False
+
+    def test_offline_gateway_contract_core_to_existing_delivery(tmp_path,monkeypatch,explicit_probe=False):
+        """Network is stubbed: exercises receipt protocol, never a real witness."""
+        from pathlib import Path
+        from cgkn.providers import GatewayCompletionClient,CGKNModelRouting
+        from cgkn.application.software_project.service import SoftwareProjectGenerationService
+        from scripts import production_candidate_provenance,provider_causal_trace
+        workspace=tmp_path/'candidate'
+        files={'main.py':'def value():\n    return 7\n\nif __name__ == "__main__":\n    print(value())\n',
+               'README.md':'# Seven\nPython standard library. Run: python main.py\nTests: python -m pytest tests\n',
+               'tests/test_main.py':'from main import value\ndef test_value():\n    assert value() == 7\n'}
+        if explicit_probe:
+            files['main.py'] += '    import sys\n    raise SystemExit(0 if len(sys.argv)==1 else 2)\n'
+        model=FakeModels();steps=[];provider_calls=[]
+        def complete(gateway,**kw):
+            provider_calls.append(kw)
+            assert len(provider_calls)<20, 'offline fixture must not hide a planner loop'
+            request=json.loads(kw['user']);config=kw['config']
+            if config.role=='worker':
+                row=next(p for p in request['tables']['paths'] if p['writable'])
+                packet={'op':2,'path':row['id'],'payload':files[row['path']]}
+            elif kw['schema_name']=='cgkn_next_milestone' or request['tables'].get('mode')=='MILESTONE_MODE':
+                reply=model.complete(**kw)
+                packet=json.loads(reply.text)
+            else:
+                tables=request['tables'];index=len(steps);steps.append(index)
+                if index<3:
+                    name=list(files)[index]
+                    packet={'action':1,'task_kind':2,
+                        'target':next(n['id'] for n in tables['nodes'] if n['state']=='available'),
+                        'scope':[next(s['id'] for s in tables['scopes'] if s['path']==name)],
+                        'goal':'Materialize declared '+name,'expected':['declared file exists'],
+                        'accept':['declared public contract'],'deps':[]}
+                elif index==3:
+                    packet={'action':1,'task_kind':4,
+                        'target':next(n['id'] for n in tables['nodes'] if n['state']=='available'),
+                        'scope':[s['id'] for s in tables['scopes'] if s['path'] in {'main.py','README.md'}],
+                        'goal':'Independently verify current value and documentation',
+                        'expected':['current independent measurement'],'accept':['measurement envelope'],
+                        'deps':[n['id'] for n in tables['nodes'] if n['state']=='existing']}
+                else: packet={'action':9}
+            return ProviderCompletion(json.dumps(packet),config.model_id,'offline-gateway-'+str(len(provider_calls)),
+                {'input_tokens':10,'output_tokens':20},raw_finish_reason='stop',routing={
+                    'identity_status':'MATCH','provider_id':config.model,'requested_model':config.model_id,
+                    'bound_model':config.model_id,'actual_model':config.model_id})
+        monkeypatch.setattr(GatewayCompletionClient,'complete',complete)
+        routing=CGKNModelRouting(ModelRoleConfig('agent','qwen',model_id='offline-flash'),
+            ModelRoleConfig('worker','deepseek',model_id='offline-worker'),frozenset({'qwen','deepseek'}))
+        from tests.session_authority_support import authorization
+        service=SoftwareProjectGenerationService(Path(__file__).resolve().parents[2],tmp_path/'state',
+            client=GatewayCompletionClient('http://127.0.0.1:9','offline-test-token'),routing=routing,
+            config={'execution_authorization':authorization('offline-delivery',('code.implement@1','project.acceptance.external@1'),'return seven')})
+        consumer=tmp_path/'consumer.py'
+        consumer.write_text("import json,sys,pathlib,runpy\nr=json.loads(pathlib.Path(sys.argv[2]).read_text())\n"
+            "w=pathlib.Path(r['workspace'])\n"
+            "ok=runpy.run_path(str(w/'main.py'))['value']()==7 and (w/'README.md').is_file()\n"
+            "print(json.dumps({'execution':'VALID','observed':{'value':ok}}))\n")
+        profile=tmp_path/'profile.json'
+        profile.write_text(json.dumps({'kind':'CGKNProjectSessionProfile','schema_version':'1.0',
+            'project_id':'offline-delivery','run_id':'run','workspace':str(workspace),
+            'intent':{'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],
+                'constraints':['Python standard library'],'forbidden_operations':['external publication'],
+                'delivery_expectations':['runnable local tool and tests'],'major_acceptance_categories':['value']},
+            'requirements':{'R-value':{'must':True,'checker_keys':['independent'],'artifact_layout':{
+                'source':'main.py','test':'tests/test_main.py','support':[{'path':'README.md','purpose':'Document local startup and tests'}]}}},
+            'independent_consumer':{'path':str(consumer),'sha256':hashlib.sha256(consumer.read_bytes()).hexdigest(),
+                'public_fields':['value']},'checkpoint_interval':1}))
+>       result=service.run_profile(profile,goal='return seven')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_worker_chain.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:83: in decide
+    aid,result=authority.admit(tree,version,proposal,known_capabilities=session.known_capabilities,
+cgkn\runtime\node_authority.py:115: in admit
+    result = admit_proposal(tree, version, proposal, known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tree = CapabilityTree(goal='return seven', nodes=()), current_tree_version = 1
+proposal = ProjectProposal(proposal_id='host-plan-1', project_id='offline-delivery', base_tree_version=1, goal_reference='return ...exploration_reason='bounded planning', exploration_budget=4, exploration_measure='public proposal admitted separately')
+
+    def admit_proposal(tree: CapabilityTree, current_tree_version: int,
+                       proposal: ProjectProposal, *,
+                       known_capabilities: set[str] | frozenset[str],
+                       catalog: Mapping[str, Any],
+                       policy: AdmissionPolicy | None = None) -> AdmissionResult:
+        policy = policy or AdmissionPolicy()
+    
+        if policy.require_capability_contract or policy.capability_contracts or proposal.target_capability_id:
+            from veriarbor.capability import CapabilityContract, GoalGap, admit_capability
+            if not policy.project_id or proposal.project_id != policy.project_id:
+                return AdmissionResult(False, 'PROJECT_SCOPE_REJECT', 'capability policy belongs to another project')
+            contracts = {k: CapabilityContract(**v) for k, v in policy.capability_contracts.items()}
+            gaps = {k: GoalGap(**v) for k, v in policy.goal_gaps.items()}
+            claim = proposal.as_dict()
+            # Resolve implementation identities from registered catalog metadata as well
+            # as the proposal. A target claim cannot hide a forbidden implementation.
+            strategies = set(proposal.strategy_capabilities)
+            for operation in proposal.proposed_operations:
+                ref = operation.get('capability_ref') or operation.get('payload', {}).get('capability_ref')
+                existing = tree.by_id.get(operation['node_id'])
+                ref = ref or (existing.capability_ref if existing else '')
+                if ref:
+                    strategies.add(ref)
+                    strategies.update(catalog.get(ref, {}).get('implements_capabilities', ()))
+            claim['strategy_capabilities'] = sorted(strategies)
+            from veriarbor.model import Evidence
+            inputs = []
+            for operation in proposal.proposed_operations:
+                for binding in policy.evidence_inputs.get(operation['node_id'], ()):
+                    if not binding.get('evidence'):
+                        return AdmissionResult(False, 'PORT_EVIDENCE_SCOPE_REJECT', 'required input evidence missing')
+                    requirements = dict(binding['requirements'])
+                    requirements['required_scope'] = {**requirements.get('required_scope', {}), 'PROJECT': policy.project_id}
+                    inputs.append((Evidence(**binding['evidence']), requirements))
+            code = admit_capability(claim, contracts, gaps, budget_allowed=policy.budget_state == 'OK', evidence_inputs=inputs)
+            if code != 'ADMITTED':
+                return AdmissionResult(False, code, 'capability proposal failed governance')
+    
+        if proposal.base_tree_version != current_tree_version:
+            return AdmissionResult(False, "STALE_BASE_TREE_VERSION",
+                                   "proposal base_tree_version is not the current tree version",
+                                   {"requested": proposal.base_tree_version,
+                                    "current": current_tree_version})
+    
+        if len(proposal.proposed_operations) > policy.max_tree_edits:
+            return AdmissionResult(False, "EDIT_LIMIT", "proposal exceeds the edit budget",
+                                   {"requested": len(proposal.proposed_operations),
+                                    "limit": policy.max_tree_edits})
+    
+        additions = [op for op in proposal.proposed_operations if op.get("operation") == "add_node"]
+        if policy.incremental_mode and len(additions) > policy.max_new_nodes:
+            return AdmissionResult(False, "INCREMENTAL_LIMIT",
+                                   "incremental mode admits one frontier capability per proposal",
+                                   {"requested": len(additions), "limit": policy.max_new_nodes,
+                                    "operations": [op.get("node_id") for op in additions]})
+    
+        if policy.budget_state == "BLOCKED":
+            wants_model = any(str(op.get("config", {}).get("executor_ref") or "").startswith("llm.")
+                              or str(op.get("resource_preference") or "").startswith("model:")
+                              for op in proposal.proposed_operations)
+            if wants_model:
+                return AdmissionResult(False, "BUDGET_BLOCKED",
+                                       "no new model resource may be admitted while budget is blocked",
+                                       {"resource_preference": proposal.resource_preference})
+    
+        canonical = _canonical_capabilities(catalog)
+        edits = []
+        try:
+            for index, operation in enumerate(proposal.proposed_operations):
+                op = str(operation["operation"])
+                capability = str(operation.get("capability_ref") or "")
+                if op == "add_node" and capability and capability not in known_capabilities:
+                    suggestion = canonical.get(capability, "")
+                    return AdmissionResult(False, "UNKNOWN_CAPABILITY",
+                                           "capability is not registered in the current catalog",
+                                           {"requested": capability,
+                                            "canonical": suggestion or "UNKNOWN"})
+                edit = _edit_from_operation(proposal, index, operation, catalog)
+                if op == "add_node":
+                    contract = dict(edit.payload.get("config", {}).get("leaf_contract") or {})
+                    if policy.require_leaf_contract and not contract:
+                        return AdmissionResult(False, "MISSING_LEAF_CONTRACT",
+                                               "add_node requires a leaf contract", {"node_id": edit.node_id})
+                    effects = set(contract.get("effect_domains") or ())
+                    remote = effects & REMOTE_EFFECTS
+                    if remote and not policy.allow_remote_effects:
+                        return AdmissionResult(False, "UNAUTHORIZED_EFFECT",
+                                               "remote external effects are not admitted",
+                                               {"node_id": edit.node_id, "effects": sorted(remote)})
+                    if not effects:
+                        return AdmissionResult(False, "MISSING_EFFECT",
+                                               "a leaf must declare its effect domain", {"node_id": edit.node_id})
+>                   extra = effects - policy.allowed_effect_domains - REMOTE_EFFECTS
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   TypeError: unsupported operand type(s) for -: 'set' and 'list'
+
+cgkn\agent\project_agent.py:415: TypeError
+____ test_offline_explicit_runtime_reverification_uses_same_delivery_gate _____
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_offline_explicit_runtime_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42D053770>
+
+    def test_offline_explicit_runtime_reverification_uses_same_delivery_gate(tmp_path,monkeypatch):
+>       test_offline_gateway_contract_core_to_existing_delivery(tmp_path,monkeypatch,explicit_probe=True)
+
+tests\agent\test_milestone_worker_chain.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\agent\test_milestone_worker_chain.py:135: in test_offline_gateway_contract_core_to_existing_delivery
+    result=service.run_profile(profile,goal='return seven')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:83: in decide
+    aid,result=authority.admit(tree,version,proposal,known_capabilities=session.known_capabilities,
+cgkn\runtime\node_authority.py:115: in admit
+    result = admit_proposal(tree, version, proposal, known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tree = CapabilityTree(goal='return seven', nodes=()), current_tree_version = 1
+proposal = ProjectProposal(proposal_id='host-plan-1', project_id='offline-delivery', base_tree_version=1, goal_reference='return ...exploration_reason='bounded planning', exploration_budget=4, exploration_measure='public proposal admitted separately')
+
+    def admit_proposal(tree: CapabilityTree, current_tree_version: int,
+                       proposal: ProjectProposal, *,
+                       known_capabilities: set[str] | frozenset[str],
+                       catalog: Mapping[str, Any],
+                       policy: AdmissionPolicy | None = None) -> AdmissionResult:
+        policy = policy or AdmissionPolicy()
+    
+        if policy.require_capability_contract or policy.capability_contracts or proposal.target_capability_id:
+            from veriarbor.capability import CapabilityContract, GoalGap, admit_capability
+            if not policy.project_id or proposal.project_id != policy.project_id:
+                return AdmissionResult(False, 'PROJECT_SCOPE_REJECT', 'capability policy belongs to another project')
+            contracts = {k: CapabilityContract(**v) for k, v in policy.capability_contracts.items()}
+            gaps = {k: GoalGap(**v) for k, v in policy.goal_gaps.items()}
+            claim = proposal.as_dict()
+            # Resolve implementation identities from registered catalog metadata as well
+            # as the proposal. A target claim cannot hide a forbidden implementation.
+            strategies = set(proposal.strategy_capabilities)
+            for operation in proposal.proposed_operations:
+                ref = operation.get('capability_ref') or operation.get('payload', {}).get('capability_ref')
+                existing = tree.by_id.get(operation['node_id'])
+                ref = ref or (existing.capability_ref if existing else '')
+                if ref:
+                    strategies.add(ref)
+                    strategies.update(catalog.get(ref, {}).get('implements_capabilities', ()))
+            claim['strategy_capabilities'] = sorted(strategies)
+            from veriarbor.model import Evidence
+            inputs = []
+            for operation in proposal.proposed_operations:
+                for binding in policy.evidence_inputs.get(operation['node_id'], ()):
+                    if not binding.get('evidence'):
+                        return AdmissionResult(False, 'PORT_EVIDENCE_SCOPE_REJECT', 'required input evidence missing')
+                    requirements = dict(binding['requirements'])
+                    requirements['required_scope'] = {**requirements.get('required_scope', {}), 'PROJECT': policy.project_id}
+                    inputs.append((Evidence(**binding['evidence']), requirements))
+            code = admit_capability(claim, contracts, gaps, budget_allowed=policy.budget_state == 'OK', evidence_inputs=inputs)
+            if code != 'ADMITTED':
+                return AdmissionResult(False, code, 'capability proposal failed governance')
+    
+        if proposal.base_tree_version != current_tree_version:
+            return AdmissionResult(False, "STALE_BASE_TREE_VERSION",
+                                   "proposal base_tree_version is not the current tree version",
+                                   {"requested": proposal.base_tree_version,
+                                    "current": current_tree_version})
+    
+        if len(proposal.proposed_operations) > policy.max_tree_edits:
+            return AdmissionResult(False, "EDIT_LIMIT", "proposal exceeds the edit budget",
+                                   {"requested": len(proposal.proposed_operations),
+                                    "limit": policy.max_tree_edits})
+    
+        additions = [op for op in proposal.proposed_operations if op.get("operation") == "add_node"]
+        if policy.incremental_mode and len(additions) > policy.max_new_nodes:
+            return AdmissionResult(False, "INCREMENTAL_LIMIT",
+                                   "incremental mode admits one frontier capability per proposal",
+                                   {"requested": len(additions), "limit": policy.max_new_nodes,
+                                    "operations": [op.get("node_id") for op in additions]})
+    
+        if policy.budget_state == "BLOCKED":
+            wants_model = any(str(op.get("config", {}).get("executor_ref") or "").startswith("llm.")
+                              or str(op.get("resource_preference") or "").startswith("model:")
+                              for op in proposal.proposed_operations)
+            if wants_model:
+                return AdmissionResult(False, "BUDGET_BLOCKED",
+                                       "no new model resource may be admitted while budget is blocked",
+                                       {"resource_preference": proposal.resource_preference})
+    
+        canonical = _canonical_capabilities(catalog)
+        edits = []
+        try:
+            for index, operation in enumerate(proposal.proposed_operations):
+                op = str(operation["operation"])
+                capability = str(operation.get("capability_ref") or "")
+                if op == "add_node" and capability and capability not in known_capabilities:
+                    suggestion = canonical.get(capability, "")
+                    return AdmissionResult(False, "UNKNOWN_CAPABILITY",
+                                           "capability is not registered in the current catalog",
+                                           {"requested": capability,
+                                            "canonical": suggestion or "UNKNOWN"})
+                edit = _edit_from_operation(proposal, index, operation, catalog)
+                if op == "add_node":
+                    contract = dict(edit.payload.get("config", {}).get("leaf_contract") or {})
+                    if policy.require_leaf_contract and not contract:
+                        return AdmissionResult(False, "MISSING_LEAF_CONTRACT",
+                                               "add_node requires a leaf contract", {"node_id": edit.node_id})
+                    effects = set(contract.get("effect_domains") or ())
+                    remote = effects & REMOTE_EFFECTS
+                    if remote and not policy.allow_remote_effects:
+                        return AdmissionResult(False, "UNAUTHORIZED_EFFECT",
+                                               "remote external effects are not admitted",
+                                               {"node_id": edit.node_id, "effects": sorted(remote)})
+                    if not effects:
+                        return AdmissionResult(False, "MISSING_EFFECT",
+                                               "a leaf must declare its effect domain", {"node_id": edit.node_id})
+>                   extra = effects - policy.allowed_effect_domains - REMOTE_EFFECTS
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   TypeError: unsupported operand type(s) for -: 'set' and 'list'
+
+cgkn\agent\project_agent.py:415: TypeError
+_ test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[session] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker0')
+entry = 'session'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42CC2EE40>
+
+    @pytest.mark.parametrize('entry',['session','application_service','profile','conversation','api_job','local_cli'])
+    def test_milestone_compiler_worker_independent_failure_repair_and_checkpoint(tmp_path,entry,monkeypatch):
+        workspace=tmp_path/'workspace';workspace.mkdir()
+        store=FileRunStore(tmp_path/'state')
+        acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                                  {'independent':'project.acceptance@1' if entry in {'profile','conversation','api_job','local_cli'} else 'measure@1'})
+        acceptance.bind_subjects({'module':'NOT_YET_PRODUCED'})
+        class Measure:
+            descriptor=ExecutorDescriptor('measure@1','deterministic',('*',))
+            def execute(self, request):
+                goal=next(g for g in acceptance.view()['goals'] if g['id']==request.task_context.node_config['goal_id'])
+                path=workspace/goal['milestone_contract']['design']['artifacts'][0]['path']
+                digest=hashlib.sha256(path.read_bytes()).hexdigest()
+                actual=runpy.run_path(str(path))['value']()
+                subjects={p:digest for p in goal['subject_refs']}
+                acceptance.bind_subjects({**acceptance.view()['subject_identities'],**subjects})
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                    status=BlockStatus.SUCCEEDED,outputs={'goal_check':{'goal_id':goal['id'],
+                        'condition_hash':identity(goal['acceptance']),'subjects':subjects,
+                        'execution':'VALID','evidence_refs':[str(path)],'observed':{'actual':actual,'expected':7},
+                        'verdict':'VERIFIED' if actual==7 else 'FAILED'}})
+        def valid_source(root,contract):
+            import ast
+            files=list(contract['target_scope'])
+            for relative in files: ast.parse((root/relative).read_text())
+            return {'passed':True,'observed':{'parsed':files},'artifacts':files}
+        def snapshot(contract):
+            return {p:hashlib.sha256((workspace/p).read_bytes()).hexdigest() if (workspace/p).is_file() else None
+                    for p in contract['target_scope']}
+        def envelope(request,contract):
+            measured=request.as_dict()['input_values']['execution_receipt']['outputs']['goal_check']
+            return {'passed':all(acceptance.view()['subject_identities'].get(k)==v for k,v in measured['subjects'].items()),
+                    'observed':measured,'evidence_refs':[dict(request.input_values['execution_receipt_ref'])]}
+        client=FakeModels();events=[]
+        registry=ExecutorRegistry()
+        registry.register(Measure())
+        registry.register(FileDeliverableChecker(workspace,{'source':valid_source}))
+        registry.register(SubjectDeliverableChecker(snapshot,{'envelope':envelope}))
+        catalog={'code@1':{'executor_ref':'llm.cheap@1','semantic_task_kinds':[2,3],
+                           'checker_ref':'source','acceptance':['source'],'effect_domains':['filesystem','external_network'],
+                           'description':'Bounded pure function implementation and repair'},
+                 'measure@1':{'executor_ref':'measure@1','semantic_task_kinds':[4],
+                              'checker_ref':'measurement','acceptance':['envelope'],'effect_domains':['measurement'],
+                              'description':'Independent current-object business checker'}}
+        intent={'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],'constraints':['offline'],
+                'forbidden_operations':['network'],'delivery_expectations':['checked local module'],
+                'major_acceptance_categories':['function result']}
+        bindings={'source':'deliverable.files@1','measurement':'deliverable.subjects@1'}
+        from tests.session_authority_support import authorization
+        from cgkn.agent.project_agent import AdmissionPolicy
+        auth=authorization('p',('code@1','measure@1','code.implement@1','project.acceptance.external@1'),'return seven')
+        if entry=='session':
+            registry.register(LLMExecutor(workspace,client,ModelRoleConfig('worker','offline-worker'),
+                                          semantic_protocol=True,protocol_trace=events.append))
+            session=ProjectSession(AgentComposer(client,ModelRoleConfig('agent','offline-flash'),
+                planner_mode='MILESTONE_MODE',protocol_trace=events.append),
+                DAGRunner(registry,store,deliverable_checkers=bindings),
+                store,known_capabilities=set(catalog),worker_model='offline-worker',capability_catalog=catalog,
+                acceptance=acceptance,continuous=True,max_decisions=1,admission_policy=AdmissionPolicy(**auth['admission_policy']),
+                subject_snapshot=lambda paths:snapshot({'target_scope':paths}))
+>           result=session.run(project_id='p',run_id='r',goal='return seven',project_intent=intent)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_worker_chain.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:330: in _run
+    decision = self.composer.decide(context)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\composer.py:240: in decide
+    return semantic_decide(self,context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\protocol\adapters.py:96: in semantic_decide
+    compiled,final,stats=exchange(composer.client,composer.config,
+cgkn\protocol\exchange.py:37: in exchange
+    completion=client.complete(system=packed_system,user=encoded(packed),
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_milestone_worker_chain.FakeModels object at 0x000001B42CC299D0>
+kw = {'config': ModelRoleConfig(role='agent', model='offline-flash', timeout_seconds=45, max_output_tokens=2200, temperatur...ith goal. Never weaken public contract or acceptance. Do not claim VERIFIED: independent GoalAcceptance decides.', ...}
+request = {'call_kind': 'semantic_decision_attempt', 'context': {'acceptance_states': [{'acceptance': 'value() returns integer 7...c_attempt_id': 'p:r:decision:5', 'table_hash': '9e603f3d24f4e31a53d77bdae44223dd489ee9a46d2a7270c60e55c486dfc9fd', ...}
+tables = {'acceptance_readiness': [{'goal_index': 0, 'instruction': 'Materialize missing declared artifacts before independent ... 'materialized': False, 'new_writer_allowed': True, 'path': 'tests/test_milestone_b15c813b9b369252efc4.py', ...}], ...}
+@py_assert0 = [], @py_assert3 = ['R-value']
+
+    def complete(self, **kw):
+        self.calls.append(kw);request=json.loads(kw['user'])
+        if kw['config'].role=='worker':
+            self.worker_calls+=1
+            # Controlled wrong first candidate; only the fake Worker repairs.
+            row=next(p for p in request['tables']['paths'] if p['writable'])
+            if row['path'].startswith('tests/'):
+                payload='from pathlib import Path\nimport runpy\ndef test_current_value():\n    assert runpy.run_path(str(Path(__file__).resolve().parents[1] / '+repr(self.source_path)+'))["value"]() == 7\n'
+            else:
+                self.source_path=row['path']
+                payload='def value():\n    return '+('6' if self.worker_calls==1 else '7')+'\n'
+            value={'op':2,'path':row['id'],'payload':payload}
+        elif kw['schema_name']=='cgkn_next_milestone':
+            value={'requirement_refs':['R-value'],'checker':'independent',
+                   'reason_summary':'Implement and independently check one pure function'}
+        elif request['tables'].get('mode')=='MILESTONE_MODE':
+            value={'semantic_goal':'Implement value returning seven','public_behavior':'value() returns integer 7',
+                   'operations':[{'name':'value','kind':'function','parameters':'no arguments','returns':'int',
+                                  'behavior':'return integer 7','failures':[], 'idempotency':'same result every call','ordering':'single result'}],
+                   'fields':{'result':{'type':'int','required':True,'consumers':['value']}},
+                   'failure_semantics':{},'persistence':'none','concurrency':'read only',
+                   'acceptance_intent':['value() returns integer 7']}
+        else:
+            self.execution_decisions+=1
+            tables=request['tables']
+            if self.execution_decisions==1:
+                value={'action':1,'task_kind':2,'target':0,'scope':[0],'goal':'Implement current value function',
+                       'expected':['Python module exports value'], 'accept':['valid public source'], 'deps':[]}
+            elif self.execution_decisions==2:
+                value={'action':1,'task_kind':2,'target':1,'scope':[1],'goal':'Materialize declared public test',
+                       'expected':['test exercises current value function'],'accept':['valid public test source'],'deps':[]}
+            elif self.execution_decisions==3:
+                value={'action':1,'task_kind':4,'target':2,'scope':[0],'goal':'Independently measure current function',
+                       'expected':['current value() measurement'],'accept':['independent measurement envelope'], 'deps':[0,1]}
+            elif self.execution_decisions==4:
+>               assert request['context']['goal_state']['failed']==['R-value']
+E               AssertionError: assert [] == ['R-value']
+E                 
+E                 Right contains one more item: 'R-value'
+E                 Use -v to get more diff
+
+tests\agent\test_milestone_worker_chain.py:54: AssertionError
+_ test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[application_service] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker1')
+entry = 'application_service'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42D1A7A70>
+
+    @pytest.mark.parametrize('entry',['session','application_service','profile','conversation','api_job','local_cli'])
+    def test_milestone_compiler_worker_independent_failure_repair_and_checkpoint(tmp_path,entry,monkeypatch):
+        workspace=tmp_path/'workspace';workspace.mkdir()
+        store=FileRunStore(tmp_path/'state')
+        acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                                  {'independent':'project.acceptance@1' if entry in {'profile','conversation','api_job','local_cli'} else 'measure@1'})
+        acceptance.bind_subjects({'module':'NOT_YET_PRODUCED'})
+        class Measure:
+            descriptor=ExecutorDescriptor('measure@1','deterministic',('*',))
+            def execute(self, request):
+                goal=next(g for g in acceptance.view()['goals'] if g['id']==request.task_context.node_config['goal_id'])
+                path=workspace/goal['milestone_contract']['design']['artifacts'][0]['path']
+                digest=hashlib.sha256(path.read_bytes()).hexdigest()
+                actual=runpy.run_path(str(path))['value']()
+                subjects={p:digest for p in goal['subject_refs']}
+                acceptance.bind_subjects({**acceptance.view()['subject_identities'],**subjects})
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                    status=BlockStatus.SUCCEEDED,outputs={'goal_check':{'goal_id':goal['id'],
+                        'condition_hash':identity(goal['acceptance']),'subjects':subjects,
+                        'execution':'VALID','evidence_refs':[str(path)],'observed':{'actual':actual,'expected':7},
+                        'verdict':'VERIFIED' if actual==7 else 'FAILED'}})
+        def valid_source(root,contract):
+            import ast
+            files=list(contract['target_scope'])
+            for relative in files: ast.parse((root/relative).read_text())
+            return {'passed':True,'observed':{'parsed':files},'artifacts':files}
+        def snapshot(contract):
+            return {p:hashlib.sha256((workspace/p).read_bytes()).hexdigest() if (workspace/p).is_file() else None
+                    for p in contract['target_scope']}
+        def envelope(request,contract):
+            measured=request.as_dict()['input_values']['execution_receipt']['outputs']['goal_check']
+            return {'passed':all(acceptance.view()['subject_identities'].get(k)==v for k,v in measured['subjects'].items()),
+                    'observed':measured,'evidence_refs':[dict(request.input_values['execution_receipt_ref'])]}
+        client=FakeModels();events=[]
+        registry=ExecutorRegistry()
+        registry.register(Measure())
+        registry.register(FileDeliverableChecker(workspace,{'source':valid_source}))
+        registry.register(SubjectDeliverableChecker(snapshot,{'envelope':envelope}))
+        catalog={'code@1':{'executor_ref':'llm.cheap@1','semantic_task_kinds':[2,3],
+                           'checker_ref':'source','acceptance':['source'],'effect_domains':['filesystem','external_network'],
+                           'description':'Bounded pure function implementation and repair'},
+                 'measure@1':{'executor_ref':'measure@1','semantic_task_kinds':[4],
+                              'checker_ref':'measurement','acceptance':['envelope'],'effect_domains':['measurement'],
+                              'description':'Independent current-object business checker'}}
+        intent={'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],'constraints':['offline'],
+                'forbidden_operations':['network'],'delivery_expectations':['checked local module'],
+                'major_acceptance_categories':['function result']}
+        bindings={'source':'deliverable.files@1','measurement':'deliverable.subjects@1'}
+        from tests.session_authority_support import authorization
+        from cgkn.agent.project_agent import AdmissionPolicy
+        auth=authorization('p',('code@1','measure@1','code.implement@1','project.acceptance.external@1'),'return seven')
+        if entry=='session':
+            registry.register(LLMExecutor(workspace,client,ModelRoleConfig('worker','offline-worker'),
+                                          semantic_protocol=True,protocol_trace=events.append))
+            session=ProjectSession(AgentComposer(client,ModelRoleConfig('agent','offline-flash'),
+                planner_mode='MILESTONE_MODE',protocol_trace=events.append),
+                DAGRunner(registry,store,deliverable_checkers=bindings),
+                store,known_capabilities=set(catalog),worker_model='offline-worker',capability_catalog=catalog,
+                acceptance=acceptance,continuous=True,max_decisions=1,admission_policy=AdmissionPolicy(**auth['admission_policy']),
+                subject_snapshot=lambda paths:snapshot({'target_scope':paths}))
+            result=session.run(project_id='p',run_id='r',goal='return seven',project_intent=intent)
+        else:
+            from pathlib import Path
+            from cgkn.application.software_project.service import SoftwareProjectGenerationService
+            service=SoftwareProjectGenerationService(Path(__file__).resolve().parents[2],store.root,client=client,config={'execution_authorization':auth})
+            if entry in {'profile','conversation','api_job','local_cli'}:
+                consumer=tmp_path/'consumer.py'
+                consumer.write_text("import json,sys,pathlib,runpy\n"
+                    "r=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\n"
+                    "p=pathlib.Path(r['workspace'])/next(iter(r['subjects']))\n"
+                    "v=runpy.run_path(str(p))['value']()\n"
+                    "print(json.dumps({'execution':'VALID','observed':{'value':v==7,'actual':v}}))\n")
+                profile=tmp_path/'controller/.cgkn/project-session.json'
+                profile.parent.mkdir(parents=True)
+                profile.write_text(json.dumps({'kind':'CGKNProjectSessionProfile','schema_version':'1.0',
+                    'project_id':'p','run_id':'r','workspace':str(workspace),'intent':intent,
+                    'requirements':{'R-value':{'must':True,'checker_keys':['independent']}},
+                    'independent_consumer':{'path':str(consumer),'sha256':hashlib.sha256(consumer.read_bytes()).hexdigest(),
+                        'public_fields':['value','actual']},'checkpoint_interval':1}))
+                if entry in {'conversation','api_job','local_cli'}:
+                    from scripts import codex_conversation
+                    from cgkn.application.software_project import service as service_module
+                    monkeypatch.setattr(service_module,'SoftwareProjectGenerationService',lambda *a,**k:service)
+                    monkeypatch.setattr(codex_conversation,'CodexConversation',lambda:pytest.fail('legacy execution entered'))
+                    if entry=='conversation':
+                        document=codex_conversation.run_formal_generation_once(tmp_path/'controller',goal='return seven')
+                    elif entry=='api_job':
+                        api_session={'project_session_profile':str(profile),'whiteboard':{'project_summary':'return seven'}}
+                        monkeypatch.setattr(codex_conversation,'load_session',lambda *a:api_session)
+                        monkeypatch.setattr(codex_conversation,'save_session',lambda *a:None)
+                        codex_conversation.start_generation_from_income(None,'api',tmp_path,tmp_path,'ignored',60,
+                            api_session,reason='offline full chain',background=False)
+                        assert api_session['generation']['status']=='goals_verified'
+                        document=json.loads(next((store.run_dir('p','r')/'core_results').glob('*.json')).read_text())
+                    else:
+                        from scripts import run_local_pipeline
+                        from types import SimpleNamespace
+                        document=run_local_pipeline.execute(SimpleNamespace(use_api=True,provider_mode='live',
+                            goal='return seven',project_session_profile=str(profile),run_dir=store.root,
+                            result=tmp_path/'local-result.json'))
+                else:
+                    document=service.run_profile(profile,goal='return seven')
+                assert document['status']=='GOALS_VERIFIED'
+                assert document['public_delivery_allowed'] is False
+                assert document['delivery_status']=='NOT_EVALUATED'
+                acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                    {'independent':'project.acceptance@1'})
+                assert [c['verdict'] for c in acceptance.data['checks']]==['FAILED','VERIFIED']
+                assert [c['observation']['observed']['actual'] for c in acceptance.data['checks']]==[6,7]
+                assert all(c['provenance']['status']=='TRUSTED' for c in acceptance.data['checks'])
+                assert acceptance.view()['evidence_mode']=='production_provenance'
+                from cgkn.state.provenance import ProvenanceGate,ProvenanceError
+                gate=ProvenanceGate(store,'p','r')
+                from scripts.canonical_evidence_hash import candidate_source_manifest
+                manifest=candidate_source_manifest(workspace)
+                assert '.cgkn-publication.lock' not in manifest
+                origins=gate.delivery_sources(acceptance,workspace,manifest)
+                assert origins['status']=='TRUSTED'
+                assert not origins['real_provider_backed'] and not origins['delivery_authorized']
+                assert set(origins['source_origins'])==set(manifest)
+                from scripts import production_candidate_provenance as production
+                delivery=production.produce_project_session(store,'p','r',candidate_dir=workspace,commit_sha='offline-fixture')
+                assert delivery['schema_version']=='2.0' and delivery['status']=='NEEDS_REWORK'
+                assert 'real_provider_planner_and_worker_required' in delivery['failures']
+                assert production.inspect(delivery['provenance_ref'])['status']=='NEEDS_REWORK'
+                from scripts import codex_conversation as delivery_adapter
+                facts=delivery_adapter.delivery_fact_check(workspace,{},provider_result=document)
+                assert facts['facts']['provider_success'] is False
+                assert 'provider_not_successful' in facts['hard_blockers']
+                assert production.produce_project_session(store,'p','r',candidate_dir=workspace,
+                    commit_sha='offline-fixture')['provenance_hash']==delivery['provenance_hash']
+                from scripts import provider_causal_trace
+                trace=provider_causal_trace.finalize_project_session(delivery['provenance_ref'])
+                assert trace['status']=='NEEDS_REWORK'
+                assert provider_causal_trace.inspect(trace['trace_ref'])['status']=='NEEDS_REWORK'
+                assert provider_causal_trace.finalize_project_session(delivery['provenance_ref'])['trace_hash']==trace['trace_hash']
+                calls_before=len(client.calls)
+                blocked=service.finalize_core(json.loads(profile.read_text()),document)
+                assert blocked['delivery_status']=='BLOCKED' and not blocked['public_delivery_allowed']
+                assert 'real_provider_planner_and_worker_required' in blocked['delivery_failures']
+                assert service.finalize_core(json.loads(profile.read_text()),document)==blocked
+                assert len(client.calls)==calls_before
+                with pytest.raises(ProvenanceError,match='lacks bounded Worker origin'):
+                    gate.delivery_sources(acceptance,workspace,{**manifest,'unowned.py':'not-produced-by-worker'})
+                assert client.worker_calls==3
+                assert len(store.load_run('p','r').nodes['sem-node-0000'].attempts)==2
+                # Read-only reconstruction cannot mutate the authoritative record.
+                acceptance_path=store.run_dir('p','r')/'goal_acceptance.json'
+                before=acceptance_path.read_bytes()
+                assert acceptance.view()==acceptance.view()
+                assert acceptance_path.read_bytes()==before
+                current=next(iter(acceptance.view()['goals'][0]['subject_refs']))
+                source=(workspace/current).read_bytes()
+                (workspace/current).write_text('def value():\n    return 99\n')
+                assert not acceptance.view()['complete']
+                assert acceptance_path.read_bytes()==before
+                (workspace/current).write_bytes(source)
+                assert acceptance.view()['complete']
+                # The same typed raw observation must remain authentic on rebuild.
+                check=acceptance.data['checks'][-1]
+                receipt=json.loads((store.run_dir('p','r')/'attempts'/check['node_id']/(check['attempt_id']+'.json')).read_text())
+                typed_ref=receipt['metadata']['raw_observation_refs'][0]
+                typed_path=store.root/typed_ref['path']
+                raw=typed_path.read_bytes()
+                typed_path.write_text('{}')
+                assert not acceptance.view()['complete']
+                assert acceptance_path.read_bytes()==before
+                typed_path.write_bytes(raw)
+                assert acceptance.view()['complete']
+                binding_path=next((store.run_dir('p','r')/'provenance_goals').glob('*.json'))
+                binding=json.loads(binding_path.read_text())
+                binding['subject_refs']=[]
+                binding_path.write_text(json.dumps(binding))
+                assert not acceptance.view()['complete']
+                assert acceptance_path.read_bytes()==before
+                return
+            from cgkn.state.store import StateStoreError
+            with store.exclusive_file(store.run_dir('p','r')/'project_session.lock'):
+                with pytest.raises(StateStoreError,match='active coordinator'):
+                    service.run_project(project_id='p',run_id='r',workspace=workspace,intent=intent,
+                        registry=registry,acceptance=acceptance,capability_catalog=catalog,
+                        deliverable_checkers=bindings,checkpoint_interval=1)
+            assert not client.calls
+>           result=service.run_project(project_id='p',run_id='r',workspace=workspace,intent=intent,
+                registry=registry,acceptance=acceptance,capability_catalog=catalog,
+                deliverable_checkers=bindings,checkpoint_interval=1)
+
+tests\agent\test_milestone_worker_chain.py:370: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\application\software_project\service.py:181: in run_project
+    policy,planning=self._execution_authorities(project_id,run_id,store,execution_authorization)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:231: in _execution_authorities
+    store.immutable_json(store.run_dir(project_id,run_id)/'execution_authorization.json',raw)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.state.store.FileRunStore object at 0x000001B42D1A7590>
+path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker1/state/p/r/execution_authorization.json')
+value = {'admission_policy': {'allow_remote_effects': True, 'allowed_effect_domains': ['filesystem', 'external_network', 'loca...ion': False, ...}, ...}, 'execution_budget': {'calls': 4}, ...}, 'calls_per_decision': 4, 'max_planning_decisions': 32}
+
+    def immutable_json(self, path: pathlib.Path, value: Mapping[str, Any]) -> None:
+        """Idempotent immutable record with an OS lock, not check-then-overwrite."""
+        path = pathlib.Path(path)
+        with self.exclusive_file(path.with_name(path.name + '.lock'), wait_seconds=10):
+            if path.exists():
+                if json.loads(path.read_text(encoding='utf-8')) != value:
+>                   raise ValueError('conflicting immutable record: ' + path.name)
+E                   ValueError: conflicting immutable record: execution_authorization.json
+
+cgkn\state\store.py:153: ValueError
+_ test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[profile] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker2')
+entry = 'profile'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42D273200>
+
+    @pytest.mark.parametrize('entry',['session','application_service','profile','conversation','api_job','local_cli'])
+    def test_milestone_compiler_worker_independent_failure_repair_and_checkpoint(tmp_path,entry,monkeypatch):
+        workspace=tmp_path/'workspace';workspace.mkdir()
+        store=FileRunStore(tmp_path/'state')
+        acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                                  {'independent':'project.acceptance@1' if entry in {'profile','conversation','api_job','local_cli'} else 'measure@1'})
+        acceptance.bind_subjects({'module':'NOT_YET_PRODUCED'})
+        class Measure:
+            descriptor=ExecutorDescriptor('measure@1','deterministic',('*',))
+            def execute(self, request):
+                goal=next(g for g in acceptance.view()['goals'] if g['id']==request.task_context.node_config['goal_id'])
+                path=workspace/goal['milestone_contract']['design']['artifacts'][0]['path']
+                digest=hashlib.sha256(path.read_bytes()).hexdigest()
+                actual=runpy.run_path(str(path))['value']()
+                subjects={p:digest for p in goal['subject_refs']}
+                acceptance.bind_subjects({**acceptance.view()['subject_identities'],**subjects})
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                    status=BlockStatus.SUCCEEDED,outputs={'goal_check':{'goal_id':goal['id'],
+                        'condition_hash':identity(goal['acceptance']),'subjects':subjects,
+                        'execution':'VALID','evidence_refs':[str(path)],'observed':{'actual':actual,'expected':7},
+                        'verdict':'VERIFIED' if actual==7 else 'FAILED'}})
+        def valid_source(root,contract):
+            import ast
+            files=list(contract['target_scope'])
+            for relative in files: ast.parse((root/relative).read_text())
+            return {'passed':True,'observed':{'parsed':files},'artifacts':files}
+        def snapshot(contract):
+            return {p:hashlib.sha256((workspace/p).read_bytes()).hexdigest() if (workspace/p).is_file() else None
+                    for p in contract['target_scope']}
+        def envelope(request,contract):
+            measured=request.as_dict()['input_values']['execution_receipt']['outputs']['goal_check']
+            return {'passed':all(acceptance.view()['subject_identities'].get(k)==v for k,v in measured['subjects'].items()),
+                    'observed':measured,'evidence_refs':[dict(request.input_values['execution_receipt_ref'])]}
+        client=FakeModels();events=[]
+        registry=ExecutorRegistry()
+        registry.register(Measure())
+        registry.register(FileDeliverableChecker(workspace,{'source':valid_source}))
+        registry.register(SubjectDeliverableChecker(snapshot,{'envelope':envelope}))
+        catalog={'code@1':{'executor_ref':'llm.cheap@1','semantic_task_kinds':[2,3],
+                           'checker_ref':'source','acceptance':['source'],'effect_domains':['filesystem','external_network'],
+                           'description':'Bounded pure function implementation and repair'},
+                 'measure@1':{'executor_ref':'measure@1','semantic_task_kinds':[4],
+                              'checker_ref':'measurement','acceptance':['envelope'],'effect_domains':['measurement'],
+                              'description':'Independent current-object business checker'}}
+        intent={'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],'constraints':['offline'],
+                'forbidden_operations':['network'],'delivery_expectations':['checked local module'],
+                'major_acceptance_categories':['function result']}
+        bindings={'source':'deliverable.files@1','measurement':'deliverable.subjects@1'}
+        from tests.session_authority_support import authorization
+        from cgkn.agent.project_agent import AdmissionPolicy
+        auth=authorization('p',('code@1','measure@1','code.implement@1','project.acceptance.external@1'),'return seven')
+        if entry=='session':
+            registry.register(LLMExecutor(workspace,client,ModelRoleConfig('worker','offline-worker'),
+                                          semantic_protocol=True,protocol_trace=events.append))
+            session=ProjectSession(AgentComposer(client,ModelRoleConfig('agent','offline-flash'),
+                planner_mode='MILESTONE_MODE',protocol_trace=events.append),
+                DAGRunner(registry,store,deliverable_checkers=bindings),
+                store,known_capabilities=set(catalog),worker_model='offline-worker',capability_catalog=catalog,
+                acceptance=acceptance,continuous=True,max_decisions=1,admission_policy=AdmissionPolicy(**auth['admission_policy']),
+                subject_snapshot=lambda paths:snapshot({'target_scope':paths}))
+            result=session.run(project_id='p',run_id='r',goal='return seven',project_intent=intent)
+        else:
+            from pathlib import Path
+            from cgkn.application.software_project.service import SoftwareProjectGenerationService
+            service=SoftwareProjectGenerationService(Path(__file__).resolve().parents[2],store.root,client=client,config={'execution_authorization':auth})
+            if entry in {'profile','conversation','api_job','local_cli'}:
+                consumer=tmp_path/'consumer.py'
+                consumer.write_text("import json,sys,pathlib,runpy\n"
+                    "r=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\n"
+                    "p=pathlib.Path(r['workspace'])/next(iter(r['subjects']))\n"
+                    "v=runpy.run_path(str(p))['value']()\n"
+                    "print(json.dumps({'execution':'VALID','observed':{'value':v==7,'actual':v}}))\n")
+                profile=tmp_path/'controller/.cgkn/project-session.json'
+                profile.parent.mkdir(parents=True)
+                profile.write_text(json.dumps({'kind':'CGKNProjectSessionProfile','schema_version':'1.0',
+                    'project_id':'p','run_id':'r','workspace':str(workspace),'intent':intent,
+                    'requirements':{'R-value':{'must':True,'checker_keys':['independent']}},
+                    'independent_consumer':{'path':str(consumer),'sha256':hashlib.sha256(consumer.read_bytes()).hexdigest(),
+                        'public_fields':['value','actual']},'checkpoint_interval':1}))
+                if entry in {'conversation','api_job','local_cli'}:
+                    from scripts import codex_conversation
+                    from cgkn.application.software_project import service as service_module
+                    monkeypatch.setattr(service_module,'SoftwareProjectGenerationService',lambda *a,**k:service)
+                    monkeypatch.setattr(codex_conversation,'CodexConversation',lambda:pytest.fail('legacy execution entered'))
+                    if entry=='conversation':
+                        document=codex_conversation.run_formal_generation_once(tmp_path/'controller',goal='return seven')
+                    elif entry=='api_job':
+                        api_session={'project_session_profile':str(profile),'whiteboard':{'project_summary':'return seven'}}
+                        monkeypatch.setattr(codex_conversation,'load_session',lambda *a:api_session)
+                        monkeypatch.setattr(codex_conversation,'save_session',lambda *a:None)
+                        codex_conversation.start_generation_from_income(None,'api',tmp_path,tmp_path,'ignored',60,
+                            api_session,reason='offline full chain',background=False)
+                        assert api_session['generation']['status']=='goals_verified'
+                        document=json.loads(next((store.run_dir('p','r')/'core_results').glob('*.json')).read_text())
+                    else:
+                        from scripts import run_local_pipeline
+                        from types import SimpleNamespace
+                        document=run_local_pipeline.execute(SimpleNamespace(use_api=True,provider_mode='live',
+                            goal='return seven',project_session_profile=str(profile),run_dir=store.root,
+                            result=tmp_path/'local-result.json'))
+                else:
+>                   document=service.run_profile(profile,goal='return seven')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_worker_chain.py:288: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:83: in decide
+    aid,result=authority.admit(tree,version,proposal,known_capabilities=session.known_capabilities,
+cgkn\runtime\node_authority.py:115: in admit
+    result = admit_proposal(tree, version, proposal, known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tree = CapabilityTree(goal='return seven', nodes=()), current_tree_version = 1
+proposal = ProjectProposal(proposal_id='host-plan-1', project_id='p', base_tree_version=1, goal_reference='return seven', observe...exploration_reason='bounded planning', exploration_budget=4, exploration_measure='public proposal admitted separately')
+
+    def admit_proposal(tree: CapabilityTree, current_tree_version: int,
+                       proposal: ProjectProposal, *,
+                       known_capabilities: set[str] | frozenset[str],
+                       catalog: Mapping[str, Any],
+                       policy: AdmissionPolicy | None = None) -> AdmissionResult:
+        policy = policy or AdmissionPolicy()
+    
+        if policy.require_capability_contract or policy.capability_contracts or proposal.target_capability_id:
+            from veriarbor.capability import CapabilityContract, GoalGap, admit_capability
+            if not policy.project_id or proposal.project_id != policy.project_id:
+                return AdmissionResult(False, 'PROJECT_SCOPE_REJECT', 'capability policy belongs to another project')
+            contracts = {k: CapabilityContract(**v) for k, v in policy.capability_contracts.items()}
+            gaps = {k: GoalGap(**v) for k, v in policy.goal_gaps.items()}
+            claim = proposal.as_dict()
+            # Resolve implementation identities from registered catalog metadata as well
+            # as the proposal. A target claim cannot hide a forbidden implementation.
+            strategies = set(proposal.strategy_capabilities)
+            for operation in proposal.proposed_operations:
+                ref = operation.get('capability_ref') or operation.get('payload', {}).get('capability_ref')
+                existing = tree.by_id.get(operation['node_id'])
+                ref = ref or (existing.capability_ref if existing else '')
+                if ref:
+                    strategies.add(ref)
+                    strategies.update(catalog.get(ref, {}).get('implements_capabilities', ()))
+            claim['strategy_capabilities'] = sorted(strategies)
+            from veriarbor.model import Evidence
+            inputs = []
+            for operation in proposal.proposed_operations:
+                for binding in policy.evidence_inputs.get(operation['node_id'], ()):
+                    if not binding.get('evidence'):
+                        return AdmissionResult(False, 'PORT_EVIDENCE_SCOPE_REJECT', 'required input evidence missing')
+                    requirements = dict(binding['requirements'])
+                    requirements['required_scope'] = {**requirements.get('required_scope', {}), 'PROJECT': policy.project_id}
+                    inputs.append((Evidence(**binding['evidence']), requirements))
+            code = admit_capability(claim, contracts, gaps, budget_allowed=policy.budget_state == 'OK', evidence_inputs=inputs)
+            if code != 'ADMITTED':
+                return AdmissionResult(False, code, 'capability proposal failed governance')
+    
+        if proposal.base_tree_version != current_tree_version:
+            return AdmissionResult(False, "STALE_BASE_TREE_VERSION",
+                                   "proposal base_tree_version is not the current tree version",
+                                   {"requested": proposal.base_tree_version,
+                                    "current": current_tree_version})
+    
+        if len(proposal.proposed_operations) > policy.max_tree_edits:
+            return AdmissionResult(False, "EDIT_LIMIT", "proposal exceeds the edit budget",
+                                   {"requested": len(proposal.proposed_operations),
+                                    "limit": policy.max_tree_edits})
+    
+        additions = [op for op in proposal.proposed_operations if op.get("operation") == "add_node"]
+        if policy.incremental_mode and len(additions) > policy.max_new_nodes:
+            return AdmissionResult(False, "INCREMENTAL_LIMIT",
+                                   "incremental mode admits one frontier capability per proposal",
+                                   {"requested": len(additions), "limit": policy.max_new_nodes,
+                                    "operations": [op.get("node_id") for op in additions]})
+    
+        if policy.budget_state == "BLOCKED":
+            wants_model = any(str(op.get("config", {}).get("executor_ref") or "").startswith("llm.")
+                              or str(op.get("resource_preference") or "").startswith("model:")
+                              for op in proposal.proposed_operations)
+            if wants_model:
+                return AdmissionResult(False, "BUDGET_BLOCKED",
+                                       "no new model resource may be admitted while budget is blocked",
+                                       {"resource_preference": proposal.resource_preference})
+    
+        canonical = _canonical_capabilities(catalog)
+        edits = []
+        try:
+            for index, operation in enumerate(proposal.proposed_operations):
+                op = str(operation["operation"])
+                capability = str(operation.get("capability_ref") or "")
+                if op == "add_node" and capability and capability not in known_capabilities:
+                    suggestion = canonical.get(capability, "")
+                    return AdmissionResult(False, "UNKNOWN_CAPABILITY",
+                                           "capability is not registered in the current catalog",
+                                           {"requested": capability,
+                                            "canonical": suggestion or "UNKNOWN"})
+                edit = _edit_from_operation(proposal, index, operation, catalog)
+                if op == "add_node":
+                    contract = dict(edit.payload.get("config", {}).get("leaf_contract") or {})
+                    if policy.require_leaf_contract and not contract:
+                        return AdmissionResult(False, "MISSING_LEAF_CONTRACT",
+                                               "add_node requires a leaf contract", {"node_id": edit.node_id})
+                    effects = set(contract.get("effect_domains") or ())
+                    remote = effects & REMOTE_EFFECTS
+                    if remote and not policy.allow_remote_effects:
+                        return AdmissionResult(False, "UNAUTHORIZED_EFFECT",
+                                               "remote external effects are not admitted",
+                                               {"node_id": edit.node_id, "effects": sorted(remote)})
+                    if not effects:
+                        return AdmissionResult(False, "MISSING_EFFECT",
+                                               "a leaf must declare its effect domain", {"node_id": edit.node_id})
+>                   extra = effects - policy.allowed_effect_domains - REMOTE_EFFECTS
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   TypeError: unsupported operand type(s) for -: 'set' and 'list'
+
+cgkn\agent\project_agent.py:415: TypeError
+_ test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[conversation] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker3')
+entry = 'conversation'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42D1A9FD0>
+
+    @pytest.mark.parametrize('entry',['session','application_service','profile','conversation','api_job','local_cli'])
+    def test_milestone_compiler_worker_independent_failure_repair_and_checkpoint(tmp_path,entry,monkeypatch):
+        workspace=tmp_path/'workspace';workspace.mkdir()
+        store=FileRunStore(tmp_path/'state')
+        acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                                  {'independent':'project.acceptance@1' if entry in {'profile','conversation','api_job','local_cli'} else 'measure@1'})
+        acceptance.bind_subjects({'module':'NOT_YET_PRODUCED'})
+        class Measure:
+            descriptor=ExecutorDescriptor('measure@1','deterministic',('*',))
+            def execute(self, request):
+                goal=next(g for g in acceptance.view()['goals'] if g['id']==request.task_context.node_config['goal_id'])
+                path=workspace/goal['milestone_contract']['design']['artifacts'][0]['path']
+                digest=hashlib.sha256(path.read_bytes()).hexdigest()
+                actual=runpy.run_path(str(path))['value']()
+                subjects={p:digest for p in goal['subject_refs']}
+                acceptance.bind_subjects({**acceptance.view()['subject_identities'],**subjects})
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                    status=BlockStatus.SUCCEEDED,outputs={'goal_check':{'goal_id':goal['id'],
+                        'condition_hash':identity(goal['acceptance']),'subjects':subjects,
+                        'execution':'VALID','evidence_refs':[str(path)],'observed':{'actual':actual,'expected':7},
+                        'verdict':'VERIFIED' if actual==7 else 'FAILED'}})
+        def valid_source(root,contract):
+            import ast
+            files=list(contract['target_scope'])
+            for relative in files: ast.parse((root/relative).read_text())
+            return {'passed':True,'observed':{'parsed':files},'artifacts':files}
+        def snapshot(contract):
+            return {p:hashlib.sha256((workspace/p).read_bytes()).hexdigest() if (workspace/p).is_file() else None
+                    for p in contract['target_scope']}
+        def envelope(request,contract):
+            measured=request.as_dict()['input_values']['execution_receipt']['outputs']['goal_check']
+            return {'passed':all(acceptance.view()['subject_identities'].get(k)==v for k,v in measured['subjects'].items()),
+                    'observed':measured,'evidence_refs':[dict(request.input_values['execution_receipt_ref'])]}
+        client=FakeModels();events=[]
+        registry=ExecutorRegistry()
+        registry.register(Measure())
+        registry.register(FileDeliverableChecker(workspace,{'source':valid_source}))
+        registry.register(SubjectDeliverableChecker(snapshot,{'envelope':envelope}))
+        catalog={'code@1':{'executor_ref':'llm.cheap@1','semantic_task_kinds':[2,3],
+                           'checker_ref':'source','acceptance':['source'],'effect_domains':['filesystem','external_network'],
+                           'description':'Bounded pure function implementation and repair'},
+                 'measure@1':{'executor_ref':'measure@1','semantic_task_kinds':[4],
+                              'checker_ref':'measurement','acceptance':['envelope'],'effect_domains':['measurement'],
+                              'description':'Independent current-object business checker'}}
+        intent={'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],'constraints':['offline'],
+                'forbidden_operations':['network'],'delivery_expectations':['checked local module'],
+                'major_acceptance_categories':['function result']}
+        bindings={'source':'deliverable.files@1','measurement':'deliverable.subjects@1'}
+        from tests.session_authority_support import authorization
+        from cgkn.agent.project_agent import AdmissionPolicy
+        auth=authorization('p',('code@1','measure@1','code.implement@1','project.acceptance.external@1'),'return seven')
+        if entry=='session':
+            registry.register(LLMExecutor(workspace,client,ModelRoleConfig('worker','offline-worker'),
+                                          semantic_protocol=True,protocol_trace=events.append))
+            session=ProjectSession(AgentComposer(client,ModelRoleConfig('agent','offline-flash'),
+                planner_mode='MILESTONE_MODE',protocol_trace=events.append),
+                DAGRunner(registry,store,deliverable_checkers=bindings),
+                store,known_capabilities=set(catalog),worker_model='offline-worker',capability_catalog=catalog,
+                acceptance=acceptance,continuous=True,max_decisions=1,admission_policy=AdmissionPolicy(**auth['admission_policy']),
+                subject_snapshot=lambda paths:snapshot({'target_scope':paths}))
+            result=session.run(project_id='p',run_id='r',goal='return seven',project_intent=intent)
+        else:
+            from pathlib import Path
+            from cgkn.application.software_project.service import SoftwareProjectGenerationService
+            service=SoftwareProjectGenerationService(Path(__file__).resolve().parents[2],store.root,client=client,config={'execution_authorization':auth})
+            if entry in {'profile','conversation','api_job','local_cli'}:
+                consumer=tmp_path/'consumer.py'
+                consumer.write_text("import json,sys,pathlib,runpy\n"
+                    "r=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\n"
+                    "p=pathlib.Path(r['workspace'])/next(iter(r['subjects']))\n"
+                    "v=runpy.run_path(str(p))['value']()\n"
+                    "print(json.dumps({'execution':'VALID','observed':{'value':v==7,'actual':v}}))\n")
+                profile=tmp_path/'controller/.cgkn/project-session.json'
+                profile.parent.mkdir(parents=True)
+                profile.write_text(json.dumps({'kind':'CGKNProjectSessionProfile','schema_version':'1.0',
+                    'project_id':'p','run_id':'r','workspace':str(workspace),'intent':intent,
+                    'requirements':{'R-value':{'must':True,'checker_keys':['independent']}},
+                    'independent_consumer':{'path':str(consumer),'sha256':hashlib.sha256(consumer.read_bytes()).hexdigest(),
+                        'public_fields':['value','actual']},'checkpoint_interval':1}))
+                if entry in {'conversation','api_job','local_cli'}:
+                    from scripts import codex_conversation
+                    from cgkn.application.software_project import service as service_module
+                    monkeypatch.setattr(service_module,'SoftwareProjectGenerationService',lambda *a,**k:service)
+                    monkeypatch.setattr(codex_conversation,'CodexConversation',lambda:pytest.fail('legacy execution entered'))
+                    if entry=='conversation':
+>                       document=codex_conversation.run_formal_generation_once(tmp_path/'controller',goal='return seven')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agent\test_milestone_worker_chain.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:856: in run_formal_generation_once
+    result = service.run_profile(core_profile, goal=goal, on_started=on_started)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:83: in decide
+    aid,result=authority.admit(tree,version,proposal,known_capabilities=session.known_capabilities,
+cgkn\runtime\node_authority.py:115: in admit
+    result = admit_proposal(tree, version, proposal, known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tree = CapabilityTree(goal='return seven', nodes=()), current_tree_version = 1
+proposal = ProjectProposal(proposal_id='host-plan-1', project_id='p', base_tree_version=1, goal_reference='return seven', observe...exploration_reason='bounded planning', exploration_budget=4, exploration_measure='public proposal admitted separately')
+
+    def admit_proposal(tree: CapabilityTree, current_tree_version: int,
+                       proposal: ProjectProposal, *,
+                       known_capabilities: set[str] | frozenset[str],
+                       catalog: Mapping[str, Any],
+                       policy: AdmissionPolicy | None = None) -> AdmissionResult:
+        policy = policy or AdmissionPolicy()
+    
+        if policy.require_capability_contract or policy.capability_contracts or proposal.target_capability_id:
+            from veriarbor.capability import CapabilityContract, GoalGap, admit_capability
+            if not policy.project_id or proposal.project_id != policy.project_id:
+                return AdmissionResult(False, 'PROJECT_SCOPE_REJECT', 'capability policy belongs to another project')
+            contracts = {k: CapabilityContract(**v) for k, v in policy.capability_contracts.items()}
+            gaps = {k: GoalGap(**v) for k, v in policy.goal_gaps.items()}
+            claim = proposal.as_dict()
+            # Resolve implementation identities from registered catalog metadata as well
+            # as the proposal. A target claim cannot hide a forbidden implementation.
+            strategies = set(proposal.strategy_capabilities)
+            for operation in proposal.proposed_operations:
+                ref = operation.get('capability_ref') or operation.get('payload', {}).get('capability_ref')
+                existing = tree.by_id.get(operation['node_id'])
+                ref = ref or (existing.capability_ref if existing else '')
+                if ref:
+                    strategies.add(ref)
+                    strategies.update(catalog.get(ref, {}).get('implements_capabilities', ()))
+            claim['strategy_capabilities'] = sorted(strategies)
+            from veriarbor.model import Evidence
+            inputs = []
+            for operation in proposal.proposed_operations:
+                for binding in policy.evidence_inputs.get(operation['node_id'], ()):
+                    if not binding.get('evidence'):
+                        return AdmissionResult(False, 'PORT_EVIDENCE_SCOPE_REJECT', 'required input evidence missing')
+                    requirements = dict(binding['requirements'])
+                    requirements['required_scope'] = {**requirements.get('required_scope', {}), 'PROJECT': policy.project_id}
+                    inputs.append((Evidence(**binding['evidence']), requirements))
+            code = admit_capability(claim, contracts, gaps, budget_allowed=policy.budget_state == 'OK', evidence_inputs=inputs)
+            if code != 'ADMITTED':
+                return AdmissionResult(False, code, 'capability proposal failed governance')
+    
+        if proposal.base_tree_version != current_tree_version:
+            return AdmissionResult(False, "STALE_BASE_TREE_VERSION",
+                                   "proposal base_tree_version is not the current tree version",
+                                   {"requested": proposal.base_tree_version,
+                                    "current": current_tree_version})
+    
+        if len(proposal.proposed_operations) > policy.max_tree_edits:
+            return AdmissionResult(False, "EDIT_LIMIT", "proposal exceeds the edit budget",
+                                   {"requested": len(proposal.proposed_operations),
+                                    "limit": policy.max_tree_edits})
+    
+        additions = [op for op in proposal.proposed_operations if op.get("operation") == "add_node"]
+        if policy.incremental_mode and len(additions) > policy.max_new_nodes:
+            return AdmissionResult(False, "INCREMENTAL_LIMIT",
+                                   "incremental mode admits one frontier capability per proposal",
+                                   {"requested": len(additions), "limit": policy.max_new_nodes,
+                                    "operations": [op.get("node_id") for op in additions]})
+    
+        if policy.budget_state == "BLOCKED":
+            wants_model = any(str(op.get("config", {}).get("executor_ref") or "").startswith("llm.")
+                              or str(op.get("resource_preference") or "").startswith("model:")
+                              for op in proposal.proposed_operations)
+            if wants_model:
+                return AdmissionResult(False, "BUDGET_BLOCKED",
+                                       "no new model resource may be admitted while budget is blocked",
+                                       {"resource_preference": proposal.resource_preference})
+    
+        canonical = _canonical_capabilities(catalog)
+        edits = []
+        try:
+            for index, operation in enumerate(proposal.proposed_operations):
+                op = str(operation["operation"])
+                capability = str(operation.get("capability_ref") or "")
+                if op == "add_node" and capability and capability not in known_capabilities:
+                    suggestion = canonical.get(capability, "")
+                    return AdmissionResult(False, "UNKNOWN_CAPABILITY",
+                                           "capability is not registered in the current catalog",
+                                           {"requested": capability,
+                                            "canonical": suggestion or "UNKNOWN"})
+                edit = _edit_from_operation(proposal, index, operation, catalog)
+                if op == "add_node":
+                    contract = dict(edit.payload.get("config", {}).get("leaf_contract") or {})
+                    if policy.require_leaf_contract and not contract:
+                        return AdmissionResult(False, "MISSING_LEAF_CONTRACT",
+                                               "add_node requires a leaf contract", {"node_id": edit.node_id})
+                    effects = set(contract.get("effect_domains") or ())
+                    remote = effects & REMOTE_EFFECTS
+                    if remote and not policy.allow_remote_effects:
+                        return AdmissionResult(False, "UNAUTHORIZED_EFFECT",
+                                               "remote external effects are not admitted",
+                                               {"node_id": edit.node_id, "effects": sorted(remote)})
+                    if not effects:
+                        return AdmissionResult(False, "MISSING_EFFECT",
+                                               "a leaf must declare its effect domain", {"node_id": edit.node_id})
+>                   extra = effects - policy.allowed_effect_domains - REMOTE_EFFECTS
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   TypeError: unsupported operand type(s) for -: 'set' and 'list'
+
+cgkn\agent\project_agent.py:415: TypeError
+_ test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[api_job] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker4')
+entry = 'api_job'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42EB839B0>
+
+    @pytest.mark.parametrize('entry',['session','application_service','profile','conversation','api_job','local_cli'])
+    def test_milestone_compiler_worker_independent_failure_repair_and_checkpoint(tmp_path,entry,monkeypatch):
+        workspace=tmp_path/'workspace';workspace.mkdir()
+        store=FileRunStore(tmp_path/'state')
+        acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                                  {'independent':'project.acceptance@1' if entry in {'profile','conversation','api_job','local_cli'} else 'measure@1'})
+        acceptance.bind_subjects({'module':'NOT_YET_PRODUCED'})
+        class Measure:
+            descriptor=ExecutorDescriptor('measure@1','deterministic',('*',))
+            def execute(self, request):
+                goal=next(g for g in acceptance.view()['goals'] if g['id']==request.task_context.node_config['goal_id'])
+                path=workspace/goal['milestone_contract']['design']['artifacts'][0]['path']
+                digest=hashlib.sha256(path.read_bytes()).hexdigest()
+                actual=runpy.run_path(str(path))['value']()
+                subjects={p:digest for p in goal['subject_refs']}
+                acceptance.bind_subjects({**acceptance.view()['subject_identities'],**subjects})
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                    status=BlockStatus.SUCCEEDED,outputs={'goal_check':{'goal_id':goal['id'],
+                        'condition_hash':identity(goal['acceptance']),'subjects':subjects,
+                        'execution':'VALID','evidence_refs':[str(path)],'observed':{'actual':actual,'expected':7},
+                        'verdict':'VERIFIED' if actual==7 else 'FAILED'}})
+        def valid_source(root,contract):
+            import ast
+            files=list(contract['target_scope'])
+            for relative in files: ast.parse((root/relative).read_text())
+            return {'passed':True,'observed':{'parsed':files},'artifacts':files}
+        def snapshot(contract):
+            return {p:hashlib.sha256((workspace/p).read_bytes()).hexdigest() if (workspace/p).is_file() else None
+                    for p in contract['target_scope']}
+        def envelope(request,contract):
+            measured=request.as_dict()['input_values']['execution_receipt']['outputs']['goal_check']
+            return {'passed':all(acceptance.view()['subject_identities'].get(k)==v for k,v in measured['subjects'].items()),
+                    'observed':measured,'evidence_refs':[dict(request.input_values['execution_receipt_ref'])]}
+        client=FakeModels();events=[]
+        registry=ExecutorRegistry()
+        registry.register(Measure())
+        registry.register(FileDeliverableChecker(workspace,{'source':valid_source}))
+        registry.register(SubjectDeliverableChecker(snapshot,{'envelope':envelope}))
+        catalog={'code@1':{'executor_ref':'llm.cheap@1','semantic_task_kinds':[2,3],
+                           'checker_ref':'source','acceptance':['source'],'effect_domains':['filesystem','external_network'],
+                           'description':'Bounded pure function implementation and repair'},
+                 'measure@1':{'executor_ref':'measure@1','semantic_task_kinds':[4],
+                              'checker_ref':'measurement','acceptance':['envelope'],'effect_domains':['measurement'],
+                              'description':'Independent current-object business checker'}}
+        intent={'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],'constraints':['offline'],
+                'forbidden_operations':['network'],'delivery_expectations':['checked local module'],
+                'major_acceptance_categories':['function result']}
+        bindings={'source':'deliverable.files@1','measurement':'deliverable.subjects@1'}
+        from tests.session_authority_support import authorization
+        from cgkn.agent.project_agent import AdmissionPolicy
+        auth=authorization('p',('code@1','measure@1','code.implement@1','project.acceptance.external@1'),'return seven')
+        if entry=='session':
+            registry.register(LLMExecutor(workspace,client,ModelRoleConfig('worker','offline-worker'),
+                                          semantic_protocol=True,protocol_trace=events.append))
+            session=ProjectSession(AgentComposer(client,ModelRoleConfig('agent','offline-flash'),
+                planner_mode='MILESTONE_MODE',protocol_trace=events.append),
+                DAGRunner(registry,store,deliverable_checkers=bindings),
+                store,known_capabilities=set(catalog),worker_model='offline-worker',capability_catalog=catalog,
+                acceptance=acceptance,continuous=True,max_decisions=1,admission_policy=AdmissionPolicy(**auth['admission_policy']),
+                subject_snapshot=lambda paths:snapshot({'target_scope':paths}))
+            result=session.run(project_id='p',run_id='r',goal='return seven',project_intent=intent)
+        else:
+            from pathlib import Path
+            from cgkn.application.software_project.service import SoftwareProjectGenerationService
+            service=SoftwareProjectGenerationService(Path(__file__).resolve().parents[2],store.root,client=client,config={'execution_authorization':auth})
+            if entry in {'profile','conversation','api_job','local_cli'}:
+                consumer=tmp_path/'consumer.py'
+                consumer.write_text("import json,sys,pathlib,runpy\n"
+                    "r=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\n"
+                    "p=pathlib.Path(r['workspace'])/next(iter(r['subjects']))\n"
+                    "v=runpy.run_path(str(p))['value']()\n"
+                    "print(json.dumps({'execution':'VALID','observed':{'value':v==7,'actual':v}}))\n")
+                profile=tmp_path/'controller/.cgkn/project-session.json'
+                profile.parent.mkdir(parents=True)
+                profile.write_text(json.dumps({'kind':'CGKNProjectSessionProfile','schema_version':'1.0',
+                    'project_id':'p','run_id':'r','workspace':str(workspace),'intent':intent,
+                    'requirements':{'R-value':{'must':True,'checker_keys':['independent']}},
+                    'independent_consumer':{'path':str(consumer),'sha256':hashlib.sha256(consumer.read_bytes()).hexdigest(),
+                        'public_fields':['value','actual']},'checkpoint_interval':1}))
+                if entry in {'conversation','api_job','local_cli'}:
+                    from scripts import codex_conversation
+                    from cgkn.application.software_project import service as service_module
+                    monkeypatch.setattr(service_module,'SoftwareProjectGenerationService',lambda *a,**k:service)
+                    monkeypatch.setattr(codex_conversation,'CodexConversation',lambda:pytest.fail('legacy execution entered'))
+                    if entry=='conversation':
+                        document=codex_conversation.run_formal_generation_once(tmp_path/'controller',goal='return seven')
+                    elif entry=='api_job':
+                        api_session={'project_session_profile':str(profile),'whiteboard':{'project_summary':'return seven'}}
+                        monkeypatch.setattr(codex_conversation,'load_session',lambda *a:api_session)
+                        monkeypatch.setattr(codex_conversation,'save_session',lambda *a:None)
+>                       codex_conversation.start_generation_from_income(None,'api',tmp_path,tmp_path,'ignored',60,
+                            api_session,reason='offline full chain',background=False)
+
+tests\agent\test_milestone_worker_chain.py:277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\codex_conversation.py:7308: in start_generation_from_income
+    start_agent_generation(client,conversation_id,session_dir,log_dir,model,timeout,
+scripts\codex_conversation.py:7027: in start_agent_generation
+    run_provider_generation_job(client,conversation_id,session_dir,log_dir,model,timeout,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\codex_conversation.py:6625: in run_provider_generation_job
+    result=service.run_profile(profile,goal=combined_requirement(session),on_started=started)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:83: in decide
+    aid,result=authority.admit(tree,version,proposal,known_capabilities=session.known_capabilities,
+cgkn\runtime\node_authority.py:115: in admit
+    result = admit_proposal(tree, version, proposal, known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tree = CapabilityTree(goal='return seven', nodes=()), current_tree_version = 1
+proposal = ProjectProposal(proposal_id='host-plan-1', project_id='p', base_tree_version=1, goal_reference='return seven', observe...exploration_reason='bounded planning', exploration_budget=4, exploration_measure='public proposal admitted separately')
+
+    def admit_proposal(tree: CapabilityTree, current_tree_version: int,
+                       proposal: ProjectProposal, *,
+                       known_capabilities: set[str] | frozenset[str],
+                       catalog: Mapping[str, Any],
+                       policy: AdmissionPolicy | None = None) -> AdmissionResult:
+        policy = policy or AdmissionPolicy()
+    
+        if policy.require_capability_contract or policy.capability_contracts or proposal.target_capability_id:
+            from veriarbor.capability import CapabilityContract, GoalGap, admit_capability
+            if not policy.project_id or proposal.project_id != policy.project_id:
+                return AdmissionResult(False, 'PROJECT_SCOPE_REJECT', 'capability policy belongs to another project')
+            contracts = {k: CapabilityContract(**v) for k, v in policy.capability_contracts.items()}
+            gaps = {k: GoalGap(**v) for k, v in policy.goal_gaps.items()}
+            claim = proposal.as_dict()
+            # Resolve implementation identities from registered catalog metadata as well
+            # as the proposal. A target claim cannot hide a forbidden implementation.
+            strategies = set(proposal.strategy_capabilities)
+            for operation in proposal.proposed_operations:
+                ref = operation.get('capability_ref') or operation.get('payload', {}).get('capability_ref')
+                existing = tree.by_id.get(operation['node_id'])
+                ref = ref or (existing.capability_ref if existing else '')
+                if ref:
+                    strategies.add(ref)
+                    strategies.update(catalog.get(ref, {}).get('implements_capabilities', ()))
+            claim['strategy_capabilities'] = sorted(strategies)
+            from veriarbor.model import Evidence
+            inputs = []
+            for operation in proposal.proposed_operations:
+                for binding in policy.evidence_inputs.get(operation['node_id'], ()):
+                    if not binding.get('evidence'):
+                        return AdmissionResult(False, 'PORT_EVIDENCE_SCOPE_REJECT', 'required input evidence missing')
+                    requirements = dict(binding['requirements'])
+                    requirements['required_scope'] = {**requirements.get('required_scope', {}), 'PROJECT': policy.project_id}
+                    inputs.append((Evidence(**binding['evidence']), requirements))
+            code = admit_capability(claim, contracts, gaps, budget_allowed=policy.budget_state == 'OK', evidence_inputs=inputs)
+            if code != 'ADMITTED':
+                return AdmissionResult(False, code, 'capability proposal failed governance')
+    
+        if proposal.base_tree_version != current_tree_version:
+            return AdmissionResult(False, "STALE_BASE_TREE_VERSION",
+                                   "proposal base_tree_version is not the current tree version",
+                                   {"requested": proposal.base_tree_version,
+                                    "current": current_tree_version})
+    
+        if len(proposal.proposed_operations) > policy.max_tree_edits:
+            return AdmissionResult(False, "EDIT_LIMIT", "proposal exceeds the edit budget",
+                                   {"requested": len(proposal.proposed_operations),
+                                    "limit": policy.max_tree_edits})
+    
+        additions = [op for op in proposal.proposed_operations if op.get("operation") == "add_node"]
+        if policy.incremental_mode and len(additions) > policy.max_new_nodes:
+            return AdmissionResult(False, "INCREMENTAL_LIMIT",
+                                   "incremental mode admits one frontier capability per proposal",
+                                   {"requested": len(additions), "limit": policy.max_new_nodes,
+                                    "operations": [op.get("node_id") for op in additions]})
+    
+        if policy.budget_state == "BLOCKED":
+            wants_model = any(str(op.get("config", {}).get("executor_ref") or "").startswith("llm.")
+                              or str(op.get("resource_preference") or "").startswith("model:")
+                              for op in proposal.proposed_operations)
+            if wants_model:
+                return AdmissionResult(False, "BUDGET_BLOCKED",
+                                       "no new model resource may be admitted while budget is blocked",
+                                       {"resource_preference": proposal.resource_preference})
+    
+        canonical = _canonical_capabilities(catalog)
+        edits = []
+        try:
+            for index, operation in enumerate(proposal.proposed_operations):
+                op = str(operation["operation"])
+                capability = str(operation.get("capability_ref") or "")
+                if op == "add_node" and capability and capability not in known_capabilities:
+                    suggestion = canonical.get(capability, "")
+                    return AdmissionResult(False, "UNKNOWN_CAPABILITY",
+                                           "capability is not registered in the current catalog",
+                                           {"requested": capability,
+                                            "canonical": suggestion or "UNKNOWN"})
+                edit = _edit_from_operation(proposal, index, operation, catalog)
+                if op == "add_node":
+                    contract = dict(edit.payload.get("config", {}).get("leaf_contract") or {})
+                    if policy.require_leaf_contract and not contract:
+                        return AdmissionResult(False, "MISSING_LEAF_CONTRACT",
+                                               "add_node requires a leaf contract", {"node_id": edit.node_id})
+                    effects = set(contract.get("effect_domains") or ())
+                    remote = effects & REMOTE_EFFECTS
+                    if remote and not policy.allow_remote_effects:
+                        return AdmissionResult(False, "UNAUTHORIZED_EFFECT",
+                                               "remote external effects are not admitted",
+                                               {"node_id": edit.node_id, "effects": sorted(remote)})
+                    if not effects:
+                        return AdmissionResult(False, "MISSING_EFFECT",
+                                               "a leaf must declare its effect domain", {"node_id": edit.node_id})
+>                   extra = effects - policy.allowed_effect_domains - REMOTE_EFFECTS
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   TypeError: unsupported operand type(s) for -: 'set' and 'list'
+
+cgkn\agent\project_agent.py:415: TypeError
+_ test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[local_cli] _
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23532/test_milestone_compiler_worker5')
+entry = 'local_cli'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B42EB82A50>
+
+    @pytest.mark.parametrize('entry',['session','application_service','profile','conversation','api_job','local_cli'])
+    def test_milestone_compiler_worker_independent_failure_repair_and_checkpoint(tmp_path,entry,monkeypatch):
+        workspace=tmp_path/'workspace';workspace.mkdir()
+        store=FileRunStore(tmp_path/'state')
+        acceptance=GoalAcceptance(store,'p','r',{'R-value':{'must':True,'checker_keys':['independent']}},
+                                  {'independent':'project.acceptance@1' if entry in {'profile','conversation','api_job','local_cli'} else 'measure@1'})
+        acceptance.bind_subjects({'module':'NOT_YET_PRODUCED'})
+        class Measure:
+            descriptor=ExecutorDescriptor('measure@1','deterministic',('*',))
+            def execute(self, request):
+                goal=next(g for g in acceptance.view()['goals'] if g['id']==request.task_context.node_config['goal_id'])
+                path=workspace/goal['milestone_contract']['design']['artifacts'][0]['path']
+                digest=hashlib.sha256(path.read_bytes()).hexdigest()
+                actual=runpy.run_path(str(path))['value']()
+                subjects={p:digest for p in goal['subject_refs']}
+                acceptance.bind_subjects({**acceptance.view()['subject_identities'],**subjects})
+                return BlockExecutionResult(project_id=request.project_id,run_id=request.run_id,
+                    node_id=request.node_id,attempt_id=request.attempt_id,executor_ref='measure@1',
+                    status=BlockStatus.SUCCEEDED,outputs={'goal_check':{'goal_id':goal['id'],
+                        'condition_hash':identity(goal['acceptance']),'subjects':subjects,
+                        'execution':'VALID','evidence_refs':[str(path)],'observed':{'actual':actual,'expected':7},
+                        'verdict':'VERIFIED' if actual==7 else 'FAILED'}})
+        def valid_source(root,contract):
+            import ast
+            files=list(contract['target_scope'])
+            for relative in files: ast.parse((root/relative).read_text())
+            return {'passed':True,'observed':{'parsed':files},'artifacts':files}
+        def snapshot(contract):
+            return {p:hashlib.sha256((workspace/p).read_bytes()).hexdigest() if (workspace/p).is_file() else None
+                    for p in contract['target_scope']}
+        def envelope(request,contract):
+            measured=request.as_dict()['input_values']['execution_receipt']['outputs']['goal_check']
+            return {'passed':all(acceptance.view()['subject_identities'].get(k)==v for k,v in measured['subjects'].items()),
+                    'observed':measured,'evidence_refs':[dict(request.input_values['execution_receipt_ref'])]}
+        client=FakeModels();events=[]
+        registry=ExecutorRegistry()
+        registry.register(Measure())
+        registry.register(FileDeliverableChecker(workspace,{'source':valid_source}))
+        registry.register(SubjectDeliverableChecker(snapshot,{'envelope':envelope}))
+        catalog={'code@1':{'executor_ref':'llm.cheap@1','semantic_task_kinds':[2,3],
+                           'checker_ref':'source','acceptance':['source'],'effect_domains':['filesystem','external_network'],
+                           'description':'Bounded pure function implementation and repair'},
+                 'measure@1':{'executor_ref':'measure@1','semantic_task_kinds':[4],
+                              'checker_ref':'measurement','acceptance':['envelope'],'effect_domains':['measurement'],
+                              'description':'Independent current-object business checker'}}
+        intent={'overall_goal':'return seven','user_visible_outcomes':['value() returns 7'],'constraints':['offline'],
+                'forbidden_operations':['network'],'delivery_expectations':['checked local module'],
+                'major_acceptance_categories':['function result']}
+        bindings={'source':'deliverable.files@1','measurement':'deliverable.subjects@1'}
+        from tests.session_authority_support import authorization
+        from cgkn.agent.project_agent import AdmissionPolicy
+        auth=authorization('p',('code@1','measure@1','code.implement@1','project.acceptance.external@1'),'return seven')
+        if entry=='session':
+            registry.register(LLMExecutor(workspace,client,ModelRoleConfig('worker','offline-worker'),
+                                          semantic_protocol=True,protocol_trace=events.append))
+            session=ProjectSession(AgentComposer(client,ModelRoleConfig('agent','offline-flash'),
+                planner_mode='MILESTONE_MODE',protocol_trace=events.append),
+                DAGRunner(registry,store,deliverable_checkers=bindings),
+                store,known_capabilities=set(catalog),worker_model='offline-worker',capability_catalog=catalog,
+                acceptance=acceptance,continuous=True,max_decisions=1,admission_policy=AdmissionPolicy(**auth['admission_policy']),
+                subject_snapshot=lambda paths:snapshot({'target_scope':paths}))
+            result=session.run(project_id='p',run_id='r',goal='return seven',project_intent=intent)
+        else:
+            from pathlib import Path
+            from cgkn.application.software_project.service import SoftwareProjectGenerationService
+            service=SoftwareProjectGenerationService(Path(__file__).resolve().parents[2],store.root,client=client,config={'execution_authorization':auth})
+            if entry in {'profile','conversation','api_job','local_cli'}:
+                consumer=tmp_path/'consumer.py'
+                consumer.write_text("import json,sys,pathlib,runpy\n"
+                    "r=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\n"
+                    "p=pathlib.Path(r['workspace'])/next(iter(r['subjects']))\n"
+                    "v=runpy.run_path(str(p))['value']()\n"
+                    "print(json.dumps({'execution':'VALID','observed':{'value':v==7,'actual':v}}))\n")
+                profile=tmp_path/'controller/.cgkn/project-session.json'
+                profile.parent.mkdir(parents=True)
+                profile.write_text(json.dumps({'kind':'CGKNProjectSessionProfile','schema_version':'1.0',
+                    'project_id':'p','run_id':'r','workspace':str(workspace),'intent':intent,
+                    'requirements':{'R-value':{'must':True,'checker_keys':['independent']}},
+                    'independent_consumer':{'path':str(consumer),'sha256':hashlib.sha256(consumer.read_bytes()).hexdigest(),
+                        'public_fields':['value','actual']},'checkpoint_interval':1}))
+                if entry in {'conversation','api_job','local_cli'}:
+                    from scripts import codex_conversation
+                    from cgkn.application.software_project import service as service_module
+                    monkeypatch.setattr(service_module,'SoftwareProjectGenerationService',lambda *a,**k:service)
+                    monkeypatch.setattr(codex_conversation,'CodexConversation',lambda:pytest.fail('legacy execution entered'))
+                    if entry=='conversation':
+                        document=codex_conversation.run_formal_generation_once(tmp_path/'controller',goal='return seven')
+                    elif entry=='api_job':
+                        api_session={'project_session_profile':str(profile),'whiteboard':{'project_summary':'return seven'}}
+                        monkeypatch.setattr(codex_conversation,'load_session',lambda *a:api_session)
+                        monkeypatch.setattr(codex_conversation,'save_session',lambda *a:None)
+                        codex_conversation.start_generation_from_income(None,'api',tmp_path,tmp_path,'ignored',60,
+                            api_session,reason='offline full chain',background=False)
+                        assert api_session['generation']['status']=='goals_verified'
+                        document=json.loads(next((store.run_dir('p','r')/'core_results').glob('*.json')).read_text())
+                    else:
+                        from scripts import run_local_pipeline
+                        from types import SimpleNamespace
+>                       document=run_local_pipeline.execute(SimpleNamespace(use_api=True,provider_mode='live',
+                            goal='return seven',project_session_profile=str(profile),run_dir=store.root,
+                            result=tmp_path/'local-result.json'))
+
+tests\agent\test_milestone_worker_chain.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\run_local_pipeline.py:145: in execute
+    result=service.run_profile(profile,goal=str(args.goal))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\application\software_project\service.py:354: in run_profile
+    result=self.run_project(project_id=project_id,run_id=run_id,workspace=workspace,intent=profile['intent'],
+cgkn\application\software_project\service.py:216: in run_project
+    return session.run(project_id=project_id,run_id=run_id,goal=intent['overall_goal'],project_intent=intent,
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:82: in run
+    return self._run(project_id=project_id, run_id=run_id, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\project_loop.py:332: in _run
+    decision, tree = planning.decide(self, context)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\agent\planning_scope.py:83: in decide
+    aid,result=authority.admit(tree,version,proposal,known_capabilities=session.known_capabilities,
+cgkn\runtime\node_authority.py:115: in admit
+    result = admit_proposal(tree, version, proposal, known_capabilities=known_capabilities,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tree = CapabilityTree(goal='return seven', nodes=()), current_tree_version = 1
+proposal = ProjectProposal(proposal_id='host-plan-1', project_id='p', base_tree_version=1, goal_reference='return seven', observe...exploration_reason='bounded planning', exploration_budget=4, exploration_measure='public proposal admitted separately')
+
+    def admit_proposal(tree: CapabilityTree, current_tree_version: int,
+                       proposal: ProjectProposal, *,
+                       known_capabilities: set[str] | frozenset[str],
+                       catalog: Mapping[str, Any],
+                       policy: AdmissionPolicy | None = None) -> AdmissionResult:
+        policy = policy or AdmissionPolicy()
+    
+        if policy.require_capability_contract or policy.capability_contracts or proposal.target_capability_id:
+            from veriarbor.capability import CapabilityContract, GoalGap, admit_capability
+            if not policy.project_id or proposal.project_id != policy.project_id:
+                return AdmissionResult(False, 'PROJECT_SCOPE_REJECT', 'capability policy belongs to another project')
+            contracts = {k: CapabilityContract(**v) for k, v in policy.capability_contracts.items()}
+            gaps = {k: GoalGap(**v) for k, v in policy.goal_gaps.items()}
+            claim = proposal.as_dict()
+            # Resolve implementation identities from registered catalog metadata as well
+            # as the proposal. A target claim cannot hide a forbidden implementation.
+            strategies = set(proposal.strategy_capabilities)
+            for operation in proposal.proposed_operations:
+                ref = operation.get('capability_ref') or operation.get('payload', {}).get('capability_ref')
+                existing = tree.by_id.get(operation['node_id'])
+                ref = ref or (existing.capability_ref if existing else '')
+                if ref:
+                    strategies.add(ref)
+                    strategies.update(catalog.get(ref, {}).get('implements_capabilities', ()))
+            claim['strategy_capabilities'] = sorted(strategies)
+            from veriarbor.model import Evidence
+            inputs = []
+            for operation in proposal.proposed_operations:
+                for binding in policy.evidence_inputs.get(operation['node_id'], ()):
+                    if not binding.get('evidence'):
+                        return AdmissionResult(False, 'PORT_EVIDENCE_SCOPE_REJECT', 'required input evidence missing')
+                    requirements = dict(binding['requirements'])
+                    requirements['required_scope'] = {**requirements.get('required_scope', {}), 'PROJECT': policy.project_id}
+                    inputs.append((Evidence(**binding['evidence']), requirements))
+            code = admit_capability(claim, contracts, gaps, budget_allowed=policy.budget_state == 'OK', evidence_inputs=inputs)
+            if code != 'ADMITTED':
+                return AdmissionResult(False, code, 'capability proposal failed governance')
+    
+        if proposal.base_tree_version != current_tree_version:
+            return AdmissionResult(False, "STALE_BASE_TREE_VERSION",
+                                   "proposal base_tree_version is not the current tree version",
+                                   {"requested": proposal.base_tree_version,
+                                    "current": current_tree_version})
+    
+        if len(proposal.proposed_operations) > policy.max_tree_edits:
+            return AdmissionResult(False, "EDIT_LIMIT", "proposal exceeds the edit budget",
+                                   {"requested": len(proposal.proposed_operations),
+                                    "limit": policy.max_tree_edits})
+    
+        additions = [op for op in proposal.proposed_operations if op.get("operation") == "add_node"]
+        if policy.incremental_mode and len(additions) > policy.max_new_nodes:
+            return AdmissionResult(False, "INCREMENTAL_LIMIT",
+                                   "incremental mode admits one frontier capability per proposal",
+                                   {"requested": len(additions), "limit": policy.max_new_nodes,
+                                    "operations": [op.get("node_id") for op in additions]})
+    
+        if policy.budget_state == "BLOCKED":
+            wants_model = any(str(op.get("config", {}).get("executor_ref") or "").startswith("llm.")
+                              or str(op.get("resource_preference") or "").startswith("model:")
+                              for op in proposal.proposed_operations)
+            if wants_model:
+                return AdmissionResult(False, "BUDGET_BLOCKED",
+                                       "no new model resource may be admitted while budget is blocked",
+                                       {"resource_preference": proposal.resource_preference})
+    
+        canonical = _canonical_capabilities(catalog)
+        edits = []
+        try:
+            for index, operation in enumerate(proposal.proposed_operations):
+                op = str(operation["operation"])
+                capability = str(operation.get("capability_ref") or "")
+                if op == "add_node" and capability and capability not in known_capabilities:
+                    suggestion = canonical.get(capability, "")
+                    return AdmissionResult(False, "UNKNOWN_CAPABILITY",
+                                           "capability is not registered in the current catalog",
+                                           {"requested": capability,
+                                            "canonical": suggestion or "UNKNOWN"})
+                edit = _edit_from_operation(proposal, index, operation, catalog)
+                if op == "add_node":
+                    contract = dict(edit.payload.get("config", {}).get("leaf_contract") or {})
+                    if policy.require_leaf_contract and not contract:
+                        return AdmissionResult(False, "MISSING_LEAF_CONTRACT",
+                                               "add_node requires a leaf contract", {"node_id": edit.node_id})
+                    effects = set(contract.get("effect_domains") or ())
+                    remote = effects & REMOTE_EFFECTS
+                    if remote and not policy.allow_remote_effects:
+                        return AdmissionResult(False, "UNAUTHORIZED_EFFECT",
+                                               "remote external effects are not admitted",
+                                               {"node_id": edit.node_id, "effects": sorted(remote)})
+                    if not effects:
+                        return AdmissionResult(False, "MISSING_EFFECT",
+                                               "a leaf must declare its effect domain", {"node_id": edit.node_id})
+>                   extra = effects - policy.allowed_effect_domains - REMOTE_EFFECTS
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   TypeError: unsupported operand type(s) for -: 'set' and 'list'
+
+cgkn\agent\project_agent.py:415: TypeError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\milestone-chain.xml -
+=========================== short test summary info ===========================
+FAILED tests/agent/test_milestone_worker_chain.py::test_offline_gateway_contract_core_to_existing_delivery
+FAILED tests/agent/test_milestone_worker_chain.py::test_offline_explicit_runtime_reverification_uses_same_delivery_gate
+FAILED tests/agent/test_milestone_worker_chain.py::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[session]
+FAILED tests/agent/test_milestone_worker_chain.py::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[application_service]
+FAILED tests/agent/test_milestone_worker_chain.py::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[profile]
+FAILED tests/agent/test_milestone_worker_chain.py::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[conversation]
+FAILED tests/agent/test_milestone_worker_chain.py::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[api_job]
+FAILED tests/agent/test_milestone_worker_chain.py::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[local_cli]
+8 failed in 3.95s

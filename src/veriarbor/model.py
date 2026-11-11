@@ -55,6 +55,14 @@ class Evidence:
     checker_versions: dict[str, str]
     evidence_refs: tuple[str, ...]
     qualified: bool = False
+    source_type: str = ''
+    confidence: float | None = None
+    scope: dict[str, str] = field(default_factory=dict)
+    usable_for: tuple[str, ...] = ()
+    forbidden_for: tuple[str, ...] = ()
+    producer: str = ''
+    producer_version: str = ''
+    context: dict[str, str] = field(default_factory=dict)
 
     def current(self, objects, checkers):
         return (self.qualified and bool(self.evidence_refs) and bool(self.object_versions)

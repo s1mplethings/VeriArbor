@@ -1,0 +1,38 @@
+............................................F.....                       [100%]
+================================== FAILURES ===================================
+__________ test_six_slots_real_contract_handoff_and_no_seventh_post ___________
+
+runtime = {'cert_path': 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23504\\test_six_slots_real_contract_h0\...c280-1', 'client_attempt_id': 'offline-final-0', 'client_call_id': '29295be2c25442249ba01b2049cd938f', ...}, ...], ...}
+batch = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23504/test_six_slots_real_contract_h0/acceptance')
+
+    def test_six_slots_real_contract_handoff_and_no_seventh_post(runtime,batch):
+        from tests.test_general_requirement_compiler import proposal
+        from tests.application.software_project.test_gateway_e2e import ProjectGateway
+        from cgkn.providers.streaming_sse import sse_events,StreamLimits
+        ProjectGateway.models=[];ProjectGateway.agent_calls=0
+        def produce(payload):
+            n=len(runtime['posts'])
+            if n==1:return 'CGKN_QWEN_STREAM_OK'
+            if n==2:return 'CGKN_DEEPSEEK_STREAM_OK'
+            if n==3:return json.dumps(proposal('offline backup planning',core=['snapshot']))
+            provider='deepseek' if payload['model'].startswith('deepseek') else 'qwen'
+            schema_name='cgkn_scoped_project_worker' if provider=='deepseek' else 'cgkn_agent_decision'
+            fake=object.__new__(ProjectGateway);fake.rfile=io.BytesIO(json.dumps(dict(model=provider,text={'format':{'name':schema_name}})).encode())
+            fake.headers={'Content-Length':len(fake.rfile.getvalue())};fake.wfile=io.BytesIO();fake.send_response=lambda *a:None;fake.send_header=lambda *a:None;fake.end_headers=lambda:None
+            fake.do_POST();rows=list(sse_events(fake.wfile.getvalue().splitlines(keepends=True),limits=StreamLimits()))
+            return json.loads(rows[-1].data)['response']['output_text']
+        runtime['produce']=produce
+        for name in ('ITER118-01','ITER118-02','ITER118-03','ITER118-04'):
+            result=acceptance.run_case(name,'RUN_AUTHORIZED_STREAMING_CASE')
+>           assert result['status']=='PASS',result
+E           AssertionError: {'case_id': 'ITER118-04', 'error_code': '', 'error_type': 'ValueError', 'job_id': 'ISOLATED_TEST_ONLY', ...}
+E           assert 'FAIL' == 'PASS'
+E             
+E             - PASS
+E             + FAIL
+
+tests\providers\test_iter118_acceptance.py:64: AssertionError
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\scheduler-03.xml -
+=========================== short test summary info ===========================
+FAILED tests/providers/test_iter118_acceptance.py::test_six_slots_real_contract_handoff_and_no_seventh_post
+1 failed, 49 passed in 45.24s

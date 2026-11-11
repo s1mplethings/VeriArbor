@@ -1,0 +1,138 @@
+........FF.............................................................. [ 80%]
+..................                                                       [100%]
+================================== FAILURES ===================================
+_____ test_unknown_operation_cannot_escape_by_adding_new_node_name[None] ______
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23503/test_unknown_operation_cannot_0')
+operation = None
+
+    @pytest.mark.parametrize('operation',[None,'business-op'])
+    def test_unknown_operation_cannot_escape_by_adding_new_node_name(tmp_path,operation):
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self, request):
+                return replace(super().execute(request),status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+        e=Unknown();reg=ExecutorRegistry();reg.register(e);r=governed_probe_runner(reg,FileRunStore(tmp_path))
+        first=probe_node('a',capability_ref='c@1',config={'executor_ref':'record@1',**({'operation_id':operation} if operation else {})})
+        t=CapabilityTree('goal',(first,));run(r,t)
+        renamed=CapabilityTree('goal',(first,replace(first,id='new-name')))
+>       with pytest.raises(ValueError,match='UNRESOLVED_OPERATION'):run(r,renamed,resume=True,accept_edits=True)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_graph_commit.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_graph_commit.py:24: in run
+    def run(r,t,identity='r',**kw):return run_calibration(r,project_id='p',run_id=identity,tree=t,dag=compile_tree(t),**kw)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\calibration_admission.py:51: in run_calibration
+    aid,result=authority.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:128: in admit
+    self.validate_recovery_tree(result.preview, retry_nodes={op['node_id']
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001D1DD6859A0>
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='a', parent_id='', capability_ref='c@1', depends_on=(), config=ma...e', 'output_identity': 'probe/a', 'effect_domains': ('probe/a',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+
+    def validate_recovery_tree(self, tree, *, retry_nodes=()):
+        """Reject unresolved reexecution before committing a proposed graph.
+    
+        Reuse the canonical run's outcomes and resource interpretation. A new
+        node name or a config edit cannot authorize replay of an UNKNOWN effect.
+        """
+        from cgkn.state import StateStoreError
+        from cgkn.orchestration.execution_dag import ExecutionDAG, compile_tree
+        from cgkn.orchestration.invalidation import downstream_closure
+        from .dag_runner import DAGRunner, GraphEditRejected
+        try:state=self.store.load_run(self.project_id,self.run_id)
+        except StateStoreError:return
+        if not state.execution_dag:return
+        proposed=compile_tree(tree);original=ExecutionDAG.from_dict(state.execution_dag)
+        retries={n for root in retry_nodes for n in downstream_closure(proposed,{root})}
+        for old in original.nodes:
+            record=state.nodes[old.id]
+            if not record.latest_result_ref:continue
+            result=self.store.load_result(self.project_id,self.run_id,old.id)
+            if not (result.error and result.error.details.get('outcome_unknown')):continue
+            if old.id in retries:
+                raise GraphEditRejected('UNRESOLVED_OUTCOME: reconcile original attempt before retrying '+old.id)
+            operation=old.config.get('operation_id')
+>           old_resources=DAGRunner._effective_config(old).get('resources',{})
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: DAGRunner._effective_config() missing 1 required positional argument: 'node'
+
+cgkn\runtime\node_authority.py:173: TypeError
+__ test_unknown_operation_cannot_escape_by_adding_new_node_name[business-op] __
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23503/test_unknown_operation_cannot_1')
+operation = 'business-op'
+
+    @pytest.mark.parametrize('operation',[None,'business-op'])
+    def test_unknown_operation_cannot_escape_by_adding_new_node_name(tmp_path,operation):
+        from cgkn.execution import ExecutionError, ExecutionErrorCode
+        from cgkn.runtime import DAGRunner
+        class Unknown(Recorder):
+            def execute(self, request):
+                return replace(super().execute(request),status=BlockStatus.FAILED,error=ExecutionError(ExecutionErrorCode.EXECUTION_ERROR,'unknown',{'outcome_unknown':True}))
+        e=Unknown();reg=ExecutorRegistry();reg.register(e);r=governed_probe_runner(reg,FileRunStore(tmp_path))
+        first=probe_node('a',capability_ref='c@1',config={'executor_ref':'record@1',**({'operation_id':operation} if operation else {})})
+        t=CapabilityTree('goal',(first,));run(r,t)
+        renamed=CapabilityTree('goal',(first,replace(first,id='new-name')))
+>       with pytest.raises(ValueError,match='UNRESOLVED_OPERATION'):run(r,renamed,resume=True,accept_edits=True)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_graph_commit.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_graph_commit.py:24: in run
+    def run(r,t,identity='r',**kw):return run_calibration(r,project_id='p',run_id=identity,tree=t,dag=compile_tree(t),**kw)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\calibration_admission.py:51: in run_calibration
+    aid,result=authority.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\runtime\node_authority.py:128: in admit
+    self.validate_recovery_tree(result.preview, retry_nodes={op['node_id']
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <cgkn.runtime.node_authority.ExecutionAuthority object at 0x000001D1DD6649E0>
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='a', parent_id='', capability_ref='c@1', depends_on=(), config=ma...e', 'output_identity': 'probe/a', 'effect_domains': ('probe/a',), 'executor_ref': 'record@1', 'dependencies': ()})}))))
+
+    def validate_recovery_tree(self, tree, *, retry_nodes=()):
+        """Reject unresolved reexecution before committing a proposed graph.
+    
+        Reuse the canonical run's outcomes and resource interpretation. A new
+        node name or a config edit cannot authorize replay of an UNKNOWN effect.
+        """
+        from cgkn.state import StateStoreError
+        from cgkn.orchestration.execution_dag import ExecutionDAG, compile_tree
+        from cgkn.orchestration.invalidation import downstream_closure
+        from .dag_runner import DAGRunner, GraphEditRejected
+        try:state=self.store.load_run(self.project_id,self.run_id)
+        except StateStoreError:return
+        if not state.execution_dag:return
+        proposed=compile_tree(tree);original=ExecutionDAG.from_dict(state.execution_dag)
+        retries={n for root in retry_nodes for n in downstream_closure(proposed,{root})}
+        for old in original.nodes:
+            record=state.nodes[old.id]
+            if not record.latest_result_ref:continue
+            result=self.store.load_result(self.project_id,self.run_id,old.id)
+            if not (result.error and result.error.details.get('outcome_unknown')):continue
+            if old.id in retries:
+                raise GraphEditRejected('UNRESOLVED_OUTCOME: reconcile original attempt before retrying '+old.id)
+            operation=old.config.get('operation_id')
+>           old_resources=DAGRunner._effective_config(old).get('resources',{})
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: DAGRunner._effective_config() missing 1 required positional argument: 'node'
+
+cgkn\runtime\node_authority.py:173: TypeError
+============================== warnings summary ===============================
+tests/runtime/test_node_execution_authority.py::test_goal_acceptance_rejects_receiptless_and_legacy_reopen
+  F:\CGKN-LeanLoop-V1-20261101\cgkn\state\acceptance.py:36: RuntimeWarning: LEGACY GoalAcceptance: no node receipt boundary
+    warnings.warn('LEGACY GoalAcceptance: no node receipt boundary',RuntimeWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\scheduler-02.xml -
+=========================== short test summary info ===========================
+FAILED tests/runtime/test_graph_commit.py::test_unknown_operation_cannot_escape_by_adding_new_node_name[None]
+FAILED tests/runtime/test_graph_commit.py::test_unknown_operation_cannot_escape_by_adding_new_node_name[business-op]
+2 failed, 88 passed, 1 warning in 38.89s

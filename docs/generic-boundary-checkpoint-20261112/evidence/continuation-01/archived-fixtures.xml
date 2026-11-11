@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="17" time="19.070" timestamp="2026-11-11T22:39:44.950605+08:00" hostname="test"><testcase classname="tests.providers.test_iter117_bounded_acceptance" name="test_three_cases_exact_posts_and_progress" time="2.036" /><testcase classname="tests.providers.test_iter117_bounded_acceptance" name="test_unknown_stops_all_later_cases" time="1.348" /><testcase classname="tests.providers.test_iter117_bounded_acceptance" name="test_no_authorization_no_post" time="1.222" /><testcase classname="tests.providers.test_iter117_bounded_acceptance" name="test_cost_and_contract_caps" time="0.117" /><testcase classname="tests.providers.test_iter117_long_acceptance" name="test_long_single_call_contract_and_no_replay" time="0.897" /><testcase classname="tests.providers.test_iter117_long_acceptance" name="test_long_unknown_never_resends" time="0.824" /><testcase classname="tests.providers.test_iter117_long_acceptance" name="test_old_authorization_cannot_authorize_new_call" time="1.157" /><testcase classname="tests.providers.test_iter117_long_acceptance" name="test_long_frozen_payload_and_cost_caps" time="0.104" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_no_authorization_zero_posts" time="1.209" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_unknown_never_replayed_or_advanced" time="1.269" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_final_wire_input_limit_rejects_before_provider_post" time="1.076"><failure message="ValueError: exact model identity required for final wire preflight">runtime = {'cert_path': 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23501\\test_final_wire_input_limit_re0\...ing=None, setup_seconds=60, initial_progress_seconds=180, progress_idle_seconds=120), 'delay': 0.02, 'events': [], ...}
+batch = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23501/test_final_wire_input_limit_re0/acceptance')
+
+    def test_final_wire_input_limit_rejects_before_provider_post(runtime,batch):
+        client=dataclasses.replace(runtime['client'],input_token_ceiling=10)
+        from cgkn.providers.client import ModelRoleConfig
+        from cgkn.providers.gateway_client import GatewayCompletionError
+        with pytest.raises(GatewayCompletionError) as exc:
+&gt;           client.complete(system='offline',user='bounded',schema_name='x',schema=None,config=ModelRoleConfig('agent','qwen',max_output_tokens=20))
+
+tests\providers\test_iter118_acceptance.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\providers\gateway_client.py:340: in complete
+    check=completion_preflight(system=system,user=user,schema_name=schema_name,schema=schema_doc,config=config,ceiling=self.input_token_ceiling)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\providers\text_wire.py:47: in completion_preflight
+    return input_size(completion_wire(system=system,user=user,schema_name=schema_name,schema=schema,config=config),ceiling)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def completion_wire(*,system,user,schema_name,schema,config):
+&gt;       if not config.model_id:raise ValueError('exact model identity required for final wire preflight')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: exact model identity required for final wire preflight
+
+cgkn\providers\text_wire.py:51: ValueError</failure></testcase><testcase classname="tests.providers.test_iter118_acceptance" name="test_six_slots_real_contract_handoff_and_no_seventh_post" time="2.293"><failure message="AssertionError: {'case_id': 'ITER118-04', 'error_code': '', 'error_type': 'ValueError', 'job_id': 'ISOLATED_TEST_ONLY', ...}&#10;assert 'FAIL' == 'PASS'&#10;  &#10;  - PASS&#10;  + FAIL">runtime = {'cert_path': 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23501\\test_six_slots_real_contract_h0\...2fb9-1', 'client_attempt_id': 'offline-final-0', 'client_call_id': 'd19f87cf86634fb38b9c1c86ddc7bb1c', ...}, ...], ...}
+batch = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23501/test_six_slots_real_contract_h0/acceptance')
+
+    def test_six_slots_real_contract_handoff_and_no_seventh_post(runtime,batch):
+        from tests.test_general_requirement_compiler import proposal
+        from tests.application.software_project.test_gateway_e2e import ProjectGateway
+        from cgkn.providers.streaming_sse import sse_events,StreamLimits
+        ProjectGateway.models=[];ProjectGateway.agent_calls=0
+        def produce(payload):
+            n=len(runtime['posts'])
+            if n==1:return 'CGKN_QWEN_STREAM_OK'
+            if n==2:return 'CGKN_DEEPSEEK_STREAM_OK'
+            if n==3:return json.dumps(proposal('offline backup planning',core=['snapshot']))
+            provider='deepseek' if payload['model'].startswith('deepseek') else 'qwen'
+            schema_name='cgkn_scoped_project_worker' if provider=='deepseek' else 'cgkn_agent_decision'
+            fake=object.__new__(ProjectGateway);fake.rfile=io.BytesIO(json.dumps(dict(model=provider,text={'format':{'name':schema_name}})).encode())
+            fake.headers={'Content-Length':len(fake.rfile.getvalue())};fake.wfile=io.BytesIO();fake.send_response=lambda *a:None;fake.send_header=lambda *a:None;fake.end_headers=lambda:None
+            fake.do_POST();rows=list(sse_events(fake.wfile.getvalue().splitlines(keepends=True),limits=StreamLimits()))
+            return json.loads(rows[-1].data)['response']['output_text']
+        runtime['produce']=produce
+        for name in ('ITER118-01','ITER118-02','ITER118-03','ITER118-04'):
+            result=acceptance.run_case(name,'RUN_AUTHORIZED_STREAMING_CASE')
+&gt;           assert result['status']=='PASS',result
+E           AssertionError: {'case_id': 'ITER118-04', 'error_code': '', 'error_type': 'ValueError', 'job_id': 'ISOLATED_TEST_ONLY', ...}
+E           assert 'FAIL' == 'PASS'
+E             
+E             - PASS
+E             + FAIL
+
+tests\providers\test_iter118_acceptance.py:64: AssertionError</failure></testcase><testcase classname="tests.providers.test_iter118_acceptance" name="test_dual_long_authorized_caps_and_no_replay" time="1.535" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_explicit_unused_deepseek_resume_preserves_unknown" time="1.036" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_efficient_pair_bound_once" time="1.069" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_duration_pair_caps_and_no_replay" time="1.008" /><testcase classname="tests.providers.test_iter118_acceptance" name="test_archived_live_plans_refuse_even_existing_authorization" time="0.108" /></testsuite></testsuites>

@@ -1,0 +1,829 @@
+{
+  "task": "VERIARBOR_GENERIC_BOUNDARY_CLOSURE_V1",
+  "status": "IN_PROGRESS_NOT_QUALIFIED",
+  "final_same_source_profile_required": true,
+  "note": "Overlapping targeted diagnostics, never sum as unique passes; host-focused source changed during run. No paid calls or business work.",
+  "runs": [
+    {
+      "file": "archived-fixtures.xml",
+      "tests": 17,
+      "failed_or_error": 2,
+      "failures": [
+        {
+          "case": "tests.providers.test_iter118_acceptance::test_final_wire_input_limit_rejects_before_provider_post",
+          "message": "ValueError: exact model identity required for final wire preflight"
+        },
+        {
+          "case": "tests.providers.test_iter118_acceptance::test_six_slots_real_contract_handoff_and_no_seventh_post",
+          "message": "AssertionError: {'case_id': 'ITER118-04', 'error_code': '', 'error_type': 'ValueError', 'job_id': 'ISOLATED_TEST_ONLY', ...}\nassert 'FAIL' == 'PASS'\n  \n  - PASS\n  + FAIL"
+        }
+      ]
+    },
+    {
+      "file": "artifacts-02.xml",
+      "tests": 29,
+      "failed_or_error": 15,
+      "failures": [
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_artifact_execution_and_repeat_use_canonical_state",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_failed_branch_does_not_erase_independent_success",
+          "message": "AssertionError: Regex pattern did not match.\n Regex: 'controlled local failure'\n Input: 'INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation'"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_unknown_is_not_replayed_by_new_adapter_instance",
+          "message": "cgkn.state.store.StateStoreError: cannot load node result: [Errno 2] No such file or directory: 'C:\\\\Users\\\\sunom\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-sunom\\\\pytest-23515\\\\test_unknown_is_not_replayed_b0\\\\run\\\\execution\\\\artifact-flow\\\\session\\\\node_results\\\\n_requirement_interpretation.json'"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_tampered_artifact_cannot_be_reused",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_changed_loaded_implementation_requires_explicit_redecision",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_changed_input_identity_is_not_silently_rebound",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_runtime_materializes_outputs_and_index_consumers",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_checkpoint_contains_refs_not_business_content",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_same_fingerprint_hits_cache_and_changes_miss",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_upstream_change_invalidates_only_descendants_and_explains",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_invalidation_dry_run_does_not_mutate",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_stale_artifact_blocks_delivery_readiness",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_complete_lineage_passes_and_tree_reaches_inputs",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_run_manifest_and_feed_forward_report_exist",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_run_failure_marks_manifest_failed",
+          "message": "AssertionError: Regex pattern did not match.\n Regex: 'not bound'\n Input: 'INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation'"
+        }
+      ]
+    },
+    {
+      "file": "artifacts-03.xml",
+      "tests": 29,
+      "failed_or_error": 2,
+      "failures": [
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_unknown_is_not_replayed_by_new_adapter_instance",
+          "message": "AssertionError: Regex pattern did not match.\n Regex: 'UNRESOLVED_OUTCOME'\n Input: 'UNMANAGED_TREE_MUTATION'"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_upstream_change_invalidates_only_descendants_and_explains",
+          "message": "ValueError: PERMIT_REQUIRED"
+        }
+      ]
+    },
+    {
+      "file": "artifacts-04.xml",
+      "tests": 3,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "artifacts.xml",
+      "tests": 29,
+      "failed_or_error": 18,
+      "failures": [
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_artifact_execution_and_repeat_use_canonical_state",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_failed_branch_does_not_erase_independent_success",
+          "message": "AssertionError: Regex pattern did not match.\n Regex: 'controlled local failure'\n Input: 'EDIT_LIMIT: proposal exceeds the edit budget'"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_unknown_is_not_replayed_by_new_adapter_instance",
+          "message": "cgkn.state.store.StateStoreError: cannot load node result: [Errno 2] No such file or directory: 'C:\\\\Users\\\\sunom\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-sunom\\\\pytest-23514\\\\test_unknown_is_not_replayed_b0\\\\run\\\\execution\\\\artifact-flow\\\\session\\\\node_results\\\\n_requirement_interpretation.json'"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_tampered_artifact_cannot_be_reused",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_changed_loaded_implementation_requires_explicit_redecision",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_changed_input_identity_is_not_silently_rebound",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_runtime_materializes_outputs_and_index_consumers",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_checkpoint_contains_refs_not_business_content",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_provider_output_gets_one_bounded_schema_repair",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_provider_invalid_output_creates_diagnostic_and_no_artifact",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_same_fingerprint_hits_cache_and_changes_miss",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_upstream_change_invalidates_only_descendants_and_explains",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_invalidation_dry_run_does_not_mutate",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_stale_artifact_blocks_delivery_readiness",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_complete_lineage_passes_and_tree_reaches_inputs",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_run_manifest_and_feed_forward_report_exist",
+          "message": "cgkn.runtime.runner.ModuleExecutionError: EDIT_LIMIT: proposal exceeds the edit budget"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_run_failure_marks_manifest_failed",
+          "message": "AssertionError: Regex pattern did not match.\n Regex: 'not bound'\n Input: 'EDIT_LIMIT: proposal exceeds the edit budget'"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_artifact_runner_adapter_helper_boundaries",
+          "message": "AttributeError: 'function' object has no attribute '_provider_payload'"
+        }
+      ]
+    },
+    {
+      "file": "checker-revisions-02.xml",
+      "tests": 31,
+      "failed_or_error": 2,
+      "failures": [
+        {
+          "case": "tests.state.test_provenance_v5::test_I14_concurrent_immutable_and_acceptance",
+          "message": "ValueError: TREE_VERSION_REJECT"
+        },
+        {
+          "case": "tests.application.software_project.test_milestone_consumer::test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[import json,sys,pathlib,runpy\\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\\nactual=runpy.run_path(str(pathlib.Path(request['workspace'])/'module.py'))['value']()\\nprint(json.dumps({'execution':'VALID','observed':{'value':actual==7,'actual':actual,'hidden_answer':'PRIVATE-CHECKER-MARKER'}}))\\n\\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\\n]",
+          "message": "ValueError: INPUT_BINDING_REJECT"
+        }
+      ]
+    },
+    {
+      "file": "checker-revisions-03.xml",
+      "tests": 8,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "checker-revisions.xml",
+      "tests": 91,
+      "failed_or_error": 8,
+      "failures": [
+        {
+          "case": "tests.application.software_project.test_milestone_consumer::test_exit_zero_or_invalid_harness_cannot_verify_a_candidate[import json,sys,pathlib,runpy\\nrequest=json.loads(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'))\\nactual=runpy.run_path(str(pathlib.Path(request['workspace'])/'module.py'))['value']()\\nprint(json.dumps({'execution':'VALID','observed':{'value':actual==7,'actual':actual,'hidden_answer':'PRIVATE-CHECKER-MARKER'}}))\\n\\n(pathlib.Path(request['workspace'])/'module.py').write_text('changed')\\n]",
+          "message": "ValueError: INPUT_BINDING_REJECT"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I12_one_task_revised_history",
+          "message": "assert (0 == 1)"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I14_concurrent_immutable_and_acceptance",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I5_existing_and_or_parent_negative",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[same_operation]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[changed_executor]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[shared_resource]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[same_capability]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        }
+      ]
+    },
+    {
+      "file": "continuity.xml",
+      "tests": 26,
+      "failed_or_error": 4,
+      "failures": [
+        {
+          "case": "tests.runtime.test_execution_continuity::test_no_delta_is_failed_deliverable_and_next_decision_feedback",
+          "message": "KeyError: 'execution_status'"
+        },
+        {
+          "case": "tests.runtime.test_execution_continuity::test_readonly_evidence_not_false_no_progress",
+          "message": "ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains"
+        },
+        {
+          "case": "tests.runtime.test_execution_continuity::test_check_task_requires_observable_subject_and_rule",
+          "message": "ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains"
+        },
+        {
+          "case": "tests.runtime.test_execution_continuity::test_progress_is_received_by_next_canonical_planner_decision",
+          "message": "IndexError: list index out of range"
+        }
+      ]
+    },
+    {
+      "file": "evaluation-02.xml",
+      "tests": 20,
+      "failed_or_error": 2,
+      "failures": [
+        {
+          "case": "tests.agent.test_capability_routing_qualification::test_evaluation_changes_next_real_executor_route_only_for_supported_class",
+          "message": "TypeError: BlockExecutionRequest.__init__() missing 1 required positional argument: 'task_context'"
+        },
+        {
+          "case": "tests.agent.test_capability_routing_qualification::test_concurrent_ledger_publication_and_revision_history",
+          "message": "TypeError: BlockExecutionRequest.__init__() missing 1 required positional argument: 'task_context'"
+        }
+      ]
+    },
+    {
+      "file": "evaluation-03.xml",
+      "tests": 6,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "evaluation-loop.xml",
+      "tests": 1,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "evaluation.xml",
+      "tests": 12,
+      "failed_or_error": 2,
+      "failures": [
+        {
+          "case": "tests.agent.test_capability_routing_qualification::test_evaluation_changes_next_real_executor_route_only_for_supported_class",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.agent.test_capability_routing_qualification::test_concurrent_ledger_publication_and_revision_history",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        }
+      ]
+    },
+    {
+      "file": "failure-evidence.xml",
+      "tests": 53,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "host-focused.xml",
+      "tests": 741,
+      "failed_or_error": 92,
+      "failures": [
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_artifact_execution_and_repeat_use_canonical_state",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_failed_branch_does_not_erase_independent_success",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_unknown_is_not_replayed_by_new_adapter_instance",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_tampered_artifact_cannot_be_reused",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_changed_loaded_implementation_requires_explicit_redecision",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_dag_authority::test_changed_input_identity_is_not_silently_rebound",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_runtime_materializes_outputs_and_index_consumers",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_checkpoint_contains_refs_not_business_content",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_provider_output_gets_one_bounded_schema_repair",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_provider_invalid_output_creates_diagnostic_and_no_artifact",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_context_uses_only_declared_required_artifacts_and_projection",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_context_budget_and_trace_are_enforced",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_same_fingerprint_hits_cache_and_changes_miss",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_upstream_change_invalidates_only_descendants_and_explains",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_invalidation_dry_run_does_not_mutate",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_stale_artifact_blocks_delivery_readiness",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_complete_lineage_passes_and_tree_reaches_inputs",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_run_manifest_and_feed_forward_report_exist",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_run_failure_marks_manifest_failed",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_cache_rejects_empty_missing_stale_and_tampered_entries",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_context_shrink_decision_ledger_and_scalar_paths",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_delivery_detects_hash_tamper",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_artifact_runtime_contract::test_artifact_invalidator_uses_direct_consumers_when_producer_is_external",
+          "message": "ValueError: PERMIT_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_parallel_processes::test_process_overlap_join_and_durable_resume",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.agent.test_agent_mvp::test_fake_provider_vertical_slice_edits_file_and_passes_real_pytest",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_agent_mvp::test_failed_test_triggers_affected_only_retry",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_agent_mvp::test_worker_escalation_returns_to_agent_then_recovers",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_agent_mvp::test_worker_rejects_shell_and_path_escape",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_agent_mvp_gateway_cli::test_agent_mvp_cli_uses_gateway_routing_snapshot_and_budget",
+          "message": "AssertionError: {\n    \"agent_model\": \"qwen\",\n    \"error\": \"governed Session requires explicit capability admission policy\",\n    \"functional_readiness_candidate\": \"LEVEL_3\",\n    \"initial_test\": {\n      \"returncode\": 1,\n      \"stderr\": \"\",\n      \"stdout\": \"F                                                                        [100%]\\n================================== FAILURES ===================================\\n____________________________ test_adds_two_numbers ____________________________\\n\\n    def test_adds_two_numbers() -> None:\\n>       assert add(2, 3) == 5\\nE       assert -1 == 5\\nE        +  where -1 = add(2, 3)\\n\\ntest_math_utils.py:5: AssertionError\\n=========================== short test summary info ===========================\\nFAILED test_math_utils.py::test_adds_two_numbers - assert -1 == 5\\n1 failed in 0.06s\\n\"\n    },\n    \"kind\": \"CGKNAgentMVPResult\",\n    \"project_root\": \"C:\\\\Users\\\\sunom\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-sunom\\\\pytest-23513\\\\test_agent_mvp_cli_uses_gatewa0\\\\run\\\\project\",\n    \"provider_validation\": \"BLOCKED_PROVIDER\",\n    \"run_id\": \"agent-mvp-9850be6d23\",\n    \"run_root\": \"C:\\\\Users\\\\sunom\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-sunom\\\\pytest-23513\\\\test_agent_mvp_cli_uses_gatewa0\\\\run\",\n    \"schema_version\": \"1.0\",\n    \"status\": \"BLOCKED_PROVIDER\",\n    \"worker_model\": \"deepseek\"\n  }\n  \nassert 1 == 0\n +  where 1 = CompletedProcess(args=['D:\\\\anaconda\\\\python.exe', 'scripts/run_agent_mvp.py', '--run-root', 'C:\\\\Users\\\\sunom\\\\AppDat...0\\\\\\\\run\",\\n  \"schema_version\": \"1.0\",\\n  \"status\": \"BLOCKED_PROVIDER\",\\n  \"worker_model\": \"deepseek\"\\n}\\n', stderr='').returncode"
+        },
+        {
+          "case": "tests.agent.test_committed_graph_checkpoint::test_canonical_committed_nodes_survive_missing_next_decision[committed-ahead]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_committed_graph_checkpoint::test_canonical_committed_nodes_survive_missing_next_decision[mirror-tampered]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_committed_graph_checkpoint::test_canonical_committed_nodes_survive_missing_next_decision[divergent]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_committed_graph_checkpoint::test_canonical_committed_nodes_survive_missing_next_decision[intent-ahead]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_committed_graph_checkpoint::test_canonical_committed_nodes_survive_missing_next_decision[unknown-committed-ahead]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_composer_schema::test_completed_schema_rejection_reaches_next_project_decision",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_durable_continuation_requirements::test_continuation_requirements_survive_execution_refresh",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.agent.test_feedback_requests::test_frozen_retrieval_sent_to_actual_planner_and_worker_calls",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_existing_session_declares_checks_and_appends_next_milestone",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_repeated_admission_rejection_is_bounded_across_decisions_and_resume",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_independent_acceptance_is_unavailable_until_all_declared_artifacts_exist",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_unverified_finish_loop_is_bounded_and_resume_does_not_repeat_calls",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_failed_independent_measurement_does_not_admit_next_milestone",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_dependent_milestone_receives_public_contract_and_binds_upstream_identity",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_incomplete_declaration_is_checkpointed_and_not_automatically_replayed",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay[False]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_worker_unknown_stops_planning_and_explicit_redecision_cannot_replay[True]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_interrupted_context_is_immutable_and_requires_explicit_new_decision",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_repeated_blocked_runs_without_execution_are_bounded_and_preserved",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_session::test_graph_rejection_reaches_actual_wire_context_and_stops_identical_repetition",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_offline_gateway_contract_core_to_existing_delivery",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_offline_explicit_runtime_reverification_uses_same_delivery_gate",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[session]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[application_service]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[profile]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[conversation]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[api_job]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_milestone_worker_chain::test_milestone_compiler_worker_independent_failure_repair_and_checkpoint[local_cli]",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_project_session::test_minimal_intent_is_frozen_in_existing_store_before_planning",
+          "message": "ValueError: governed Session requires explicit capability admission policy"
+        },
+        {
+          "case": "tests.agent.test_repair_history_context::test_loop_retains_bounded_noop_evidence_for_next_decision",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.project_agent.test_session_budget.ProjectSessionBudgetTests::test_budget_block_stops_without_another_planner_call",
+          "message": "AttributeError: '_Runner' object has no attribute 'execution_mode'"
+        },
+        {
+          "case": "tests.project_agent.test_worker_loop.WorkerLoopTests::test_budget_denial_is_not_a_business_failure",
+          "message": "AssertionError: <BlockStatus.FAILED: 'FAILED'> != <BlockStatus.BLOCKED: 'BLOCKED'>"
+        },
+        {
+          "case": "tests.project_agent.test_worker_loop.WorkerLoopTests::test_read_then_write_succeeds",
+          "message": "AssertionError: <BlockStatus.FAILED: 'FAILED'> != <BlockStatus.SUCCEEDED: 'SUCCEEDED'>"
+        },
+        {
+          "case": "tests.project_agent.test_worker_loop.WorkerLoopTests::test_repeated_read_only_stops_without_artifact_delta",
+          "message": "AssertionError: <BlockStatus.FAILED: 'FAILED'> != <BlockStatus.BLOCKED: 'BLOCKED'>"
+        },
+        {
+          "case": "tests.project_agent.test_worker_loop.WorkerLoopTests::test_transport_failure_is_infra_not_model",
+          "message": "AssertionError: <BlockStatus.FAILED: 'FAILED'> != <BlockStatus.BLOCKED: 'BLOCKED'>"
+        },
+        {
+          "case": "tests.state.test_checker_revision::test_revised_consumer_uses_same_goal_and_preserves_original_receipt[7-VERIFIED]",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_checker_revision::test_revised_consumer_uses_same_goal_and_preserves_original_receipt[6-FAILED]",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_current_scoped_coverage::test_scoped_observer_needs_current_measurement_preserving_history[7-VERIFIED-INSUFFICIENT_EVIDENCE]",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_current_scoped_coverage::test_scoped_observer_needs_current_measurement_preserving_history[6-FAILED-FAILED]",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_current_scoped_coverage::test_unrelated_scoped_revision_preserves_existing_pass",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_negative_business_measurement_survives_dag_deliverable_rejection",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_negative_business_shortcut_requires_exact_successful_raw_receipt[missing]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_negative_business_shortcut_requires_exact_successful_raw_receipt[hash_tamper]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_negative_business_shortcut_requires_exact_successful_raw_receipt[checker_failed]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_negative_business_shortcut_requires_exact_successful_raw_receipt[wrong_path]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_negative_business_shortcut_requires_exact_successful_raw_receipt[metadata_only]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_negative_business_provenance::test_failed_final_execution_cannot_promote_positive_business_claim",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I12_one_task_revised_history",
+          "message": "assert (0 == 1)"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I14_concurrent_immutable_and_acceptance",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I5_existing_and_or_parent_negative",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[same_operation]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[changed_executor]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[shared_resource]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_provenance_v5::test_I18_unknown_effect_alias_matrix[same_capability]",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.state.test_scoped_checker_revision::test_scoped_revision_preserves_unrelated_checker_identity[scope0-qualified-revision-1]",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.state.test_scoped_checker_revision::test_scoped_revision_preserves_unrelated_checker_identity[scope1-1]",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.executors.test_public_test_feedback::test_actual_product_failure_reaches_repair_contract_without_private_oracle",
+          "message": "AssertionError: assert 'INVALID' == 'FAIL'\n  \n  - FAIL\n  + INVALID"
+        },
+        {
+          "case": "tests.executors.test_public_test_feedback::test_large_product_diagnostic_is_explicitly_truncated_with_raw_hash",
+          "message": "AssertionError: Missing public diagnostic projection\nassert ()\n +  where () = <built-in method get of mappingproxy object at 0x0000013263BD2320>('failure_details')\n +    where <built-in method get of mappingproxy object at 0x0000013263BD2320> = mappingproxy({'kind': 'PytestExecutionObservation', 'status': 'INVALID', 'collected': 0, 'executed': 0, 'passed': 0, '...ile or directory: 'C:\\\\\\\\Users\\\\\\\\sunom\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\cgkn-pycache-j37zi6v7\\\\\\\\current-tests.xml'\"})}).get"
+        },
+        {
+          "case": "tests.execution.test_migration_contracts::test_real_nonfile_delta_enters_canonical_feedback[False]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.execution.test_migration_contracts::test_real_nonfile_delta_enters_canonical_feedback[True]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.execution.test_observation_contract::test_real_process_to_typed_feedback_fake_repair_checker_statistics_audit",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.architecture.test_kernel_gates::test_current_kernel_governance_passes_all_gates",
+          "message": "AssertionError: assert 'FAIL' == 'PASS'\n  \n  - PASS\n  + FAIL"
+        },
+        {
+          "case": "tests.architecture.test_source_boundaries::test_current_receipts_are_fresh_in_their_own_boundaries",
+          "message": "AssertionError: {'kind': 'CGKNReceiptFreshness', 'results': [{'boundary': 'kernel', 'current_boundary_hash': 'sha256:a6aec551306443d8d...56:8e724ba7cae413b02d4086fdb06c1ddf63c4d14f61c93c62d78efac78237f0d5', ...}], 'schema_version': '1.0', 'status': 'FAIL'}\nassert 'FAIL' == 'PASS'\n  \n  - PASS\n  + FAIL"
+        }
+      ]
+    },
+    {
+      "file": "loop-boundaries.xml",
+      "tests": 7,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "parallel-02.xml",
+      "tests": 8,
+      "failed_or_error": 1,
+      "failures": [
+        {
+          "case": "tests.runtime.test_parallel_qualification::test_evaluation_overlaps_unrelated_business_and_route_waits",
+          "message": "AssertionError: assert 'FAILED' == 'SUCCEEDED'\n  \n  - SUCCEEDED\n  + FAILED"
+        }
+      ]
+    },
+    {
+      "file": "parallel-03.xml",
+      "tests": 46,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "parallel.xml",
+      "tests": 8,
+      "failed_or_error": 4,
+      "failures": [
+        {
+          "case": "tests.runtime.test_parallel_qualification::test_barrier_failure_isolation_retry_and_join",
+          "message": "AssertionError: assert ('FAILED' == 'SUCCEEDED'\n  \n  - SUCCEEDED\n  + FAILED)"
+        },
+        {
+          "case": "tests.runtime.test_parallel_qualification::test_unknown_effect_checked_before_reconciliation_not_replayed",
+          "message": "ValueError: RECEIPT_ID_REQUIRED"
+        },
+        {
+          "case": "tests.runtime.test_parallel_qualification::test_evaluation_overlaps_unrelated_business_and_route_waits",
+          "message": "veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required"
+        },
+        {
+          "case": "tests.runtime.test_parallel_qualification::test_real_controller_process_loss_preserves_completed_sibling",
+          "message": "AssertionError: Traceback (most recent call last):\r\n    File \"<string>\", line 23, in <module>\r\n    File \"F:\\CGKN-LeanLoop-V1-20261101\\tests\\qualification_support.py\", line 62, in probe_runner\r\n      return DAGRunner(registry,store,deliverable_checkers={'fixture.probe':'deliverable.subjects@1'},**kwargs)\r\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n    File \"F:\\CGKN-LeanLoop-V1-20261101\\cgkn\\runtime\\dag_runner.py\", line 49, in __init__\r\n      require_legacy()\r\n    File \"D:\\VeriArbor\\src\\veriarbor\\governance.py\", line 194, in require_legacy\r\n      if not context:raise GovernanceError('LEGACY_NOT_ALLOWED','explicit allowlist/reason scope required')\r\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  veriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required\r\n  \nassert 1 == 73\n +  where 1 = CompletedProcess(args=['D:\\\\anaconda\\\\python.exe', '-c', \"\\nimport os,sys,time,pathlib\\nfrom cgkn.execution import Blo...^^^^^^^^^^^\\r\\nveriarbor.governance.GovernanceError: LEGACY_NOT_ALLOWED: explicit allowlist/reason scope required\\r\\n').returncode"
+        }
+      ]
+    },
+    {
+      "file": "provider-concurrency.xml",
+      "tests": 29,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "scheduler-01.xml",
+      "tests": 52,
+      "failed_or_error": 9,
+      "failures": [
+        {
+          "case": "tests.runtime.test_graph_commit::test_R2_missing_executor_correction_and_append",
+          "message": "AssertionError: assert 'FAILED' == 'SUCCEEDED'\n  \n  - SUCCEEDED\n  + FAILED"
+        },
+        {
+          "case": "tests.runtime.test_graph_commit::test_R4_committed_graph_reload_and_atomic_write_failure",
+          "message": "ValueError: explicit edit commit required"
+        },
+        {
+          "case": "tests.runtime.test_graph_commit::test_unknown_operation_cannot_escape_by_adding_new_node_name[None]",
+          "message": "AssertionError: Fixture admission changed the requested graph"
+        },
+        {
+          "case": "tests.runtime.test_graph_commit::test_unknown_operation_cannot_escape_by_adding_new_node_name[business-op]",
+          "message": "AssertionError: Fixture admission changed the requested graph"
+        },
+        {
+          "case": "tests.runtime.test_event_frontier::test_inflight_cancel_preserves_observed_result_without_success",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.runtime.test_executor_timeout_defaults::test_runner_uses_registered_default_but_preserves_explicit_node_budget[60-None-60]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.runtime.test_executor_timeout_defaults::test_runner_uses_registered_default_but_preserves_explicit_node_budget[60-7-7]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.runtime.test_executor_timeout_defaults::test_runner_uses_registered_default_but_preserves_explicit_node_budget[30-None-30]",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        },
+        {
+          "case": "tests.runtime.test_executor_context::test_parallel_dispatch_inherits_context_and_isolates_mutation",
+          "message": "ValueError: UNMANAGED_TREE_MUTATION"
+        }
+      ]
+    },
+    {
+      "file": "scheduler-02.xml",
+      "tests": 90,
+      "failed_or_error": 2,
+      "failures": [
+        {
+          "case": "tests.runtime.test_graph_commit::test_unknown_operation_cannot_escape_by_adding_new_node_name[None]",
+          "message": "TypeError: DAGRunner._effective_config() missing 1 required positional argument: 'node'"
+        },
+        {
+          "case": "tests.runtime.test_graph_commit::test_unknown_operation_cannot_escape_by_adding_new_node_name[business-op]",
+          "message": "TypeError: DAGRunner._effective_config() missing 1 required positional argument: 'node'"
+        }
+      ]
+    },
+    {
+      "file": "scheduler-03.xml",
+      "tests": 50,
+      "failed_or_error": 1,
+      "failures": [
+        {
+          "case": "tests.providers.test_iter118_acceptance::test_six_slots_real_contract_handoff_and_no_seventh_post",
+          "message": "AssertionError: {'case_id': 'ITER118-04', 'error_code': '', 'error_type': 'ValueError', 'job_id': 'ISOLATED_TEST_ONLY', ...}\nassert 'FAIL' == 'PASS'\n  \n  - PASS\n  + FAIL"
+        }
+      ]
+    },
+    {
+      "file": "test-observation.xml",
+      "tests": 7,
+      "failed_or_error": 0,
+      "failures": []
+    },
+    {
+      "file": "workers.xml",
+      "tests": 12,
+      "failed_or_error": 0,
+      "failures": []
+    }
+  ]
+}

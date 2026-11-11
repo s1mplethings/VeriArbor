@@ -1,0 +1,206 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_________ test_agent_mvp_cli_uses_gateway_routing_snapshot_and_budget _________
+tests\agent\test_agent_mvp_gateway_cli.py:99: in test_agent_mvp_cli_uses_gateway_routing_snapshot_and_budget
+    assert completed.returncode == 0, completed.stderr + completed.stdout
+E   AssertionError: {
+E       "agent_model": "qwen",
+E       "benchmark": null,
+E       "decision_efficiency": {
+E         "baseline_high_model_calls": null,
+E         "cgkn_cheap_worker_calls": 1,
+E         "cgkn_high_agent_calls": 4,
+E         "note": "The baseline is reported as observed; it is not throttled or degraded."
+E       },
+E       "functional_readiness_candidate": "LEVEL_3",
+E       "initial_test": {
+E         "returncode": 1,
+E         "stderr": "",
+E         "stdout": "F                                                                        [100%]\n================================== FAILURES ===================================\n____________________________ test_adds_two_numbers ____________________________\n\n    def test_adds_two_numbers() -> None:\n>       assert add(2, 3) == 5\nE       assert -1 == 5\nE        +  where -1 = add(2, 3)\n\ntest_math_utils.py:5: AssertionError\n=========================== short test summary info ===========================\nFAILED test_math_utils.py::test_adds_two_numbers - assert -1 == 5\n1 failed in 0.06s\n"
+E       },
+E       "kind": "CGKNAgentMVPResult",
+E       "lean_report_ref": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23535\\test_agent_mvp_cli_uses_gatewa0\\run\\runs\\agent-mvp\\agent-mvp-e6de6d925f\\lean-report.md",
+E       "project_root": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23535\\test_agent_mvp_cli_uses_gatewa0\\run\\project",
+E       "provider_validation": "REAL",
+E       "result": {
+E         "agent_calls": 4,
+E         "decision_count": 4,
+E         "escalation_reason": "BUDGET_BLOCKED: provider budget denied; no further planning or worker calls",
+E         "execution_mode": "GOVERNED",
+E         "run_summary": {
+E           "actual_executions": [
+E             "inspect",
+E             "fix",
+E             "test"
+E           ],
+E           "blocked_nodes": [],
+E           "execution_mode": "GOVERNED",
+E           "failed_nodes": [],
+E           "node_count": 3,
+E           "project_id": "agent-mvp",
+E           "retry_attempts": 0,
+E           "reused_nodes": [],
+E           "run_id": "agent-mvp-e6de6d925f",
+E           "status": "SUCCEEDED"
+E         },
+E         "status": "BLOCKED",
+E         "tree": {
+E           "goal": "Fix the failing math_utils.add implementation in this small Python project. Compose exactly three executable nodes: inspect uses repo.inspect@1 with local.file@1 read_file math_utils.py; fix uses code.modify@1 with llm.cheap@1 and depends on inspect; test uses test.python@1 with local.python-test@1 and depends on fix. Request a run after composing. After a successful pytest result, finish. After a failure or worker escalation, make the smallest update_config plus retry_node repair and request another run.",
+E           "kind": "CGKNCapabilityTree",
+E           "nodes": [
+E             {
+E               "capability_ref": "",
+E               "config": {
+E                 "capability_contract_id": "host.planning@1",
+E                 "executor_ref": "host.project-agent@1",
+E                 "leaf_contract": {
+E                   "acceptance": [
+E                     "proposal-envelope"
+E                   ],
+E                   "checker_ref": "host-proposal",
+E                   "dependencies": [],
+E                   "effect_domains": [
+E                     "external_network"
+E                   ],
+E                   "executor_ref": "host.project-agent@1",
+E                   "expected_observation": "public bounded proposal, never execution authority",
+E                   "leaf_goal": "Produce a bounded public proposal for the authorized root goal",
+E                   "output_identity": "public-proposal",
+E                   "pass_fail_rule": "capture public response; normal Admission validates proposal",
+E                   "schema_version": "1.0",
+E                   "subject": "authorized-root",
+E                   "target_scope": [
+E                     "public-proposal"
+E                   ],
+E                   "task_kind": "INSPECTION"
+E                 },
+E                 "required": false
+E               },
+E               "depends_on": [],
+E               "id": "__host_planning_root__",
+E               "parent_id": ""
+E             },
+E             {
+E               "capability_ref": "repo.inspect@1",
+E               "config": {
+E                 "action": "read_file",
+E                 "executor_ref": "local.file@1",
+E                 "leaf_contract": {
+E                   "acceptance": [
+E                     "demo-observation"
+E                   ],
+E                   "checker_ref": "demo-observation",
+E                   "dependencies": [],
+E                   "effect_domains": [
+E                     "filesystem"
+E                   ],
+E                   "executor_ref": "local.file@1",
+E                   "expected_observation": "source read",
+E                   "leaf_goal": "Measure inspect for the public arithmetic demo",
+E                   "output_identity": "demo/inspect",
+E                   "pass_fail_rule": "independent observation with current subject and raw receipt",
+E                   "schema_version": "1.0",
+E                   "subject": "math_utils.py",
+E                   "target_scope": [
+E                     "observations/inspect"
+E                   ],
+E                   "task_kind": "INSPECTION"
+E                 },
+E                 "path": "math_utils.py"
+E               },
+E               "depends_on": [],
+E               "id": "inspect",
+E               "parent_id": ""
+E             },
+E             {
+E               "capability_ref": "code.modify@1",
+E               "config": {
+E                 "acceptance": [
+E                   "pytest passes"
+E                 ],
+E                 "executor_ref": "llm.cheap@1",
+E                 "goal": "Correct add so it returns the sum",
+E                 "leaf_contract": {
+E                   "acceptance": [
+E                     "arithmetic"
+E                   ],
+E                   "checker_ref": "demo-files",
+E                   "dependencies": [
+E                     "inspect"
+E                   ],
+E                   "effect_domains": [
+E                     "filesystem",
+E                     "external_network"
+E                   ],
+E                   "executor_ref": "llm.cheap@1",
+E                   "expected_delta": "correct the arithmetic implementation",
+E                   "leaf_goal": "add returns the arithmetic sum for positive, negative and zero operands",
+E                   "output_identity": "demo/fix",
+E                   "schema_version": "1.0",
+E                   "target_scope": [
+E                     "math_utils.py"
+E                   ],
+E                   "task_kind": "IMPLEMENTATION"
+E                 }
+E               },
+E               "depends_on": [
+E                 "inspect"
+E               ],
+E               "id": "fix",
+E               "parent_id": ""
+E             },
+E             {
+E               "capability_ref": "test.python@1",
+E               "config": {
+E                 "executor_ref": "local.python-test@1",
+E                 "leaf_contract": {
+E                   "acceptance": [
+E                     "demo-observation"
+E                   ],
+E                   "checker_ref": "demo-observation",
+E                   "dependencies": [
+E                     "fix"
+E                   ],
+E                   "effect_domains": [
+E                     "local_process"
+E                   ],
+E                   "executor_ref": "local.python-test@1",
+E                   "expected_observation": "add returns the arithmetic sum for positive, negative and zero operands",
+E                   "leaf_goal": "Measure test for the public arithmetic demo",
+E                   "output_identity": "demo/test",
+E                   "pass_fail_rule": "independent observation with current subject and raw receipt",
+E                   "schema_version": "1.0",
+E                   "subject": "math_utils.py",
+E                   "target_scope": [
+E                     "observations/test"
+E                   ],
+E                   "task_kind": "TEST"
+E                 },
+E                 "pytest_args": [
+E                   "-q"
+E                 ]
+E               },
+E               "depends_on": [
+E                 "fix"
+E               ],
+E               "id": "test",
+E               "parent_id": ""
+E             }
+E           ],
+E           "schema_version": "1.0"
+E         },
+E         "worker_calls": 1
+E       },
+E       "run_id": "agent-mvp-e6de6d925f",
+E       "run_root": "C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23535\\test_agent_mvp_cli_uses_gatewa0\\run",
+E       "schema_version": "1.0",
+E       "status": "FAIL",
+E       "worker_model": "deepseek"
+E     }
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=['D:\\anaconda\\python.exe', 'scripts/run_agent_mvp.py', '--run-root', 'C:\\Users\\sunom\\AppDat..._uses_gatewa0\\\\run",\n  "schema_version": "1.0",\n  "status": "FAIL",\n  "worker_model": "deepseek"\n}\n', stderr='').returncode
+- generated xml file: D:\VeriArbor\reports\generic-boundary-closure-v1\continuation-01\mvp-cli.xml -
+=========================== short test summary info ===========================
+FAILED tests/agent/test_agent_mvp_gateway_cli.py::test_agent_mvp_cli_uses_gateway_routing_snapshot_and_budget
+1 failed in 10.04s

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="26" time="13.872" timestamp="2026-11-11T22:36:02.707259+08:00" hostname="test"><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change0-INVALID_CONTRACT]" time="0.161" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change1-INVALID_CONTRACT]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change2-INVALID_CONTRACT]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change3-NEEDS_DECOMPOSITION]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change4-NEEDS_DECOMPOSITION]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_invalid_leaf_cannot_compile[change5-INVALID_CONTRACT]" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_composite_rejected_and_split_children_compile" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_pure_function_checked_and_version_reuse_guard" time="0.731" /><testcase classname="tests.runtime.test_execution_continuity" name="test_partial_two_files_retained_and_continued_without_rewrite" time="0.860" /><testcase classname="tests.runtime.test_execution_continuity" name="test_no_delta_is_failed_deliverable_and_next_decision_feedback" time="0.314"><failure message="KeyError: 'execution_status'">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_no_delta_is_failed_delive0')
+
+    def test_no_delta_is_failed_deliverable_and_next_decision_feedback(tmp_path):
+        root,store,runner=setup(tmp_path,Client([]));(root/'f.py').write_text('def f(x): return x + 1\n')
+        assert run(runner,[node()]).status=='FAILED'
+        r=store.load_result('p','r','n')
+&gt;       assert r.metadata['execution_status']=='EXECUTION_SUCCESS'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'execution_status'
+
+tests\runtime\test_execution_continuity.py:116: KeyError</failure></testcase><testcase classname="tests.runtime.test_execution_continuity" name="test_readonly_evidence_not_false_no_progress" time="0.010"><failure message="ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_readonly_evidence_not_fal0')
+
+    def test_readonly_evidence_not_false_no_progress(tmp_path):
+        root,store,runner=setup(tmp_path,Client([{'action':'read_file','path':'f.py'}]));(root/'f.py').write_text('def f(x): return x + 1\n')
+&gt;       assert run(runner,[node(kind='RESEARCH')]).status=='SUCCEEDED'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_execution_continuity.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_execution_continuity.py:69: in run
+    tree=admit_fixture_tree(runner.store,tree)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+store = &lt;cgkn.state.store.FileRunStore object at 0x000001D93F823260&gt;
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='n', parent_id='', capability_ref='code@1', depends_on=(), config...unction', 'source_refs': ('public:source',), 'completion_criterion': 'evidence recorded'}), 'parallel_safe': True})),))
+
+    def admit_fixture_tree(store,tree,*,operations=None):
+        """Explicit bounded batch policy for scheduler fixtures, not Session defaults."""
+        a=ExecutionAuthority(store,'p','r');current=a.committed_tree()
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        contracts={n.capability_ref:asdict(CapabilityContract(n.capability_ref,'Bounded scheduler fixture',critical=False,
+            positive_controls=('independent-observation',))) for n in tree.nodes if n.executable}
+        ops=operations or tuple({'operation':'add_node','node_id':n.id,'capability_ref':n.capability_ref,
+            'parent_id':n.parent_id,'depends_on':list(n.depends_on),'config':n.as_dict()['config']} for n in tree.nodes if n.executable)
+        cap=next(iter(contracts))
+        proposal=ProjectProposal('fixture-tree-'+str(version),'p',version,tree.goal,(),tuple(ops),reason_summary='explicit bounded test graph',
+            target_capability_id=cap,strategy_capabilities=(cap,),exploration_reason='scheduler calibration',exploration_budget=1,
+            exploration_measure='independent deliverable observation')
+        domains={d for n in tree.nodes if n.executable for d in n.config['leaf_contract']['effect_domains']}
+        policy=AdmissionPolicy(project_id='p',capability_contracts=contracts,incremental_mode=False,
+            max_new_nodes=len(tree.nodes),allowed_effect_domains=frozenset(domains),allow_remote_effects=True,execution_budget={'calls':20})
+        aid,result=a.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+':'+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains
+
+tests\governed_measurement_support.py:29: ValueError</failure></testcase><testcase classname="tests.runtime.test_execution_continuity" name="test_parallel_join_failure_isolation_targeted_repair" time="3.180" /><testcase classname="tests.runtime.test_execution_continuity" name="test_three_independent_branches_join_current_versions_and_no_sibling_replay" time="4.399" /><testcase classname="tests.runtime.test_execution_continuity" name="test_parent_requires_children_and_own_acceptance" time="0.405" /><testcase classname="tests.runtime.test_execution_continuity" name="test_out_of_scope_write_is_rejected_before_any_write" time="0.313" /><testcase classname="tests.runtime.test_execution_continuity" name="test_old_graph_load_is_readonly_not_requalified" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_contract_executor_projects_legacy_alias_without_changing_identity" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_worker_receives_current_contract_goal_not_stale_legacy_alias" time="0.448" /><testcase classname="tests.runtime.test_execution_continuity" name="test_check_task_requires_observable_subject_and_rule" time="0.025"><failure message="ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_check_task_requires_obser0')
+
+    def test_check_task_requires_observable_subject_and_rule(tmp_path):
+        root,store,runner=setup(tmp_path,Client([]));(root/'f.py').write_text('def f(x): return x + 1\n')
+&gt;       assert run(runner,[node(kind='TEST')]).status=='SUCCEEDED'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_execution_continuity.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\runtime\test_execution_continuity.py:69: in run
+    tree=admit_fixture_tree(runner.store,tree)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+store = &lt;cgkn.state.store.FileRunStore object at 0x000001D93F90B800&gt;
+tree = CapabilityTree(goal='goal', nodes=(CapabilityNode(id='n', parent_id='', capability_ref='code@1', depends_on=(), config...ect': 'f.py', 'expected_observation': 'works', 'pass_fail_rule': 'independent predicate'}), 'parallel_safe': True})),))
+
+    def admit_fixture_tree(store,tree,*,operations=None):
+        """Explicit bounded batch policy for scheduler fixtures, not Session defaults."""
+        a=ExecutionAuthority(store,'p','r');current=a.committed_tree()
+        base=CapabilityTree.from_dict(current['tree']) if current else CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable))
+        version=current['tree_version'] if current else 1
+        contracts={n.capability_ref:asdict(CapabilityContract(n.capability_ref,'Bounded scheduler fixture',critical=False,
+            positive_controls=('independent-observation',))) for n in tree.nodes if n.executable}
+        ops=operations or tuple({'operation':'add_node','node_id':n.id,'capability_ref':n.capability_ref,
+            'parent_id':n.parent_id,'depends_on':list(n.depends_on),'config':n.as_dict()['config']} for n in tree.nodes if n.executable)
+        cap=next(iter(contracts))
+        proposal=ProjectProposal('fixture-tree-'+str(version),'p',version,tree.goal,(),tuple(ops),reason_summary='explicit bounded test graph',
+            target_capability_id=cap,strategy_capabilities=(cap,),exploration_reason='scheduler calibration',exploration_budget=1,
+            exploration_measure='independent deliverable observation')
+        domains={d for n in tree.nodes if n.executable for d in n.config['leaf_contract']['effect_domains']}
+        policy=AdmissionPolicy(project_id='p',capability_contracts=contracts,incremental_mode=False,
+            max_new_nodes=len(tree.nodes),allowed_effect_domains=frozenset(domains),allow_remote_effects=True,execution_budget={'calls':20})
+        aid,result=a.admit(base,version,proposal,known_capabilities=set(contracts),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+':'+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_LEAF_CONTRACT:NEEDS_DECOMPOSITION:n:artifact bound exceeded or independent effect domains
+
+tests\governed_measurement_support.py:29: ValueError</failure></testcase><testcase classname="tests.runtime.test_execution_continuity" name="test_output_limit_preserves_partial_text_and_unknown_without_replay" time="0.001" /><testcase classname="tests.runtime.test_execution_continuity" name="test_checker_failure_preserves_worker_usage_and_classifies_harness" time="0.368" /><testcase classname="tests.runtime.test_execution_continuity" name="test_unregistered_checker_rejected_before_worker" time="0.071" /><testcase classname="tests.runtime.test_execution_continuity" name="test_legacy_ledger_scope_cannot_promote_unrelated_route" time="0.005" /><testcase classname="tests.runtime.test_execution_continuity" name="test_real_sqlite_process_acceptance_positive_negative" time="1.118" /><testcase classname="tests.runtime.test_execution_continuity" name="test_progress_is_received_by_next_canonical_planner_decision" time="0.054"><failure message="IndexError: list index out of range">tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23499/test_progress_is_received_by_n0')
+
+    def test_progress_is_received_by_next_canonical_planner_decision(tmp_path):
+        from cgkn.agent.composer import AgentComposer
+        from cgkn.agent.project_loop import AgentProjectLoop
+        from cgkn.agent.project_agent import AdmissionPolicy
+        from veriarbor.capability import CapabilityContract
+        from dataclasses import asdict
+        n=node();contexts=[]
+        class Planner:
+            def complete(self,**kw):
+                context=json.loads(kw['user']);contexts.append(context)
+                first=len(contexts)==1
+                edits=[dict(edit_id='add',operation='add_node',node_id='n',payload={k:v for k,v in CapabilityTree('g',(n,)).as_dict()['nodes'][0].items() if k!='id'},provenance={'actor':'fixture'})] if first else []
+                value=dict(schema_version='1.0',decision_id=str(len(contexts)),summary='fixture',reason='public facts',edits=edits,request_run=first,finish=False,needs_escalation=not first,escalation_reason='' if first else 'change strategy')
+                value['decision_audit']={'capability_claim':{'target_capability_id':'code@1','strategy_capabilities':['code@1'],
+                    'exploration_reason':'Measure no-progress feedback','exploration_budget':1,'exploration_measure':'Independent file predicate'}}
+                return ProviderCompletion(json.dumps(value),'fake-planner')
+        root,store,runner=setup(tmp_path,Client([]))
+        policy=AdmissionPolicy(project_id='p',capability_contracts={'code@1':asdict(CapabilityContract('code@1','bounded function',critical=False,
+            positive_controls=('independent file predicate',)))},allow_remote_effects=True,execution_budget={'calls':4})
+        loop=AgentProjectLoop(AgentComposer(Planner(),ModelRoleConfig('agent','fake')),runner,store,known_capabilities={'code@1'},worker_model='fake',max_decisions=2,admission_policy=policy)
+        loop.run(project_id='p',run_id='r',goal='g')
+        assert len(contexts)==2
+&gt;       assert contexts[1]['task_feedback']['items'][0]['implementation_progress']['verdict']=='NO_IMPLEMENTATION_PROGRESS'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests\runtime\test_execution_continuity.py:293: IndexError</failure></testcase><testcase classname="tests.runtime.test_execution_continuity" name="test_partial_output_limit_retains_verified_artifact_and_blocks_blind_retry" time="0.784" /></testsuite></testsuites>

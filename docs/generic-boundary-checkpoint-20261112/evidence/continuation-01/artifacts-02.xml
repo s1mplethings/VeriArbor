@@ -1,0 +1,1695 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="15" skipped="0" tests="29" time="4.945" timestamp="2026-11-11T23:02:22.892522+08:00" hostname="test"><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_artifact_execution_and_repeat_use_canonical_state" time="0.301"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC0D9F980&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC0DB5430&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_artifact_execution_and_re0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000023FC0D5F3E0&gt;
+
+    def test_artifact_execution_and_repeat_use_canonical_state(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+&gt;       runner.run(inputs)
+
+tests\runtime\test_artifact_dag_authority.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC0D9F980&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_failed_branch_does_not_erase_independent_success" time="0.117"><failure message="AssertionError: Regex pattern did not match.&#10; Regex: 'controlled local failure'&#10; Input: 'INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation'">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC0DB5490&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC10BE960&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_failed_branch_does_not_er0')
+
+    def test_failed_branch_does_not_erase_independent_success(tmp_path):
+        runner, inputs = _runner(tmp_path)
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+            lambda *a: (_ for _ in ()).throw(RuntimeError('controlled local failure')))
+        with pytest.raises(ModuleExecutionError, match='controlled local failure'):
+&gt;           runner.run(inputs)
+
+tests\runtime\test_artifact_dag_authority.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC0DB5490&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_failed_branch_does_not_er0')
+
+    def test_failed_branch_does_not_erase_independent_success(tmp_path):
+        runner, inputs = _runner(tmp_path)
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+            lambda *a: (_ for _ in ()).throw(RuntimeError('controlled local failure')))
+&gt;       with pytest.raises(ModuleExecutionError, match='controlled local failure'):
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'controlled local failure'
+E        Input: 'INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation'
+
+tests\runtime\test_artifact_dag_authority.py:37: AssertionError</failure></testcase><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_unknown_is_not_replayed_by_new_adapter_instance" time="0.135"><failure message="cgkn.state.store.StateStoreError: cannot load node result: [Errno 2] No such file or directory: 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23515\\test_unknown_is_not_replayed_b0\\run\\execution\\artifact-flow\\session\\node_results\\n_requirement_interpretation.json'">self = &lt;cgkn.state.store.FileRunStore object at 0x0000023FC10BD910&gt;
+project_id = 'artifact-flow', run_id = 'session'
+node_id = 'n_requirement_interpretation'
+
+    def load_result(self, project_id: str, run_id: str, node_id: str) -&gt; BlockExecutionResult:
+        self._validate_segment(node_id)
+        path = self.run_dir(project_id, run_id) / "node_results" / f"{node_id}.json"
+        try:
+&gt;           return BlockExecutionResult.from_dict(_read_snapshot(path))
+                                                  ^^^^^^^^^^^^^^^^^^^^
+
+cgkn\state\store.py:231: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\state\store.py:34: in _read_snapshot
+    return json.loads(path.read_text(encoding='utf-8'))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\anaconda\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_unknown_is_not_replayed_b0/run/execution/artifact-flow/session/node_results/n_requirement_interpretation.json')
+mode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23515\\test_unknown_is_not_replayed_b0\\run\\execution\\artifact-flow\\session\\node_results\\n_requirement_interpretation.json'
+
+D:\anaconda\Lib\pathlib.py:1013: FileNotFoundError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_unknown_is_not_replayed_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000023FC10A6A80&gt;
+
+    def test_unknown_is_not_replayed_by_new_adapter_instance(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+        class UnknownTransport(RuntimeError):
+            outcome_unknown = True
+        runner.local_functions['cgkn.runtime.reference_modules:interpret_requirement'] = (
+            lambda *a: (_ for _ in ()).throw(UnknownTransport('response lost')))
+        with pytest.raises(ModuleExecutionError):
+            runner.run(inputs)
+&gt;       result = state_store(runner).load_result('artifact-flow', 'session', 'n_requirement_interpretation')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_artifact_dag_authority.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;cgkn.state.store.FileRunStore object at 0x0000023FC10BD910&gt;
+project_id = 'artifact-flow', run_id = 'session'
+node_id = 'n_requirement_interpretation'
+
+    def load_result(self, project_id: str, run_id: str, node_id: str) -&gt; BlockExecutionResult:
+        self._validate_segment(node_id)
+        path = self.run_dir(project_id, run_id) / "node_results" / f"{node_id}.json"
+        try:
+            return BlockExecutionResult.from_dict(_read_snapshot(path))
+        except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+&gt;           raise StateStoreError(f"cannot load node result: {exc}") from exc
+E           cgkn.state.store.StateStoreError: cannot load node result: [Errno 2] No such file or directory: 'C:\\Users\\sunom\\AppData\\Local\\Temp\\pytest-of-sunom\\pytest-23515\\test_unknown_is_not_replayed_b0\\run\\execution\\artifact-flow\\session\\node_results\\n_requirement_interpretation.json'
+
+cgkn\state\store.py:233: StateStoreError</failure></testcase><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_tampered_artifact_cannot_be_reused" time="0.171"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC11D5040&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC11F2C90&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_tampered_artifact_cannot_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000023FC10BD940&gt;
+
+    def test_tampered_artifact_cannot_be_reused(tmp_path, monkeypatch):
+        runner, inputs = _runner(tmp_path)
+&gt;       result = runner.run(inputs)
+                 ^^^^^^^^^^^^^^^^^^
+
+tests\runtime\test_artifact_dag_authority.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC11D5040&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_changed_loaded_implementation_requires_explicit_redecision" time="0.154"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC103F980&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC1470E00&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_changed_loaded_implementa0')
+
+    def test_changed_loaded_implementation_requires_explicit_redecision(tmp_path):
+        runner, inputs = _runner(tmp_path)
+&gt;       runner.run(inputs)
+
+tests\runtime\test_artifact_dag_authority.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC103F980&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_dag_authority" name="test_changed_input_identity_is_not_silently_rebound" time="0.141"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC0DB4530&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC142E540&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_changed_input_identity_is0')
+
+    def test_changed_input_identity_is_not_silently_rebound(tmp_path):
+        from cgkn.artifacts import ArtifactInstance, Producer, Provenance
+        runner, inputs = _runner(tmp_path)
+&gt;       runner.run(inputs)
+
+tests\runtime\test_artifact_dag_authority.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC0DB4530&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:1ed83b4b697d3fb1dbb1cd63440dbf4a77ea878c7c73be2698c9b2b625b082c2')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_runtime_materializes_outputs_and_index_consumers" time="0.137"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC148F620&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC144EF30&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_runtime_materializes_outp0')
+
+    def test_runtime_materializes_outputs_and_index_consumers(tmp_path: pathlib.Path) -&gt; None:
+&gt;       store, _, _, result = initial_run(tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC148F620&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_checkpoint_contains_refs_not_business_content" time="0.128"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC148EF00&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC151D820&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_checkpoint_contains_refs_0')
+
+    def test_checkpoint_contains_refs_not_business_content(tmp_path: pathlib.Path) -&gt; None:
+&gt;       _, _, _, _ = initial_run(tmp_path)
+                     ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC148EF00&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_provider_output_gets_one_bounded_schema_repair" time="0.271" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_provider_invalid_output_creates_diagnostic_and_no_artifact" time="0.414" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_context_uses_only_declared_required_artifacts_and_projection" time="0.127" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_context_budget_and_trace_are_enforced" time="0.081" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_same_fingerprint_hits_cache_and_changes_miss" time="0.187"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC10724E0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC1465FD0&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_same_fingerprint_hits_cac0')
+
+    def test_same_fingerprint_hits_cache_and_changes_miss(tmp_path: pathlib.Path) -&gt; None:
+&gt;       store, inputs, _, first = initial_run(tmp_path)
+                                  ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:250: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC10724E0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_fingerprint_changes_with_input_module_and_prompt" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_upstream_change_invalidates_only_descendants_and_explains" time="0.150"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC14F81A0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC1366E40&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_upstream_change_invalidat0')
+
+    def test_upstream_change_invalidates_only_descendants_and_explains(tmp_path: pathlib.Path) -&gt; None:
+&gt;       store, _, runner, result = initial_run(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:267: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC14F81A0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_invalidation_dry_run_does_not_mutate" time="0.189"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC1367890&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC146E4E0&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_invalidation_dry_run_does0')
+
+    def test_invalidation_dry_run_does_not_mutate(tmp_path: pathlib.Path) -&gt; None:
+&gt;       store, _, runner, result = initial_run(tmp_path)
+                                   ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC1367890&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_stale_artifact_blocks_delivery_readiness" time="0.206"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC137F380&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC1619640&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_stale_artifact_blocks_del0')
+
+    def test_stale_artifact_blocks_delivery_readiness(tmp_path: pathlib.Path) -&gt; None:
+&gt;       store, _, _, result = initial_run(tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:293: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC137F380&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_complete_lineage_passes_and_tree_reaches_inputs" time="0.127"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC10BFB00&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC134F470&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_complete_lineage_passes_a0')
+
+    def test_complete_lineage_passes_and_tree_reaches_inputs(tmp_path: pathlib.Path) -&gt; None:
+&gt;       store, _, _, result = initial_run(tmp_path)
+                              ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:302: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC10BFB00&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_missing_artifact_blocks_delivery" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_effect_cardinality_accepts_node_and_run_scopes" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_effect_cardinality_violation_blocks_execution" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_run_manifest_and_feed_forward_report_exist" time="0.175"><failure message="cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC1467F50&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC161BB00&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_run_manifest_and_feed_for0')
+
+    def test_run_manifest_and_feed_forward_report_exist(tmp_path: pathlib.Path) -&gt; None:
+&gt;       _, _, _, result = initial_run(tmp_path)
+                          ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_artifact_driven_kernel.py:340: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_artifact_driven_kernel.py:60: in initial_run
+    result = runner.run(inputs, raw_source_chars=12000)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC1467F50&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', conte...='artifact.raw_requirement@1', content_hash='sha256:e310bd9861c7e1ea69cb867b93992bb6f7fc5f42b55e2d572035b10eeb2ffc22')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_run_failure_marks_manifest_failed" time="0.158"><failure message="AssertionError: Regex pattern did not match.&#10; Regex: 'not bound'&#10; Input: 'INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation'">self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC134E8A0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', content_hash='sha256:3f288c98dc75ff876169b776d53420e2640965cf6d3e54ab1cc2e4e107895e29')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+&gt;           self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+
+cgkn\runtime\runner.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\runtime\runner.py:292: in _run_canonical
+    admit_declared_tree(authority,tree,policy=self.admission_policy,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+authority = &lt;cgkn.runtime.node_authority.ExecutionAuthority object at 0x0000023FC148ED20&gt;
+tree = CapabilityTree(goal='flow.artifact_driven_project_refactor@1', nodes=(CapabilityNode(id='n_architecture', parent_id=''...oxy({}), 'flow_inputs': mappingproxy({}), 'external_dependencies': mappingproxy({}), 'overrides': mappingproxy({})}))))
+
+    def admit_declared_tree(authority, tree, *, policy, proposal_id, reason, retry_node=None):
+        """Thin admission adapter for an explicitly authorized, declared graph.
+    
+        The caller supplies the policy; this function cannot invent effects,
+        budgets, contracts or a model decision. Execution still uses DAGRunner.
+        """
+        from cgkn.agent.project_agent import ProjectProposal
+        from cgkn.orchestration.capability_tree import CapabilityTree
+        current=authority.committed_tree()
+        if current:
+            authority.validate_tree(tree)
+            if retry_node is None:return tree
+            base=tree;version=current['tree_version']
+            operations=({'operation':'retry_node','node_id':retry_node},)
+        else:
+            if retry_node is not None:raise ValueError('RETRY_REQUIRES_COMMITTED_TREE')
+            base=CapabilityTree(tree.goal,tuple(n for n in tree.nodes if not n.executable));version=1
+            operations=tuple({'operation':'add_node','node_id':n.id,'parent_id':n.parent_id,
+                'capability_ref':n.capability_ref,'depends_on':list(n.depends_on),'config':n.as_dict()['config']}
+                for n in tree.nodes if n.executable)
+        capabilities=tuple(dict.fromkeys(n.capability_ref for n in tree.nodes if n.executable))
+        if not capabilities:raise ValueError('DECLARED_EXECUTABLE_TREE_REQUIRED')
+        proposal=ProjectProposal(proposal_id,authority.project_id,version,tree.goal,(),operations,
+            reason_summary=reason,target_capability_id=capabilities[0],strategy_capabilities=capabilities,
+            exploration_reason=reason,exploration_budget=1,
+            exploration_measure='Existing independently registered deliverable checks')
+        aid,result=authority.admit(base,version,proposal,known_capabilities=set(capabilities),catalog={},policy=policy)
+&gt;       if not result.valid:raise ValueError(result.code+': '+result.message)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\governed.py:91: ValueError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_run_failure_marks_manifes0')
+
+    @pytest.mark.negative
+    @pytest.mark.fault_injection
+    def test_run_failure_marks_manifest_failed(tmp_path) -&gt; None:
+        run_dir = tmp_path / "run"
+        store = ArtifactStore(run_dir, ArtifactTypeRegistry(_SCENARIOS.ROOT))
+        project = _SCENARIOS.seed(store, "artifact.project_source@1", _SCENARIOS.PROJECT, "project")
+        runner = _SCENARIOS.ArtifactModuleRunner(_SCENARIOS.ROOT, run_dir, _SCENARIOS.FLOW)
+        with pytest.raises(_SCENARIOS.ModuleExecutionError, match="not bound"):
+&gt;           runner.run({"project": project})
+
+tests\runtime\test_artifact_runtime_contract.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+cgkn\telemetry\lean.py:353: in wrapper
+    result = function(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.artifact_authority_support.artifact_runner object at 0x0000023FC134E8A0&gt;
+flow_inputs = {'project': ArtifactRef(artifact_instance_id='ai.project-source.001', artifact_type='artifact.project_source@1', content_hash='sha256:3f288c98dc75ff876169b776d53420e2640965cf6d3e54ab1cc2e4e107895e29')}
+
+    @observed(lambda a: a["self"].flow_ref, lambda a: a["self"].run_dir, expose=True)
+    def run(
+        self,
+        flow_inputs: dict[str, ArtifactRef],
+        *,
+        node_ids: set[str] | None = None,
+        output_overrides: dict[tuple[str, str], ArtifactRef] | None = None,
+        raw_source_chars: int = 0,
+        retry_node: str | None = None,
+    ) -&gt; dict[str, Any]:
+        output_overrides = output_overrides or {}
+        self._outputs.update(output_overrides)
+        manifest = self._load_manifest()
+        manifest["status"] = "running"
+        manifest["inputArtifacts"] = [item.as_dict() for item in flow_inputs.values()]
+        self._save_manifest(manifest)
+        try:
+            self._run_canonical(flow_inputs, node_ids, output_overrides,
+                                raw_source_chars, retry_node)
+        except Exception as exc:
+            manifest = self._load_manifest()
+            manifest["status"] = "failed"
+            self._save_manifest(manifest)
+            if isinstance(exc, ModuleExecutionError):
+                raise
+&gt;           raise ModuleExecutionError(str(exc)) from exc
+E           cgkn.runtime.runner.ModuleExecutionError: INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation
+
+cgkn\runtime\runner.py:110: ModuleExecutionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/sunom/AppData/Local/Temp/pytest-of-sunom/pytest-23515/test_run_failure_marks_manifes0')
+
+    @pytest.mark.negative
+    @pytest.mark.fault_injection
+    def test_run_failure_marks_manifest_failed(tmp_path) -&gt; None:
+        run_dir = tmp_path / "run"
+        store = ArtifactStore(run_dir, ArtifactTypeRegistry(_SCENARIOS.ROOT))
+        project = _SCENARIOS.seed(store, "artifact.project_source@1", _SCENARIOS.PROJECT, "project")
+        runner = _SCENARIOS.ArtifactModuleRunner(_SCENARIOS.ROOT, run_dir, _SCENARIOS.FLOW)
+&gt;       with pytest.raises(_SCENARIOS.ModuleExecutionError, match="not bound"):
+E       AssertionError: Regex pattern did not match.
+E        Regex: 'not bound'
+E        Input: 'INVALID_DEPENDENCY: capability_tree.unknown_dependency:n_architecture:n_problem_analysis;capability_tree.unknown_dependency:n_architecture:n_requirement_interpretation'
+
+tests\runtime\test_artifact_runtime_contract.py:69: AssertionError</failure></testcase><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_cache_rejects_empty_missing_stale_and_tampered_entries" time="0.060" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_context_shrink_decision_ledger_and_scalar_paths" time="0.039" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_delivery_detects_hash_tamper" time="0.047" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_artifact_invalidator_uses_direct_consumers_when_producer_is_external" time="0.061" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_reference_adapter_conditional_branches" time="0.001" /><testcase classname="tests.runtime.test_artifact_runtime_contract" name="test_artifact_runner_adapter_helper_boundaries" time="0.001" /></testsuite></testsuites>

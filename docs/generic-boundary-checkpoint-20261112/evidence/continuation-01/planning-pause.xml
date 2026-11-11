@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="7.785" timestamp="2026-11-11T23:47:56.824805+08:00" hostname="test"><testcase classname="tests.providers.test_domestic_final" name="test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls" time="5.959"><failure message="AssertionError: assert 'BLOCKED' == 'FINISHED'&#10;  &#10;  - FINISHED&#10;  + BLOCKED">tests\providers\test_domestic_final.py:201: in test_prepared_task_runs_through_real_runtime_and_reopens_without_model_calls
+    assert acceptance.execute(root,'never-read',phase='finish')['state']=='FINISHED'
+E   AssertionError: assert 'BLOCKED' == 'FINISHED'
+E     
+E     - FINISHED
+E     + BLOCKED</failure></testcase><testcase classname="tests.agent.test_host_planning_scope" name="test_planning_is_root_scope_same_tree_not_worker_permit" time="1.351" /><testcase classname="tests.agent.test_host_planning_scope" name="test_missing_planning_scope_blocks_before_provider" time="0.045" /></testsuite></testsuites>
