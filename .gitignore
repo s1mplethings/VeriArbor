@@ -1,11 +1,30 @@
-.venv/
+# Python
 __pycache__/
 *.py[cod]
 *.egg-info/
+.pytest_cache/
+.venv/
+venv/
 build/
 dist/
-.pytest_cache/
 
-# Raw migration evidence and large report bundles stay outside Git.
+# Local application data and logs
+local-data/
+local-platform-data/
+*.log
+*.pid
+
+# Secrets and private configuration
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# Local audit archives (selected public reports are explicitly tracked)
 governance/
 reports/

@@ -1,5 +1,5 @@
 """Certified Block boundaries. Hosts retain execution and evidence authority."""
-__version__ = "0.1.0.dev0"
+__version__ = "0.1.0a1"
 
 from .block import Block
 from .port import Port
