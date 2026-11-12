@@ -1,5 +1,25 @@
 # Architecture
 
+## Project Agent boundary
+
+VeriArbor does not attempt to be the strongest general-purpose planner. A
+replaceable Project Agent supplies proposals; VeriArbor supplies admission,
+contracts, effects, execution progress, evidence, acceptance, impact and
+lifecycle. The boundary is:
+
+```
+Project Agent -> ProjectProposal -> Admission -> TreeEdit -> CapabilityTree
+```
+
+A Project Agent can propose an operation, a repair strategy and a resource
+preference. It cannot mutate the authoritative tree, declare acceptance, or
+mark an unimplemented node as a reusable capability. The embedded planner is a
+fallback Project Agent and uses the same admission path.
+
+A roadmap is not an active capability tree. Only the current frontier and its
+obligations enter the authoritative tree; later capabilities are admitted when
+new evidence activates them.
+
 Dependency direction: CGKN -> thin conversion adapters -> VeriArbor. VeriArbor
 never imports CGKN, Promotion, a provider, a concrete store, or experiment code.
 
@@ -50,3 +70,11 @@ the supplied immutable hash before returning historical bytes.
 V1 does not introduce a global semantic graph, clause store or search scheduler.
 Default host slot allocation is deterministic admission order. Existing DAG
 resource conflict checks still prevent overlapping writers and side effects.
+
+Capability semantics and strategy reuse now add `capability` and `skills` pure
+policy APIs. The host's existing Proposal Admission, ProjectSession, DAGRunner
+and FileRunStore integrate five independent quality gates, scoped input evidence,
+goal-linked proposals and lazy Skill reuse. Parent quality needs its own outcome
+contract; historical ACCEPTED and reusable strategies grant no current Utility
+PASS. See [Capability gates and skills](CAPABILITY_GATES_AND_SKILLS.md) for the
+contract, lifecycle, project-isolation rules and migration boundary.

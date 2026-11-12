@@ -1,0 +1,471 @@
+{
+  "tests\\test_formal_provider_fallback.py": [
+    "test_split_file_retry_receives_previous_dom_contract_error",
+    "test_split_file_retry_expands_self_imposed_truncation_cap",
+    "test_split_file_final_retry_scales_cap_and_fits_current_source",
+    "test_leaf_retry_accumulates_distinct_rejections_without_regression",
+    "test_thin_leaf_is_retried_with_implementation_depth_feedback",
+    "test_exhausted_leaf_repair_does_not_restart_semantic_generation",
+    "test_component_leaf_retry_publishes_exact_undefined_name_guidance",
+    "test_component_leaf_retry_publishes_small_syntax_repair_guidance",
+    "test_named_record_model_syntax_retry_avoids_decorator_indentation_trap",
+    "test_named_direct_cli_test_retry_requires_tmp_path_runtime_files",
+    "test_same_goal_semantic_resume_does_not_reuse_legacy_checkpoint_across_replanning_hash",
+    "test_same_goal_resume_invalidates_upstream_checkpoint_missing_current_required_path",
+    "test_cached_component_is_revalidated_before_reuse",
+    "test_split_leaf_generation_orders_dependencies_and_repairs_interface_mismatch",
+    "test_twelve_leaf_chain_keeps_interfaces_ordered_bounded_and_checkpointed",
+    "test_leaf_chain_resumes_from_middle_without_regenerating_passed_leaves",
+    "test_leaf_interface_prompt_stays_bounded_with_forty_completed_modules",
+    "test_python_leaf_without_declared_dependencies_receives_empty_local_import_contract",
+    "test_independent_leaves_run_in_parallel_and_publish_receipts",
+    "test_parallel_surrogate_wait_checkpoints_successful_peer_before_yield",
+    "test_repair_regenerates_only_target_and_transitive_consumers",
+    "test_forced_component_repair_regenerates_all_split_leaves",
+    "test_pending_legacy_manifest_is_expanded_before_resume",
+    "test_api_provider_feature_leaf_rejects_undeclared_error",
+    "test_index_generation_receives_executable_semantic_structure_contract",
+    "test_design_document_leaf_receives_exact_research_traceability_contract",
+    "test_artifact_store_leaf_receives_exact_stage_artifact_schema_contract",
+    "test_artifact_store_leaf_rejects_opaque_bytes_and_missing_record_fields",
+    "test_capture_leaf_receives_adapter_writer_and_readback_contract",
+    "test_stage_leaf_rejects_extra_required_parameters",
+    "test_orchestrator_leaf_rejects_object_style_stage_execution",
+    "test_media_fixture_leaf_rejects_missing_execution_entrypoint",
+    "test_pyproject_leaf_rejects_requirements_syntax_inside_toml",
+    "test_javascript_leaf_receives_exact_exported_symbol_contract",
+    "test_python_consumer_receives_dependency_api_allowlist_at_system_level",
+    "test_python_current_manifest_symbol_names_override_historical_context",
+    "test_css_leaf_receives_selected_palette_and_quality_literals",
+    "test_component_quality_failure_retries_only_affected_leaf_files",
+    "test_generation_repair_targets_failed_component_without_mutating_shared_feedforward_errors",
+    "test_failed_forced_repair_preserves_last_pass_checkpoint"
+  ],
+  "tests\\test_generation_completion_contract.py": [
+    "test_final_provider_failure_is_recoverable_blocked_result"
+  ],
+  "tests\\test_provider_job_fragmentation.py": [
+    "test_existing_provider_job_patch_applies_only_changed_owned_path",
+    "test_existing_provider_job_patch_rejects_no_actual_change",
+    "test_existing_provider_job_patch_rejects_unrepaired_affected_behavior",
+    "test_provider_job_success_not_rolled_back_by_later_job_failure",
+    "test_multi_file_provider_job_repair_keeps_current_emission_source",
+    "test_multi_file_repair_calls_only_exact_evaluator_target_in_ownership_unit",
+    "test_incomplete_emission_keeps_completed_paths_and_completes_missing_once",
+    "test_partial_job_persists_each_emission_and_reserves_prioritized_completion",
+    "test_surrogate_wait_after_first_emission_persists_semantic_file_progress",
+    "test_failed_prioritized_completion_keeps_partial_checkpoints_and_does_not_retry",
+    "test_cached_partial_job_requests_only_missing_path_and_preserves_coowned_peers"
+  ],
+  "tests\\test_provider_job_partial_acceptance.py": [
+    "test_non_json_provider_payload_blocked_without_candidate_materialization",
+    "test_only_one_provider_execution_path"
+  ],
+  "tests\\test_run_local_pipeline_usage.py": [
+    "test_provider_component_progress_refreshes_deadline_between_components",
+    "test_provider_component_checkpoint_resumes_completed_components",
+    "test_unscoped_repair_text_does_not_invalidate_passed_checkpoint",
+    "test_component_merge_generates_test_plan_from_real_tests",
+    "test_component_merge_accepts_test_report_as_qa_evidence",
+    "test_provider_semantic_review_retry_on_frontend_backend_mismatch",
+    "test_provider_semantic_review_retry_on_test_coverage_blocker",
+    "test_provider_review_failure_writes_diagnostics_without_materializing",
+    "test_repair_invariant_failed_on_repeated_blocker",
+    "test_transport_error_does_not_consume_semantic_repair_attempt",
+    "test_resume_continues_pending_frontend_repair",
+    "test_pending_repair_plan_written_before_provider_call",
+    "test_resume_rejects_late_pending_plan_without_resolved_requirement_checkpoint",
+    "test_resume_continues_file_level_frontend_repair_only",
+    "test_goal_plan_multi_file_component_manifest_call_uses_large_model",
+    "test_transport_retry_preserves_semantic_repair_capability_model",
+    "test_resume_uses_next_retry_model_from_pending_plan",
+    "test_disable_model_routing_preserves_single_model_behavior",
+    "test_component_generation_over_hard_limit_uses_split_before_provider_call",
+    "test_frontend_component_uses_split_by_default",
+    "test_component_file_manifest_prompt_is_small",
+    "test_per_file_generation_requests_exactly_one_file",
+    "test_split_provider_job_checkpoint_and_resume",
+    "test_split_file_ownership_validation_blocks_wrong_path",
+    "test_provider_phase_log_never_records_oversized_component_request",
+    "test_completed_split_component_enters_semantic_review",
+    "test_split_semantic_review_repair_loop_rechecks_after_repair",
+    "test_split_semantic_review_transport_block_writes_pending_route",
+    "test_non_json_semantic_review_preserves_files_for_candidate",
+    "test_semantic_review_quality_blockers_do_not_prevent_candidate_materialization",
+    "test_runtime_blockers_do_not_prevent_candidate_materialization",
+    "test_candidate_post_build_runs_after_repairable_fact_sanitizer"
+  ],
+  "tests\\application\\software_project\\test_session_conversation_adapter.py": [
+    "test_retired_component_generation_and_retry_owners_are_absent"
+  ],
+  "_code_only_closure": {
+    "validation": "NOT_RUN",
+    "migrations": {
+      "tests/test_formal_provider_fallback.py": {
+        "test_split_file_retry_receives_previous_dom_contract_error": {
+          "disposition": "migrated",
+          "replacement": "feedback"
+        },
+        "test_split_file_retry_expands_self_imposed_truncation_cap": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_split_file_final_retry_scales_cap_and_fits_current_source": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_leaf_retry_accumulates_distinct_rejections_without_regression": {
+          "disposition": "migrated",
+          "replacement": "multi_feedback"
+        },
+        "test_thin_leaf_is_retried_with_implementation_depth_feedback": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_exhausted_leaf_repair_does_not_restart_semantic_generation": {
+          "disposition": "migrated",
+          "replacement": "budget"
+        },
+        "test_component_leaf_retry_publishes_exact_undefined_name_guidance": {
+          "disposition": "migrated",
+          "replacement": "self_repair"
+        },
+        "test_component_leaf_retry_publishes_small_syntax_repair_guidance": {
+          "disposition": "migrated",
+          "replacement": "self_repair"
+        },
+        "test_named_record_model_syntax_retry_avoids_decorator_indentation_trap": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_named_direct_cli_test_retry_requires_tmp_path_runtime_files": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_same_goal_semantic_resume_does_not_reuse_legacy_checkpoint_across_replanning_hash": {
+          "disposition": "migrated",
+          "replacement": "stale"
+        },
+        "test_same_goal_resume_invalidates_upstream_checkpoint_missing_current_required_path": {
+          "disposition": "migrated",
+          "replacement": "missing"
+        },
+        "test_cached_component_is_revalidated_before_reuse": {
+          "disposition": "migrated",
+          "replacement": "stale"
+        },
+        "test_split_leaf_generation_orders_dependencies_and_repairs_interface_mismatch": {
+          "disposition": "migrated",
+          "replacement": "invalidation"
+        },
+        "test_twelve_leaf_chain_keeps_interfaces_ordered_bounded_and_checkpointed": {
+          "disposition": "migrated",
+          "replacement": "invalidation"
+        },
+        "test_leaf_chain_resumes_from_middle_without_regenerating_passed_leaves": {
+          "disposition": "migrated",
+          "replacement": "reuse"
+        },
+        "test_leaf_interface_prompt_stays_bounded_with_forty_completed_modules": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_python_leaf_without_declared_dependencies_receives_empty_local_import_contract": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_independent_leaves_run_in_parallel_and_publish_receipts": {
+          "disposition": "migrated",
+          "replacement": "parallel"
+        },
+        "test_parallel_surrogate_wait_checkpoints_successful_peer_before_yield": {
+          "disposition": "migrated",
+          "replacement": "parallel"
+        },
+        "test_repair_regenerates_only_target_and_transitive_consumers": {
+          "disposition": "migrated",
+          "replacement": "invalidation"
+        },
+        "test_forced_component_repair_regenerates_all_split_leaves": {
+          "disposition": "migrated",
+          "replacement": "invalidation"
+        },
+        "test_pending_legacy_manifest_is_expanded_before_resume": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_api_provider_feature_leaf_rejects_undeclared_error": {
+          "disposition": "migrated",
+          "replacement": "independent_rejection"
+        },
+        "test_index_generation_receives_executable_semantic_structure_contract": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_design_document_leaf_receives_exact_research_traceability_contract": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_artifact_store_leaf_receives_exact_stage_artifact_schema_contract": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_artifact_store_leaf_rejects_opaque_bytes_and_missing_record_fields": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_capture_leaf_receives_adapter_writer_and_readback_contract": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_stage_leaf_rejects_extra_required_parameters": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_orchestrator_leaf_rejects_object_style_stage_execution": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_media_fixture_leaf_rejects_missing_execution_entrypoint": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_pyproject_leaf_rejects_requirements_syntax_inside_toml": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_javascript_leaf_receives_exact_exported_symbol_contract": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_python_consumer_receives_dependency_api_allowlist_at_system_level": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_python_current_manifest_symbol_names_override_historical_context": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_css_leaf_receives_selected_palette_and_quality_literals": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_component_quality_failure_retries_only_affected_leaf_files": {
+          "disposition": "migrated",
+          "replacement": "invalidation"
+        },
+        "test_generation_repair_targets_failed_component_without_mutating_shared_feedforward_errors": {
+          "disposition": "migrated",
+          "replacement": "invalidation"
+        },
+        "test_failed_forced_repair_preserves_last_pass_checkpoint": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        }
+      },
+      "tests/test_run_local_pipeline_usage.py": {
+        "test_provider_component_progress_refreshes_deadline_between_components": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_provider_component_checkpoint_resumes_completed_components": {
+          "disposition": "migrated",
+          "replacement": "reuse"
+        },
+        "test_unscoped_repair_text_does_not_invalidate_passed_checkpoint": {
+          "disposition": "migrated",
+          "replacement": "reuse"
+        },
+        "test_component_merge_generates_test_plan_from_real_tests": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_component_merge_accepts_test_report_as_qa_evidence": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_provider_semantic_review_retry_on_frontend_backend_mismatch": {
+          "disposition": "migrated",
+          "replacement": "independent_rejection"
+        },
+        "test_provider_semantic_review_retry_on_test_coverage_blocker": {
+          "disposition": "migrated",
+          "replacement": "independent_rejection"
+        },
+        "test_provider_review_failure_writes_diagnostics_without_materializing": {
+          "disposition": "migrated",
+          "replacement": "invalid_json"
+        },
+        "test_repair_invariant_failed_on_repeated_blocker": {
+          "disposition": "migrated",
+          "replacement": "budget"
+        },
+        "test_transport_error_does_not_consume_semantic_repair_attempt": {
+          "disposition": "retired",
+          "replacement": "Deleted semantic-repair counter; dispatch/UNKNOWN assertions retained in tests/providers/test_gateway_client.py and test_provider_retry_recovery.py."
+        },
+        "test_resume_continues_pending_frontend_repair": {
+          "disposition": "migrated",
+          "replacement": "reuse"
+        },
+        "test_pending_repair_plan_written_before_provider_call": {
+          "disposition": "migrated",
+          "replacement": "history"
+        },
+        "test_resume_rejects_late_pending_plan_without_resolved_requirement_checkpoint": {
+          "disposition": "migrated",
+          "replacement": "stale"
+        },
+        "test_resume_continues_file_level_frontend_repair_only": {
+          "disposition": "migrated",
+          "replacement": "reuse"
+        },
+        "test_goal_plan_multi_file_component_manifest_call_uses_large_model": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_transport_retry_preserves_semantic_repair_capability_model": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_resume_uses_next_retry_model_from_pending_plan": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_disable_model_routing_preserves_single_model_behavior": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_component_generation_over_hard_limit_uses_split_before_provider_call": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_frontend_component_uses_split_by_default": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_component_file_manifest_prompt_is_small": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_per_file_generation_requests_exactly_one_file": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_split_provider_job_checkpoint_and_resume": {
+          "disposition": "migrated",
+          "replacement": "reuse"
+        },
+        "test_split_file_ownership_validation_blocks_wrong_path": {
+          "disposition": "migrated",
+          "replacement": "ownership"
+        },
+        "test_provider_phase_log_never_records_oversized_component_request": {
+          "disposition": "retired",
+          "replacement": "Deleted per-file prompt threshold; exact wire bounds retained in tests/protocol/test_context_gateway_budget.py."
+        },
+        "test_completed_split_component_enters_semantic_review": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_split_semantic_review_repair_loop_rechecks_after_repair": {
+          "disposition": "migrated",
+          "replacement": "self_repair"
+        },
+        "test_split_semantic_review_transport_block_writes_pending_route": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_non_json_semantic_review_preserves_files_for_candidate": {
+          "disposition": "migrated",
+          "replacement": "invalid_json"
+        },
+        "test_semantic_review_quality_blockers_do_not_prevent_candidate_materialization": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_runtime_blockers_do_not_prevent_candidate_materialization": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        },
+        "test_candidate_post_build_runs_after_repairable_fact_sanitizer": {
+          "disposition": "retired",
+          "replacement": "Removed generator-specific routing, budget growth or mandatory template/phase policy; other pure business-validator assertions retained."
+        }
+      },
+      "tests/test_provider_job_fragmentation.py": {
+        "test_existing_provider_job_patch_applies_only_changed_owned_path": {
+          "disposition": "migrated",
+          "replacement": "ownership"
+        },
+        "test_existing_provider_job_patch_rejects_no_actual_change": {
+          "disposition": "migrated",
+          "replacement": "unchanged"
+        },
+        "test_existing_provider_job_patch_rejects_unrepaired_affected_behavior": {
+          "disposition": "migrated",
+          "replacement": "independent_rejection"
+        },
+        "test_provider_job_success_not_rolled_back_by_later_job_failure": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_provider_job_success_not_rolled_back_by_later_failure": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_component_wide_rollback_for_repair_is_forbidden": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_multi_file_provider_job_repair_keeps_current_emission_source": {
+          "disposition": "migrated",
+          "replacement": "feedback"
+        },
+        "_run_four_ready_jobs": {
+          "disposition": "retired",
+          "replacement": "Helper owned the deleted per-file scheduler."
+        },
+        "test_production_executor_reaches_four_workers_for_four_ready_jobs": {
+          "disposition": "migrated",
+          "replacement": "parallel"
+        },
+        "test_fallback_considered_does_not_reduce_concurrency": {
+          "disposition": "migrated",
+          "replacement": "parallel"
+        },
+        "test_multi_file_repair_calls_only_exact_evaluator_target_in_ownership_unit": {
+          "disposition": "migrated",
+          "replacement": "ownership"
+        },
+        "test_incomplete_emission_keeps_completed_paths_and_completes_missing_once": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_partial_job_persists_each_emission_and_reserves_prioritized_completion": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_surrogate_wait_after_first_emission_persists_semantic_file_progress": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_failed_prioritized_completion_keeps_partial_checkpoints_and_does_not_retry": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        },
+        "test_cached_partial_job_requests_only_missing_path_and_preserves_coowned_peers": {
+          "disposition": "migrated",
+          "replacement": "partial"
+        }
+      }
+    },
+    "retained_behavior_fixture": "tests/generation_migration_support.py",
+    "partial_acceptance": "Original endpoint/DOM/syntax assertions retained; fixture uses DAGRunner and independent repair_acceptance predicate.",
+    "worker_protocol": "Explicit final submissions migrated in current executor/protocol/agent/runtime fixtures; op4 observes admitted local tests, op5 submits; source only, not executed.",
+    "new_regression_sources": [
+      "tests/application/test_goal_driven.py::test_portable_component_uses_governed_candidate_publication",
+      "tests/runtime/test_core_governance_completion.py::test_cross_project_skill_import_requires_current_target_receipts"
+    ]
+  }
+}

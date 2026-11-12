@@ -18,6 +18,7 @@ def compare_ports(old_port, new_port, adapter=None):
             and old_port.contract.semantic == new_port.contract.semantic
             and old_port.compatibility_policy == new_port.compatibility_policy == 'structural-v1'
             and old_port.default_json == new_port.default_json
+            and old_port.evidence_policy == new_port.evidence_policy
             and (old_port.required == new_port.required or
                  (old_port.direction == 'input' and old_port.required and not new_port.required) or
                  (old_port.direction == 'output' and not old_port.required and new_port.required))):

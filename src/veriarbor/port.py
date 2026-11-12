@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from .contract import Contract
 from .model import stable_hash
 
@@ -12,6 +12,11 @@ class Port:
     required: bool = True
     default_json: str = 'null'
     compatibility_policy: str = 'structural-v1'
+    evidence_policy: dict = field(default_factory=dict)
+
+    def validate_evidence(self, evidence):
+        from .capability import validate_evidence
+        return validate_evidence(evidence, consumer=self.port_id, **self.evidence_policy)
 
     def __post_init__(self):
         from .contract import canonical
@@ -23,4 +28,8 @@ class Port:
     @property
     def fingerprint(self):
         from dataclasses import asdict
-        return stable_hash(asdict(self))
+        value = asdict(self)
+        # Empty opt-in policy preserves historical certificates and boundary hashes.
+        if not self.evidence_policy:
+            value.pop('evidence_policy')
+        return stable_hash(value)
