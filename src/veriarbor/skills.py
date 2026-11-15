@@ -103,7 +103,7 @@ class SkillValidation:
     contract_hash: str = ''
 
 
-def promotion_check(manifest, validations, minimum_success_count=2, *, execution_mode='GOVERNED', receipt_validator=None):
+def promotion_check(manifest, validations, minimum_success_count=2, *, minimum_context_count=2, execution_mode='GOVERNED', receipt_validator=None):
     from .execution_authority import ExecutionMode
     mode = ExecutionMode(execution_mode)
     if mode == ExecutionMode.IMPORTED_UNMANAGED:
@@ -124,8 +124,9 @@ def promotion_check(manifest, validations, minimum_success_count=2, *, execution
                 and receipt_validator(v))
         except (ValueError, KeyError):
             return False
-    if minimum_success_count < 2:
-        raise ValueError('minimum_success_count must be >= 2')
+    for value in (minimum_success_count, minimum_context_count):
+        if type(value) is not int or value<1:
+            raise ValueError('qualification counts must be positive integers')
     if (not manifest.semantic_goal.strip() or not manifest.strategy_steps or not manifest.block_refs
             or not manifest.port_contract_refs or not manifest.capability_contract_refs
             or not manifest.acceptance_refs or not manifest.created_from_tree_branch):
@@ -144,7 +145,7 @@ def promotion_check(manifest, validations, minimum_success_count=2, *, execution
     if len({tuple(sorted(v.evidence_refs)) for v in valid}) < minimum_success_count:
         return False
     if manifest.scope == 'SHARED':
-        return (len({v.context_id for v in valid if v.context_id}) >= 2
+        return (len({v.context_id for v in valid if v.context_id}) >= minimum_context_count
                 and all(v.gates.generalization_status == 'PASS' for v in valid)
                 and not manifest.private_assumptions)
     return True
@@ -195,8 +196,11 @@ def _write(path, value):
 
 class SkillRegistry:
     """Single-coordinator file registry. Hosts provide their existing writer lock."""
-    def __init__(self, root, *, execution_mode='GOVERNED', receipt_validator=None, lineage_recorder=None, manifest_validator=None):
-        self.authority_options=dict(execution_mode=execution_mode,receipt_validator=receipt_validator)
+    def __init__(self, root, *, execution_mode='GOVERNED', receipt_validator=None, lineage_recorder=None, manifest_validator=None, minimum_success_count=2, minimum_context_count=2):
+        for value in (minimum_success_count,minimum_context_count):
+            if type(value) is not int or value<1:raise ValueError('qualification counts must be positive integers')
+        self.authority_options=dict(execution_mode=execution_mode,receipt_validator=receipt_validator,
+            minimum_success_count=minimum_success_count,minimum_context_count=minimum_context_count)
         self.lineage_recorder=lineage_recorder
         self.manifest_validator=manifest_validator
         self.root = Path(root)
@@ -230,7 +234,7 @@ class SkillRegistry:
             self.lineage_recorder(manifest)
         else:raise ValueError('IMPORTED_UNMANAGED_CANNOT_PROMOTE')
 
-    def import_candidate(self, manifest, origin, *, source_validator):
+    def import_candidate(self, manifest, origin, *, source_validator, source_authenticated=True):
         """Import changes applicability, never promotes or copies source authority."""
         if manifest.status!='NEEDS_REVALIDATION' or manifest.source_receipts:
             raise ValueError('import must discard execution qualification')
@@ -238,7 +242,8 @@ class SkillRegistry:
         path=self._path(manifest.skill_id,manifest.version)
         if path.exists():raise ValueError('skill version already registered')
         _write(path,manifest.as_dict())
-        _write(path.with_name('origin.json'),origin)
+        _write(path.with_name('origin.json'),{'packet':origin,'source_authenticated':source_authenticated,
+            'qualification':'NEEDS_REVALIDATION'})
         _write_text(path.with_name('SKILL.md'),render_instructions(manifest))
         self._index()
         return manifest

@@ -1,6 +1,7 @@
 """Portable content envelope for existing Block/Variant contracts, never authority."""
 import base64
 import hashlib
+import json
 import re
 from pathlib import PurePosixPath
 from .block import Block
@@ -58,7 +59,7 @@ def pack(block, contents, *, entrypoint, dependencies, applicability, invocation
         public_metadata(invocation)
         value.update(format='veriarbor.component/2',invocation=dict(invocation))
     value['identity']=stable_hash(value)
-    return value
+    return json.loads(json.dumps(value,ensure_ascii=False,allow_nan=False))
 
 
 def unpack(value, *, available, context):

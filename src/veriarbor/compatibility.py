@@ -51,3 +51,17 @@ def compare_blocks(old, new, adapters=()):
             adapter = next((a for a in adapters if a.connects(port, after[key])), None)
             results.append(compare_ports(port, after[key], adapter))
     return max(results, key=lambda c: list(C).index(c))
+
+
+def connect_ports(producer, consumer, adapter=None, *, context=None):
+    """Declaration-only edge check. This never authenticates an implementation."""
+    if producer.direction!='output' or consumer.direction!='input':
+        return PortCompatibility.BREAKING
+    if (producer.contract.semantic==consumer.contract.semantic
+            and producer.compatibility_policy==consumer.compatibility_policy=='structural-v1'
+            and producer.evidence_policy==consumer.evidence_policy
+            and schema_subset(producer.contract.schema,consumer.contract.schema)):
+        return PortCompatibility.COMPATIBLE
+    if adapter is not None and adapter.connects(producer,consumer):
+        return PortCompatibility.ADAPTABLE
+    return PortCompatibility.BREAKING

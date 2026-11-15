@@ -26,7 +26,10 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args();out=args.output.resolve();out.mkdir(parents=True,exist_ok=False)
     before=identity();(out/'source-identity.json').write_text(json.dumps(before,indent=2),encoding='utf-8')
-    env=dict(os.environ);env['PYTHONPATH']=os.pathsep.join(map(str,[ROOT/'src',HOST]))
+    env=dict(os.environ)
+    guard=ROOT/'tools/offline_guard'
+    env['CGKN_OFFLINE_GUARD_PATH']=str(guard)
+    env['PYTHONPATH']=os.pathsep.join(map(str,[guard,ROOT/'src',HOST]))
     env['PATH']='D:/anaconda;D:/anaconda/Library/bin;D:/anaconda/Scripts;'+env['PATH']
     env['CGKN_PYTEST_PROGRESS']='0'
     request=['tests/providers/test_default_request_packing.py','tests/providers/test_gateway_client.py','tests/providers/test_text_wire_preflight.py','tests/protocol/test_adaptive_context.py']
@@ -49,9 +52,11 @@ def main():
     if args.profile=='full':
         commands.append(('gateway',GATEWAY,['D:/anaconda/python.exe','-m','pytest','tests','-q','-p','no:pytest-qt','-p','no:opik','-p','no:langsmith','-p','no:dash']))
         commands.append(('product-direction',HOST,['D:/anaconda/python.exe','scripts/product_direction_gate.py']))
+        commands.append(('architecture',HOST,['D:/anaconda/python.exe','scripts/kernel_architecture_gate.py']))
+        commands.append(('test-coverage',HOST,['D:/anaconda/python.exe','scripts/test_architecture_gate.py']))
     results=[]
     for label,cwd,cmd in commands:
-        if label!='product-direction':cmd += ['--junitxml='+str(out/(label+'.xml'))]
+        if label in {'host','core','gateway'}:cmd += ['--junitxml='+str(out/(label+'.xml'))]
         print('Running',label,flush=True);started=time.time()
         with (out/(label+'.log')).open('w',encoding='utf-8') as log:
             code=subprocess.call(cmd,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)

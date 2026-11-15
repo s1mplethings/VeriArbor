@@ -14,6 +14,7 @@ class Adapter:
     defaults_json: str = '{}'
     semantic_mapping: tuple[tuple[str, str], ...] = ()
     certificate_ref: str | None = None
+    numeric_scale: str | None = None
 
     def __post_init__(self):
         object.__setattr__(self, 'renames', tuple(tuple(p) for p in self.renames))
@@ -27,7 +28,9 @@ class Adapter:
 
     def _provable(self):
         source, target = self.source.contract, self.target.contract
-        if (not self.adapter_id or self.source.direction != self.target.direction or
+        if self.numeric_scale is not None:return self._numeric_proof()
+        if (not self.adapter_id or (self.source.direction != self.target.direction and
+                (self.source.direction,self.target.direction)!=('output','input')) or
                 source.semantic != target.semantic):
             return False
         s, t = source.schema, target.schema
@@ -56,12 +59,36 @@ class Adapter:
             converted['required'].append(key)
         return schema_subset(converted, t)
 
+    def _numeric_proof(self):
+        # Explicit rational conversion only; semantic names never imply a factor.
+        from fractions import Fraction
+        try:factor=Fraction(self.numeric_scale)
+        except (ValueError,TypeError,ZeroDivisionError):return False
+        s,t=self.source.contract.schema,self.target.contract.schema
+        allowed={'type','minimum','maximum'}
+        if (not self.adapter_id or not self.certificate_ref or self.renames or self.defaults_json!='{}'
+                or self.semantic_mapping!=((self.source.contract.semantic,self.target.contract.semantic),)
+                or factor<=0 or len(str(self.numeric_scale))>32
+                or self.source.evidence_policy or self.target.evidence_policy
+                or (self.source.direction,self.target.direction)!=('output','input')
+                or s.get('type') not in {'integer','number'} or t.get('type')!='number'
+                or set(s)-allowed or set(t)-allowed):return False
+        converted={'type':'number',**{k:float(Fraction(str(s[k]))*factor) for k in ('minimum','maximum') if k in s}}
+        return schema_subset(converted,t)
+
     def connects(self, old, new):
         return self.source == old and self.target == new and self._provable()
 
     def transform(self, value):
         if not accepts(self.source.contract.schema, value):
             raise ValueError('AUTO_ADAPTER_DENIED: unexpected input fields')
+        if self.numeric_scale is not None:
+            from fractions import Fraction
+            import math
+            if isinstance(value,bool) or not math.isfinite(value):raise ValueError('finite numeric adapter input required')
+            result=float(Fraction(str(value))*Fraction(self.numeric_scale))
+            if not math.isfinite(result) or not accepts(self.target.contract.schema,result):raise ValueError('adapter result violates target contract')
+            return result
         mapping = dict(self.renames)
         result = {mapping.get(k, k): v for k, v in value.items()}
         for key, default in json.loads(self.defaults_json).items():

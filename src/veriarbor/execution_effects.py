@@ -59,9 +59,25 @@ def guard_provider_transport(execution_mode='GOVERNED'):
 
 def perform_scoped_effect(operation,callback,*,resource_usage=None):
     authority,permit_id=require_provider_context()
+    prepaid=operation=='PROVIDER_CALL' and _provider_reserved.get()
+    if prepaid:
+        if resource_usage != {'calls':1}:
+            raise ValueError('PROVIDER_RESERVATION_USAGE_MISMATCH')
+        # Consume the guard's single-call reservation. A subsequent invocation
+        # must obtain its own charge, even when the callback raises.
+        _provider_reserved.set(False)
     token=_provider_reserved.set(operation=='PROVIDER_CALL')
     meter=_provider_metered.set(operation=='PROVIDER_CALL')
-    try:return authority.perform_effect(permit_id,operation,callback,resource_usage=resource_usage)
+    try:
+        if not prepaid:
+            return authority.perform_effect(permit_id,operation,callback,resource_usage=resource_usage)
+        import time
+        started=time.monotonic();outcome='FAILED'
+        try:
+            value=callback();outcome='SUCCEEDED';return value
+        finally:
+            authority.finish_effect(permit_id,operation,duration_seconds=time.monotonic()-started,
+                                   cost=None,outcome=outcome)
     finally:
         _provider_metered.reset(meter)
         _provider_reserved.reset(token)
