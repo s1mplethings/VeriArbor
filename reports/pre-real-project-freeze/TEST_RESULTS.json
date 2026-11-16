@@ -1,0 +1,156 @@
+{
+  "core": {
+    "command": [
+      "D:\\VeriArbor\\reports\\pre-real-project-freeze\\test-env\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/unit/test_core.py",
+      "tests/unit/test_capability_skills.py",
+      "tests/test_strategy.py",
+      "tests/integration/test_distribution.py",
+      "tests/unit/test_execution_authority.py",
+      "tests/unit/test_governance_completion.py",
+      "-q",
+      "--tb=short",
+      "--basetemp=D:\\VeriArbor\\reports\\pre-real-project-freeze\\temp-core",
+      "--junitxml=D:\\VeriArbor\\reports\\pre-real-project-freeze\\core.xml"
+    ],
+    "cwd": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core",
+    "exit_code": 0,
+    "seconds": 2.656,
+    "offline_guard_probe": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src\\veriarbor\\__init__.py",
+    "environment": {
+      "PYTHONPATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core",
+      "CGKN_OFFLINE_GUARD_PATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "tests": "68",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "1.776"
+  },
+  "host": {
+    "command": [
+      "D:\\VeriArbor\\reports\\pre-real-project-freeze\\test-env\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/project_agent/test_positive_repair.py",
+      "tests/project_agent/test_document_context_handoff.py",
+      "tests/project_agent/test_goal_progress_integration.py",
+      "tests/agent/test_milestone_worker_chain.py::test_offline_gateway_contract_core_to_existing_delivery",
+      "tests/agent/test_milestone_worker_chain.py::test_offline_explicit_runtime_reverification_uses_same_delivery_gate",
+      "tests/architecture/test_registered_boundary_adapters.py",
+      "-q",
+      "--tb=short",
+      "--basetemp=D:\\VeriArbor\\reports\\pre-real-project-freeze\\temp-host",
+      "--junitxml=D:\\VeriArbor\\reports\\pre-real-project-freeze\\host.xml"
+    ],
+    "cwd": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\host",
+    "exit_code": 0,
+    "seconds": 226.891,
+    "offline_guard_probe": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src\\veriarbor\\__init__.py",
+    "environment": {
+      "PYTHONPATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\host",
+      "CGKN_OFFLINE_GUARD_PATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "tests": "42",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "226.128"
+  },
+  "host-sanitized": {
+    "command": [
+      "D:\\VeriArbor\\reports\\pre-real-project-freeze\\test-env\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/project_agent/test_positive_repair.py",
+      "tests/project_agent/test_document_context_handoff.py",
+      "tests/project_agent/test_goal_progress_integration.py",
+      "tests/agent/test_milestone_worker_chain.py::test_offline_gateway_contract_core_to_existing_delivery",
+      "tests/agent/test_milestone_worker_chain.py::test_offline_explicit_runtime_reverification_uses_same_delivery_gate",
+      "tests/architecture/test_registered_boundary_adapters.py",
+      "-q",
+      "--tb=short",
+      "--basetemp=D:\\VeriArbor\\reports\\pre-real-project-freeze\\temp-host-sanitized",
+      "--junitxml=D:\\VeriArbor\\reports\\pre-real-project-freeze\\host-sanitized.xml"
+    ],
+    "cwd": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\host-sanitized",
+    "exit_code": 0,
+    "seconds": 222.891,
+    "offline_guard_probe": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src\\veriarbor\\__init__.py",
+    "environment": {
+      "PYTHONPATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\host-sanitized",
+      "CGKN_OFFLINE_GUARD_PATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "tests": "42",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "222.165"
+  },
+  "known-current": {
+    "command": [
+      "D:\\VeriArbor\\reports\\pre-real-project-freeze\\test-env\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/executors/test_public_test_feedback.py::test_actual_product_failure_reaches_repair_contract_without_private_oracle",
+      "tests/executors/test_public_test_feedback.py::test_large_product_diagnostic_is_explicitly_truncated_with_raw_hash",
+      "tests/protocol/test_semantic_progress.py::test_progress_and_regression_choose_local_next_operation_without_mutation",
+      "-q",
+      "--tb=short",
+      "--basetemp=D:\\VeriArbor\\reports\\pre-real-project-freeze\\temp-known-current",
+      "--junitxml=D:\\VeriArbor\\reports\\pre-real-project-freeze\\known-current.xml"
+    ],
+    "cwd": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\host",
+    "exit_code": 1,
+    "seconds": 1.719,
+    "offline_guard_probe": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src\\veriarbor\\__init__.py",
+    "environment": {
+      "PYTHONPATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\host",
+      "CGKN_OFFLINE_GUARD_PATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "tests": "3",
+    "failures": "3",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.969"
+  },
+  "known-baseline": {
+    "command": [
+      "D:\\VeriArbor\\reports\\pre-real-project-freeze\\test-env\\Scripts\\python.exe",
+      "-m",
+      "pytest",
+      "tests/executors/test_public_test_feedback.py::test_actual_product_failure_reaches_repair_contract_without_private_oracle",
+      "tests/executors/test_public_test_feedback.py::test_large_product_diagnostic_is_explicitly_truncated_with_raw_hash",
+      "tests/protocol/test_semantic_progress.py::test_progress_and_regression_choose_local_next_operation_without_mutation",
+      "-q",
+      "--tb=short",
+      "--basetemp=D:\\VeriArbor\\reports\\pre-real-project-freeze\\temp-known-baseline",
+      "--junitxml=D:\\VeriArbor\\reports\\pre-real-project-freeze\\known-baseline.xml"
+    ],
+    "cwd": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\baseline-host",
+    "exit_code": 1,
+    "seconds": 2.703,
+    "offline_guard_probe": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src\\veriarbor\\__init__.py",
+    "environment": {
+      "PYTHONPATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\src;D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\baseline-host",
+      "CGKN_OFFLINE_GUARD_PATH": "D:\\VeriArbor\\reports\\pre-real-project-freeze\\isolated\\core\\tools\\offline_guard",
+      "PYTHONDONTWRITEBYTECODE": "1",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"
+    },
+    "tests": "3",
+    "failures": "3",
+    "errors": "0",
+    "skipped": "0",
+    "time": "1.925"
+  }
+}

@@ -177,7 +177,7 @@ def evaluate_capability(contract, observations, *, project_id, object_versions,
 
     def boolean(key, stage, expected=True):
         value, status = read(key, stage)
-        return status if status != 'PASS' else ('PASS' if value is expected else 'FAIL')
+        return status if status != 'PASS' else AcceptanceMetric(key, '==', expected, stage).compare(value)
 
     def combine(values):
         if not values:
@@ -239,8 +239,21 @@ class GoalGap:
             raise ValueError('non-finite gap')
 
     @property
+    def measurement_status(self):
+        if self.current is None:
+            return 'UNKNOWN'
+        return ('RESOLVED' if AcceptanceMetric(self.metric_id, self.comparison, self.target).compare(self.current) == 'PASS'
+                else 'MEASURED')
+
+    @property
+    def requires_diagnosis(self):
+        return self.status == 'OPEN' and self.root_impact > 0 and self.measurement_status == 'UNKNOWN'
+
+    @property
     def priority(self):
-        if self.status != 'OPEN' or self.current is None:
+        if self.current is None:
+            return None  # Unknown magnitude is neither zero nor a fabricated score.
+        if self.status != 'OPEN':
             return 0.0
         delta = (self.target - self.current if self.comparison == '>=' else
                  self.current - self.target if self.comparison == '<=' else abs(self.target - self.current))
@@ -250,6 +263,9 @@ class GoalGap:
 def admit_capability(proposal, contracts, gaps, *, budget_allowed, evidence_inputs=()):
     """Structured policy used by the existing host Proposal Admission."""
     target = proposal.get('target_capability_id') or proposal.get('satisfies_capability')
+    if (proposal.get('target_capability_id') and proposal.get('satisfies_capability')
+            and proposal['target_capability_id'] != proposal['satisfies_capability']):
+        return 'REJECT_CAPABILITY_BINDING_MISMATCH'
     if not target or target not in contracts:
         return 'REJECT_UNKNOWN_CAPABILITY_CONTRACT'
     c = contracts[target]
@@ -265,12 +281,18 @@ def admit_capability(proposal, contracts, gaps, *, budget_allowed, evidence_inpu
     if not strategies:
         return 'REJECT_UNDECLARED_STRATEGY'
     gap = gaps.get(proposal.get('target_gap_id'))
+    if gap is not None and c.parent_goal and c.parent_goal != gap.goal_id:
+        return 'REJECT_GOAL_BINDING_MISMATCH'
     linked = gap is not None and gap.status == 'OPEN' and target in gap.capability_ids
     exploration = proposal.get('exploration_reason', '').strip()
     bounded = proposal.get('exploration_budget')
     if not linked and not (not proposal.get('target_gap_id') and exploration and
                            type(bounded) in (int, float) and math.isfinite(bounded) and bounded > 0
-                           and proposal.get('exploration_measure')):
+                           and isinstance(proposal.get('exploration_measure'), str)
+                           and proposal.get('exploration_measure') in {
+                               m.metric_id for m in c.acceptance_metrics} | set(c.semantic_invariants)
+                               | set(c.positive_controls) | set(c.negative_controls)
+                               | {check.check_id for check in c.critical_checks}):
         return 'REJECT_NO_GOAL_LINK'
     if not budget_allowed:
         return 'BUDGET_BLOCKED'

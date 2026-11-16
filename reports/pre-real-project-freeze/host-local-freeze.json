@@ -1,0 +1,8 @@
+{
+  "base_head": "6e30806dc99a1151b3f389bf5cd313d2b363e4f5",
+  "manifest_sha256": "1f9e7c82b8762b558110e8336463244cbfd537648dcdf77f5352465b3502abc3",
+  "archive_sha256": "18d7b3e98885a3db9d85967a0b1c0fae8a11a86f6aea44825198ebb18a4f80b0",
+  "files": 1200,
+  "upload": "BLOCKED_CONTENT_REVIEW_REQUIRED",
+  "reason": "Existing tracked migration/evidence tree contains media, local runtime data and local-user references; no authorization to publish those. No original files changed. No substitute publisher."
+}

@@ -1,0 +1,24 @@
+{
+  "attribution": "BASELINE_ATTRIBUTION_UNVERIFIED",
+  "reason": "Historical source archive and seven exact closure edits verified; 198 supplemental dependency files lack a contemporaneous full-tree manifest. Same failure signatures are evidence, not proof of full historical attribution.",
+  "failures": [
+    {
+      "test": "test_actual_product_failure_reaches_repair_contract_without_private_oracle",
+      "current_failure": "ValueError: REJECT_NO_GOAL_LINK: capability proposal failed governance",
+      "baseline_failure": "ValueError: REJECT_NO_GOAL_LINK: capability proposal failed governance",
+      "same_message": true
+    },
+    {
+      "test": "test_large_product_diagnostic_is_explicitly_truncated_with_raw_hash",
+      "current_failure": "ValueError: REJECT_NO_GOAL_LINK: capability proposal failed governance",
+      "baseline_failure": "ValueError: REJECT_NO_GOAL_LINK: capability proposal failed governance",
+      "same_message": true
+    },
+    {
+      "test": "test_progress_and_regression_choose_local_next_operation_without_mutation",
+      "current_failure": "AssertionError: assert 'INFORMATION_GAIN' == 'PROGRESS'\n  \n  - PROGRESS\n  + INFORMATION_GAIN",
+      "baseline_failure": "AssertionError: assert 'INFORMATION_GAIN' == 'PROGRESS'\n  \n  - PROGRESS\n  + INFORMATION_GAIN",
+      "same_message": true
+    }
+  ]
+}

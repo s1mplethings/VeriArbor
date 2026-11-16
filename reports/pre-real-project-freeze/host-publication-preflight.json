@@ -1,0 +1,27 @@
+{
+  "authority": "scripts/canonical_repo_publish.py",
+  "operation": "read-only classification of release exclusions; no staging/commit/push attempted",
+  "counts": {
+    "SOURCE": 1059,
+    "UNKNOWN": 1485,
+    "DURABLE_EVIDENCE": 31,
+    "TEST": 431,
+    "CURRENT_DOC": 72,
+    "CURRENT_GOVERNANCE": 5
+  },
+  "unknown_examples": [
+    "codex_prompts/PHASE_0_CGNK_BASELINE_PROMPT.md",
+    "codex_prompts/PHASE_1_CGNK_COMPILER_PROMPT.md",
+    "experiments/product_eval_076/Dockerfile",
+    "experiments/product_eval_076/Dockerfile.media",
+    "experiments/product_eval_076/scoring_contract.json",
+    "experiments/product_eval_076_v8/Dockerfile",
+    "migration/veriarbor/ACCOUNTING.json",
+    "migration/veriarbor/ADAPTER_MAP.json",
+    "migration/veriarbor/ADDITIONAL_TEST_DEBT_TRIAGE.json",
+    "migration/veriarbor/AUTHENTICATED_MODELS_RECOVERY62_deepseek.json",
+    "migration/veriarbor/AUTHENTICATED_MODELS_RECOVERY62_qwen.json",
+    "migration/veriarbor/AUTHENTICATED_MODELS_deepseek.json"
+  ],
+  "reason": "Canonical publisher forbids UNKNOWN paths even as deletions; publishing the complete current tree would retain excluded runtime/media. No bypass or gate modification."
+}

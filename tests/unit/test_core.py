@@ -7,7 +7,10 @@ from dataclasses import replace
 from veriarbor.model import Evidence, Node, NodeKind, Status, stable_hash
 from veriarbor.verification import rollup, ready_frontier, verified_lineage, reduce_obligations
 from veriarbor.lifecycle import CapabilityCertificate, vitality, BranchVitality, active_crown, hydrate_archive
-from veriarbor.learning import LearnedNogood, DecisionCheckpoint, backtrack, minimize_conflict, strategy_fingerprint, repeated_no_progress
+from veriarbor.learning import (LearnedNogood, DecisionCheckpoint, backtrack, minimize_conflict,
+    strategy_fingerprint, repeated_no_progress, ProgressGuidedBacktracking, repair_progress)
+from veriarbor.capability import GoalGap, CapabilityContract, AcceptanceMetric, Observation, evaluate_capability
+from veriarbor.graph import evaluate_graph
 from veriarbor.search import Candidate, ProofCost, proof_cost, pareto, allocate
 from veriarbor.scheduling import ResourceClaim, conflict_graph, parallel_batch
 from veriarbor.review import review_kind, qualify_evaluator
@@ -148,7 +151,81 @@ class CoreTests(unittest.TestCase):
     def test_reducer_empty_evidence_is_not_verified(self):
         requirements = {'root': {'must': True, 'children': ['leaf']}, 'leaf': {'must': True}}
         self.assertEqual(reduce_obligations(requirements, {})['hard_verdict'], 'INSUFFICIENT_EVIDENCE')
-        self.assertEqual(reduce_obligations(requirements, {'leaf': ['VERIFIED']})['hard_verdict'], 'VERIFIED')
+        self.assertEqual(reduce_obligations(requirements, {'leaf': ['VERIFIED']})['hard_verdict'], 'INSUFFICIENT_EVIDENCE')
+        self.assertEqual(reduce_obligations(requirements, {'root': ['VERIFIED'], 'leaf': ['VERIFIED']})['hard_verdict'], 'VERIFIED')
+
+    def test_information_and_removed_failures_are_not_goal_progress(self):
+        before = {'failed':['check'], 'acceptance':[], 'verified':[]}
+        after = {'failed':[], 'acceptance':[], 'verified':['check'],
+                 'evidence':['new'], 'artifact_delta_validated':True}
+        first = ProgressGuidedBacktracking.assess(before, after)
+        self.assertEqual(first['status'], 'INFORMATION_GAIN')
+        self.assertFalse(first['goal_progress'])
+        second = ProgressGuidedBacktracking.assess(after, {**after,'evidence':['new','more']}, [first])
+        self.assertEqual(second['next_operation'], 'AFFECTED_SUBGRAPH_REPLAN')
+        self.assertEqual(ProgressGuidedBacktracking.assess(after, after)['status'], 'NO_PROGRESS')
+        self.assertTrue(ProgressGuidedBacktracking.assess(after, {**after,'acceptance':['root']})['goal_progress'])
+        repair = repair_progress(['check'], [], 's')
+        self.assertEqual(repair['newly_verified_ids'], [])
+        self.assertEqual(repair['status'], 'REPAIR_INFORMATION_GAIN')
+        self.assertEqual(repair['next_operation'], 'INSPECT')
+        self.assertEqual(repair_progress(['check'], [], 'different', [repair])['code'], 'REPEATED_REPAIR_NO_PROGRESS')
+        self.assertEqual(repair_progress(['check'], [], 's', verified=['check'])['status'], 'REPAIR_PROGRESS')
+
+    def test_qualified_utility_regression_dominates_technical_and_proxy_gain(self):
+        c = CapabilityContract('A', 'Supply a useful result', parent_goal='root',
+            semantic_invariants=('valid',), acceptance_metrics=(AcceptanceMetric('quality', '>=', .9),))
+        evidence = replace(self.evidence, scope={'PROJECT':'p','CAPABILITY':'A'},
+                           context={'contract_hash':c.fingerprint})
+        observations = {k:Observation(True,evidence) for k in ('implemented','executed','valid')}
+        observations['quality'] = Observation(.3,evidence)
+        gates = evaluate_capability(c, observations, project_id='p', strategy_capabilities=('method',), **self.bindings)
+        self.assertEqual(gates.semantic_status, 'PASS')
+        self.assertEqual(gates.utility_status, 'FAIL')
+        gap = GoalGap('quality-gap','root','quality',.9,.7,capability_ids=('A',))
+        before = {'gaps':{'quality-gap':gap},'verified':[]}
+        after = {'gaps':{'quality-gap':replace(gap,current=observations['quality'].actual)},
+                 'verified':['technical','proxy'], 'evidence':['more']}
+        advice = ProgressGuidedBacktracking.assess(before, after)
+        self.assertEqual(advice['status'], 'REGRESSION')
+        self.assertEqual(advice['regressed_gap_ids'], ['quality-gap'])
+        self.assertFalse(advice['goal_progress'])
+        self.assertEqual(ProgressGuidedBacktracking.assess(after, before)['status'], 'PROGRESS')
+        # A shifted target is not a matched utility improvement.
+        changed = {'gaps':{'quality-gap':replace(gap,current=.8,target=.1)}}
+        self.assertFalse(ProgressGuidedBacktracking.assess(before,changed)['goal_progress'])
+        # A utility decline remains a decline even when both values meet the threshold.
+        self.assertEqual(ProgressGuidedBacktracking.assess(
+            {'gaps':{'quality-gap':replace(gap,current=1.0)}},
+            {'gaps':{'quality-gap':replace(gap,current=.95)}})['status'], 'REGRESSION')
+        cost = replace(gap, comparison='<=', target=.5, current=.8)
+        self.assertEqual(ProgressGuidedBacktracking.assess({'gaps':{'cost':cost}},
+            {'gaps':{'cost':replace(cost,current=.6)}})['status'], 'PROGRESS')
+
+    def test_upstream_gap_survives_downstream_pass_and_backtracks(self):
+        nodes = [Node('input',NodeKind.EXECUTION_LEAF),
+                 Node('A',NodeKind.EXECUTION_LEAF,dependencies=('input',)),
+                 Node('B',NodeKind.EXECUTION_LEAF,dependencies=('A',)),
+                 Node('root',NodeKind.OBLIGATION_AND,children=('B',))]
+        checks = {n.id:{'acceptance':self.evidence,'integration':self.evidence} for n in nodes}
+        checks['root']['acceptance'] = None
+        checks['A']['acceptance'] = replace(self.evidence,verdict='FAILED')
+        results = evaluate_graph(nodes,checks,**self.bindings)
+        self.assertEqual(results['A'].status,Status.FAILED)
+        self.assertEqual(results['B'].status,Status.BLOCKED)
+        self.assertNotEqual(results['root'].status,Status.VERIFIED)
+        dependencies = {n.id:n.dependencies for n in nodes}
+        statuses = {k:r.status for k,r in results.items()}
+        self.assertIn('A',ready_frontier(statuses,statuses,dependencies))
+        checkpoints = [DecisionCheckpoint('supply',1,('A',),'before-A'),
+                       DecisionCheckpoint('polish',2,('B',),'before-B')]
+        self.assertEqual(backtrack([k for k,r in results.items() if r.status==Status.FAILED],checkpoints).id,'supply')
+        checks['A']['acceptance'] = None
+        results = evaluate_graph(nodes,checks,**self.bindings)
+        self.assertEqual(results['A'].status,Status.UNPROVEN)
+        self.assertIsNone(backtrack([k for k,r in results.items() if r.status==Status.FAILED],checkpoints))
+        gap = GoalGap('unknown-A','root','quality',1,None,capability_ids=('A',))
+        self.assertEqual(ProgressGuidedBacktracking.assess({}, {'gaps':{'unknown-A':gap}})['diagnostic_gap_ids'], ['unknown-A'])
 
 
 if __name__ == '__main__':

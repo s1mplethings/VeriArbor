@@ -1,0 +1,35 @@
+{
+  "purpose": "Code baseline for bounded real-project experiments; not production release or general autonomous capability proof.",
+  "core_base_head": "51fd3117a2d1b4a1c6d0125aafac4bcbdb6ab6f9",
+  "core_branch": "freeze/pre-real-project-20261116",
+  "core_freeze_commit": "the Git commit containing this file; final remote SHA recorded in local REPORT.md",
+  "core_files": 244,
+  "core_python_30_unchanged_since_document_closure": {
+    "count": 30,
+    "changed": []
+  },
+  "host_base_head": "6e30806dc99a1151b3f389bf5cd313d2b363e4f5",
+  "host_snapshot": {
+    "base_head": "6e30806dc99a1151b3f389bf5cd313d2b363e4f5",
+    "manifest_sha256": "1f9e7c82b8762b558110e8336463244cbfd537648dcdf77f5352465b3502abc3",
+    "archive_sha256": "18d7b3e98885a3db9d85967a0b1c0fae8a11a86f6aea44825198ebb18a4f80b0",
+    "files": 1200,
+    "upload": "BLOCKED_CONTENT_REVIEW_REQUIRED",
+    "reason": "Existing tracked migration/evidence tree contains media, local runtime data and local-user references; no authorization to publish those. No original files changed. No substitute publisher."
+  },
+  "host_git_freeze_commit": null,
+  "core_host_pairing": "This Core tree + the SHA256-bound 1200-file Host sanitized snapshot. Host code is not embedded in Core.",
+  "unverified": [
+    "General CapabilityContract authorization/registration to BUILD",
+    "Default automatic Utility evaluator dispatch",
+    "Real LLM autonomous business judgment",
+    "Full Host/Gateway/campaign coverage",
+    "Full historical baseline attribution"
+  ],
+  "real_provider_calls": 0,
+  "framework_changes": 0,
+  "tag": null,
+  "workspace_policy": "Original source/index/branch/HEAD preserved; only ignored local freeze evidence created.",
+  "known_failures": "Three intentionally retained; not a full Host PASS.",
+  "host_upload": "BLOCKED_CONTENT_REVIEW_REQUIRED_AND_CANONICAL_PUBLISHER_UNKNOWN_EXCLUSIONS"
+}

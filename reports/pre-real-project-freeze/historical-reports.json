@@ -1,0 +1,26 @@
+{
+  "core-goal-refactor": {
+    "exists": true,
+    "sha256": "57dccb6d2cbed2ec6d0eca1877d7e4f59e8d2fa973a68e11e433b6d54484afbd"
+  },
+  "host-goal-integration": {
+    "exists": true,
+    "sha256": "b586532067f03ff0a2bd13e2647eab2f346f23a97ba145e8d6e7a437abb24e7d"
+  },
+  "positive-repair": {
+    "exists": true,
+    "sha256": "b364a05a7a328d63033e1d30eaf3d8b22d4db7c1eb924408e86b0960d801531e"
+  },
+  "document-context-handoff": {
+    "exists": true,
+    "sha256": "2c6a175513b5026a7a5ab71674724798d70e79ca2b35b8bdc8594a76435f4303"
+  },
+  "project-documentation-closure": {
+    "exists": true,
+    "sha256": "3b5675dd5f737cf275f01e4a7628c1b5f8eba22c7ef3d0b9ef82dcdf30f8d15d"
+  },
+  "opencode-document-handoff-evaluation": {
+    "exists": true,
+    "sha256": "dbaee0573cec5eef736a5b7550f9711c291660ce3256ba1870c31d2a7c017e14"
+  }
+}

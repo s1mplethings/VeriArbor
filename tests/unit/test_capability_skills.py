@@ -133,6 +133,53 @@ class CapabilityTests(unittest.TestCase):
         self.assertEqual(admit_capability(p, {'c': replace(c, positive_controls=('yes',))}, {}, budget_allowed=True),
                          'REJECT_NON_FALSIFIABLE')
 
+    def test_unknown_gap_enters_diagnosis_without_numeric_priority(self):
+        from veriarbor.learning import ProgressGuidedBacktracking
+        gap = GoalGap('missing', 'root', 'quality', 1.0, None, capability_ids=('A',))
+        self.assertIsNone(gap.priority)
+        self.assertEqual(gap.measurement_status, 'UNKNOWN')
+        advice = ProgressGuidedBacktracking.assess({}, {'gaps': {'missing': gap}})
+        self.assertEqual(advice['diagnostic_gap_ids'], ['missing'])
+        self.assertEqual(advice['next_operation'], 'INSPECT')
+        self.assertFalse(advice['goal_progress'])
+        self.assertEqual(replace(gap, current=1.0).measurement_status, 'RESOLVED')
+        self.assertEqual(replace(gap, current=1.0).priority, 0)
+        measured = [replace(gap, current=.8), replace(gap, current=.2)]
+        self.assertEqual(sorted(measured, key=lambda g:g.priority, reverse=True)[0].current, .2)
+
+    def test_semantic_proposals_are_rejected_without_rewriting(self):
+        c = CapabilityContract('A', 'Produce a usable result', parent_goal='root',
+            acceptance_metrics=(AcceptanceMetric('quality', '>=', .8),))
+        gap = GoalGap('gap', 'root', 'quality', .8, None, capability_ids=('A',))
+        proposal = {'target_capability_id':'A', 'target_gap_id':'gap', 'strategy_capabilities':['method']}
+        for change, gaps, reason in [
+            ({'satisfies_capability':'B'}, {'gap':gap}, 'REJECT_CAPABILITY_BINDING_MISMATCH'),
+            ({}, {'gap':replace(gap, goal_id='unrelated')}, 'REJECT_GOAL_BINDING_MISMATCH'),
+            ({'target_gap_id':None,'exploration_reason':'inspect','exploration_budget':1,
+              'exploration_measure':'unrelated_score'}, {}, 'REJECT_NO_GOAL_LINK')]:
+            value = {**proposal, **change}; original = json.dumps(value, sort_keys=True)
+            self.assertEqual(admit_capability(value, {'A':c}, gaps, budget_allowed=True), reason)
+            self.assertEqual(json.dumps(value, sort_keys=True), original)
+
+    def test_new_declared_contract_uses_existing_admission(self):
+        c = CapabilityContract('new', 'Measure a missing outcome', parent_goal='root',
+            acceptance_metrics=(AcceptanceMetric('quality', '>=', .8),))
+        gap = GoalGap('gap', 'root', 'quality', .8, None, capability_ids=('new',))
+        proposal = {'target_capability_id':'new','target_gap_id':'gap','strategy_capabilities':['method']}
+        self.assertEqual(admit_capability(proposal, {}, {'gap':gap}, budget_allowed=True),
+                         'REJECT_UNKNOWN_CAPABILITY_CONTRACT')
+        # The authorized contract catalog is supplied by the Host, never inserted by a proposal.
+        catalog = {'new':c}
+        self.assertEqual(admit_capability(proposal, catalog, {'gap':gap}, budget_allowed=False), 'BUDGET_BLOCKED')
+        self.assertEqual(admit_capability(proposal, catalog, {'gap':gap}, budget_allowed=True), 'ADMITTED')
+        self.assertEqual(catalog, {'new':c})
+
+    def test_missing_boolean_measurement_is_unknown_not_failure(self):
+        c = contract()
+        obs = observations(c)
+        obs['implemented'] = replace(obs['implemented'], actual=None)
+        self.assertEqual(evaluate(c, obs).implemented_status, 'UNKNOWN')
+
     def test_legacy_compatibility(self):
         for old in ('ACCEPTED', {'status': 'ACCEPTED'}):
             gates = CapabilityGateState.from_dict(old)

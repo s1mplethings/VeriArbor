@@ -78,3 +78,88 @@ goal-linked proposals and lazy Skill reuse. Parent quality needs its own outcome
 contract; historical ACCEPTED and reusable strategies grant no current Utility
 PASS. See [Capability gates and skills](CAPABILITY_GATES_AND_SKILLS.md) for the
 contract, lifecycle, project-isolation rules and migration boundary.
+
+
+## Documents, context and agent handoff
+
+| Boundary | Responsibility |
+| --- | --- |
+| Core | Pure admission, progress and evidence policy; frozen protocols, no document runtime |
+| Host | Bind current state, prepare bounded context, enforce effects, persist receipts and resume |
+| Project Agent | Choose decomposition, research, capability proposals and revisions |
+| Worker | Implement the current leaf goal inside its admitted contract |
+| Project | Independent goal, tree, authority, evidence and budget lineage |
+| Contract | Formal interfaces, read/write scope, effects and execution constraints |
+| Document | Human-readable intent, assumptions and design rationale; advisory only |
+| Evidence | Version-bound observed facts authenticated by existing authority |
+
+The goal-driven Host uses `GoalComposer.project_context` to project current
+GoalAcceptance, leaf contracts and recent admitted DecisionRecords into existing
+task feedback. Worker uses the same projection with its actual current leaf goal.
+No handoff database is introduced. Reasons are public decision summaries, not
+hidden chain-of-thought. Resume reads committed state and existing records;
+old prompts and Markdown cannot overwrite the active leaf contract.
+
+`ContextPacker.documents` selects explicitly declared workspace references with
+role/task bindings, full/snippet/hash-bound summary/reference modes, file and
+UTF-8 byte limits, path checks and omission reasons. Required formal inputs are
+still verified and supplied through the existing Worker contract path. The
+independent Checker receives its frozen definition, not this advisory context.
+Final requests remain visible in existing provider-call records; source bytes,
+selected document bytes and final system+user bytes are different measurements.
+No token usage or cost is inferred from byte counts.
+
+Goal-driven configuration may reuse an existing `project_document` (workspace
+relative). Otherwise a derived PROJECT.md is placed under the existing
+`inputs/runtime-results/project-<identity>/` projection area. This is readable
+context, not a delivered artifact or a second truth store. `project_notes` holds
+mutable assumptions/design notes; confirmed requirements remain formal config
+and GoalAcceptance. Generated-document version conflicts are reported and the
+changed text is not silently substituted for requirements. Free-form external
+Markdown agreement is explicitly unverified; no semantic oracle is claimed.
+
+Optional `context_documents` entries declare `path`, `roles` (`agent`, `worker`),
+`task_refs` (node IDs), `mode`, optional `sha256`, `line_ranges` (inclusive,
+one-based), and a hash-bound `summary`. Workers receive text only with an explicit
+task binding. Selection defaults to four files / 12,000 material bytes, with a
+1 MiB per-source read limit. Documents cannot grant file access, change effects,
+remove requirements or replace the frozen Checker. Agent requests for further
+public context continue through the existing scoped resolver and call budget.
+
+Ordinary edits to the derived projection area do not change workspace identity.
+A document deliberately bound as a formal input remains version-sensitive;
+there is no blanket Markdown exemption. Internal algorithm replacement follows
+ordinary Proposal / Admission / TreeEdit and existing invalidation. Significant
+changes retain requirements and public reasons in existing decisions/reports;
+no mandatory ADR, new Gate, Agent, runtime or registry is required.
+
+
+Complete-project delivery is distinct from the goal-driven runtime projection.
+The existing `SoftwareProjectGenerationService.run_profile` accepts
+`delivery_kind: "project"`. Its operator-owned requirements must declare
+PROJECT.md and AGENTS.md in existing `artifact_layout.support`; absent declarations
+are rejected, not silently granted write scope. The original Agent/Worker path
+produces these files as governed candidates. The original provenance check,
+post-build finalizer, local packager and canonical manifest include their exact
+bytes. The Host does not write unreceipted documentation into a verified product.
+Profiles without this declaration retain their existing scope; single-file
+outputs are not automatically expanded into repositories.
+
+The Worker receives original intent, current formal requirements, source hashes
+and run/contract references through the existing project-context hook, including
+semantic worker packing. Declared public outcomes are not proof that a user
+confirmed an inferred story. Existing/custom or externally modified project
+documents are preserved: automatic resume requires the current bytes to match
+an authenticated successful Worker result. Otherwise explicit adoption through
+the existing source/revision authority is required; no inferred authorization.
+The same-run requirement API adds requirements only. A replacement uses a new
+authorized run/version and retains old evidence without inheriting old PASS.
+
+A context document may be marked `required: true` with explicit dependent
+`task_refs`. If its requested text is missing, stale, reference-only or over
+budget, the context audit reports `missing_required`. GoalComposer rejects edits
+to those tasks and LLMExecutor stops their dispatch before calling a Provider.
+Unrelated work remains admissible. Existing hash-bound summaries can supply the
+needed portion; formal read_subjects remain mandatory and separately verified.
+The existing public resolver has no filesystem loader: an unserved required
+file is a scoped missing prerequisite, never silently treated as supplied.

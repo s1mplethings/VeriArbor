@@ -1,0 +1,28 @@
+{
+  "scope": "Final Core release tree and new evidence; original broad scan retained locally.",
+  "omitted_private_path_files": [
+    "WORK_LOG.md",
+    "tools/package_work_report.py",
+    "tools/register_user_m12_composition.py"
+  ],
+  "credential_findings": [
+    {
+      "path": "apps/promotion_studio/README.md",
+      "rule": "credential_assignment",
+      "line": 95,
+      "match_sha256": "2a6c9c6ff09f58ddaea27f0df9650d13a57a74f760dabd6fbb5dd8bbacb982d3",
+      "review": "Documented placeholder or explicit offline test credential; not a real credential."
+    },
+    {
+      "path": "apps/promotion_studio/tests/test_bluesky_adapter.py",
+      "rule": "credential_assignment",
+      "line": 44,
+      "match_sha256": "70667f1697886d1b37b5624c982f66ab6dbc3d112f81946154b853accc7fb9e2",
+      "review": "Documented placeholder or explicit offline test credential; not a real credential."
+    }
+  ],
+  "runtime_cache_env_database_media_bundled": false,
+  "third_party_review": "Existing LICENSE and THIRD_PARTY_NOTICES reviewed; runtime stdlib only, no vendored third-party assets added.",
+  "history": "Existing Git history is retained, not rewritten or presented as newly sanitized.",
+  "host": "Not uploaded. Complete candidate scan and canonical publication preflight retained locally; sanitized snapshot includes existing redaction-test literals only."
+}

@@ -66,7 +66,8 @@ def reduce_obligations(requirements, observations):
     """Compatibility reducer extracted from GoalAcceptance's pure rollup.
 
     Observations MUST already be authenticated/version-bound by the host.
-    This compatibility API does not replace hierarchical integration checks.
+    Each requirement needs its own acceptance observation; children only constrain
+    it. This API does not replace hierarchical integration/handoff checks.
     """
     obligations, visiting = {}, set()
 
@@ -80,8 +81,9 @@ def reduce_obligations(requirements, observations):
         children = [verdict(child) for child in req.get('children', [])]
         if req.get('operator', 'AND') == 'OR' and children:
             children = ['VERIFIED' if 'VERIFIED' in children else 'FAILED' if all(v == 'FAILED' for v in children) else 'INSUFFICIENT_EVIDENCE']
-        values = list(observations.get(ref, ())) + children
-        result = 'FAILED' if 'FAILED' in values else 'VERIFIED' if values and all(v == 'VERIFIED' for v in values) else 'INSUFFICIENT_EVIDENCE'
+        values = list(observations.get(ref, ())) or ['INSUFFICIENT_EVIDENCE']
+        values += children
+        result = 'FAILED' if 'FAILED' in values else 'VERIFIED' if all(v == 'VERIFIED' for v in values) else 'INSUFFICIENT_EVIDENCE'
         obligations[ref] = {'verdict': result, 'weight': req.get('weight', 1), 'must': req['must']}
         visiting.remove(ref)
         return result
